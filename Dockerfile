@@ -1,23 +1,25 @@
-# 1. Use Node 20 (per your engines requirement)
-FROM node:20-alpine AS base
+# ─── Stage 1: Build with devDeps ────────────────────────────────────
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# 2. Install only production deps for building
-COPY package.json package-lock.json* ./
+# Install ALL deps (including typescript)
+COPY package.json package-lock.json* tsconfig.json ./
 RUN npm ci
 
-# 3. Build the TS
-COPY tsconfig.json ./
+# Bring in your source & compile it
 COPY src ./src
 RUN npm run build
 
-# 4. Final image: copy build artifiacts and deps
+# ─── Stage 2: Slim release image ──────────────────────────────────
 FROM node:20-alpine AS release
 WORKDIR /app
+
+# Copy only prod deps, but skip lifecycle scripts (so no prepare/build)
 COPY package.json package-lock.json* ./
-RUN npm ci --production
-COPY --from=base /app/build ./build
+RUN npm ci --omit=dev --ignore-scripts
+
+# Pull in your compiled output from the build stage
+COPY --from=build /app/build ./build
 
 EXPOSE 3000
-# default to the HTTP entrypoint; change to "sse" or "cli" as needed
 CMD ["node", "build/index.js"]
