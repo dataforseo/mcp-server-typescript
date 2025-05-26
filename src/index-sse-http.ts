@@ -377,6 +377,267 @@ app.all("/mcp", authMiddleware, async (req: Request, res: Response) => {
     }
 });
 
+// User-friendly documentation page
+app.get("/docs", (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "text/html");
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataForSEO MCP Server - Multi-User Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .auth-example { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .endpoint { background: #e8f4f8; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        code { background: #f0f0f0; padding: 2px 4px; border-radius: 3px; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔌 DataForSEO MCP Server</h1>
+    <p><strong>Multi-User Support Enabled</strong> - Each user provides their own DataForSEO credentials</p>
+    
+    <h2>🔐 How to Use with Your Own Credentials</h2>
+    
+    <h3>Step 1: Get Your DataForSEO Credentials</h3>
+    <ol>
+        <li>Sign up at <a href="https://dataforseo.com" target="_blank">DataForSEO.com</a></li>
+        <li>Get your username and password from your account</li>
+    </ol>
+    
+    <h3>Step 2: Create Your Auth Token</h3>
+    <div class="auth-example">
+        <h4>PowerShell (Windows):</h4>
+        <pre>$credentials = "your_username:your_password"
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($credentials)
+$token = [System.Convert]::ToBase64String($bytes)
+Write-Output $token</pre>
+    </div>
+    
+    <div class="auth-example">
+        <h4>Bash (Linux/Mac):</h4>
+        <pre>echo -n "your_username:your_password" | base64</pre>
+    </div>
+    
+    <h3>Step 3: Use with MCP Clients</h3>
+    
+    <h4>🤖 n8n MCP Client Configuration:</h4>
+    <div class="endpoint">
+        <strong>Transport Type:</strong> SSE<br>
+        <strong>URL:</strong> <code>https://d4seo.mcp.wot-ai.com/sse</code><br>
+        <strong>Auth Type:</strong> Bearer<br>
+        <strong>Token:</strong> Your base64 token from Step 2
+    </div>
+    
+    <h4>🔧 Claude Desktop Configuration:</h4>
+    <pre>{
+  "mcpServers": {
+    "dataforseo": {
+      "transport": {
+        "type": "http",
+        "url": "https://d4seo.mcp.wot-ai.com/mcp"
+      },
+      "auth": {
+        "type": "bearer",
+        "token": "YOUR_BASE64_TOKEN"
+      }
+    }
+  }
+}</pre>
+    
+    <h4>📡 Direct API Usage:</h4>
+    <div class="endpoint">
+        <strong>Validate Credentials:</strong><br>
+        <code>POST /validate-credentials</code><br>
+        <code>Authorization: Bearer YOUR_TOKEN</code>
+    </div>
+    
+    <div class="endpoint">
+        <strong>MCP Protocol:</strong><br>
+        <code>POST /mcp</code><br>
+        <code>Authorization: Bearer YOUR_TOKEN</code><br>
+        <code>Content-Type: application/json</code>
+    </div>
+    
+    <h2>🛡️ Security Features</h2>
+    <ul>
+        <li>✅ <strong>Credential Isolation:</strong> Each request uses only the provided credentials</li>
+        <li>✅ <strong>No Storage:</strong> Credentials are never stored server-side</li>
+        <li>✅ <strong>Per-Request Auth:</strong> Every API call requires valid credentials</li>
+        <li>✅ <strong>Multiple Auth Methods:</strong> Bearer Token, Basic Auth, or Environment Variables</li>
+    </ul>
+    
+    <h2>📋 Available Endpoints</h2>
+    <ul>
+        <li><code>GET /</code> - Health check</li>
+        <li><code>GET /docs</code> - This documentation</li>
+        <li><code>GET /api-docs</code> - JSON API documentation</li>
+        <li><code>POST /validate-credentials</code> - Test your credentials</li>
+        <li><code>GET /sse</code> - SSE MCP endpoint (for n8n)</li>
+        <li><code>POST /mcp</code> - HTTP MCP endpoint (for Claude Desktop)</li>
+    </ul>
+    
+    <h2>🔍 Test Your Setup</h2>
+    <p>Use the credential validation endpoint to test your setup:</p>
+    <div class="auth-example">
+        <strong>curl example:</strong>
+        <pre>curl -X POST https://d4seo.mcp.wot-ai.com/validate-credentials \\
+  -H "Authorization: Bearer YOUR_BASE64_TOKEN"</pre>
+    </div>
+    
+    <p><em>Server Version: ${version} | Multi-User Enabled ✅</em></p>
+</body>
+</html>
+    `);
+});
+
+//=============================================================================
+// API DOCUMENTATION AND VALIDATION ENDPOINTS
+//=============================================================================
+
+// API documentation endpoint
+app.get("/api-docs", (req: Request, res: Response) => {
+    res.status(200).json({
+        service: "DataForSEO MCP Server",
+        version: version,
+        description: "Multi-user MCP server for DataForSEO API access",
+        authentication: {
+            methods: ["Bearer Token", "Basic Auth", "Environment Variables"],
+            bearer_token: {
+                format: "Authorization: Bearer <base64-encoded-username:password>",
+                example: "Authorization: Bearer dXNlcm5hbWU6cGFzc3dvcmQ=",
+                note: "Base64 encode your DataForSEO 'username:password'",
+            },
+            basic_auth: {
+                format: "Authorization: Basic <base64-encoded-username:password>",
+                example: "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
+                note: "Standard HTTP Basic authentication",
+            },
+            environment_variables: {
+                note: "Server fallback if no auth header provided",
+                variables: ["DATAFORSEO_USERNAME", "DATAFORSEO_PASSWORD"],
+            },
+        },
+        endpoints: {
+            mcp: {
+                path: "/mcp",
+                description: "Streamable HTTP MCP endpoint",
+                methods: ["GET", "POST", "DELETE"],
+                protocol: "MCP 2025-03-26",
+            },
+            sse: {
+                path: "/sse",
+                description: "Server-Sent Events MCP endpoint",
+                methods: ["GET"],
+                protocol: "MCP 2024-11-05",
+            },
+            messages: {
+                path: "/messages",
+                description: "Message handling for SSE transport",
+                methods: ["POST"],
+                protocol: "MCP 2024-11-05",
+            },
+        },
+        usage: {
+            n8n_configuration: {
+                transport_type: "sse",
+                url: "/sse",
+                auth_type: "bearer",
+                token_format: "base64(username:password)",
+            },
+            claude_desktop: {
+                transport_type: "http",
+                url: "/mcp",
+                auth_header: "Authorization: Bearer <token>",
+            },
+        },
+        multi_user_support: {
+            enabled: true,
+            description: "Each user provides their own DataForSEO credentials",
+            isolation: "Per-request credential isolation",
+            security: "Credentials are not stored server-side",
+        },
+    });
+});
+
+// Credential validation endpoint
+app.post(
+    "/validate-credentials",
+    authMiddleware,
+    async (req: Request, res: Response) => {
+        try {
+            // Check if credentials are provided
+            if (!req.username && !req.password) {
+                const envUsername = process.env.DATAFORSEO_USERNAME;
+                const envPassword = process.env.DATAFORSEO_PASSWORD;
+
+                if (!envUsername || !envPassword) {
+                    res.status(401).json({
+                        valid: false,
+                        error: "No credentials provided",
+                        message:
+                            "Provide DataForSEO credentials via Authorization header",
+                    });
+                    return;
+                }
+                req.username = envUsername;
+                req.password = envPassword;
+            }
+
+            // Create DataForSEO client to test credentials
+            const dataForSEOConfig: DataForSEOConfig = {
+                username: req.username || "",
+                password: req.password || "",
+            };
+
+            const dataForSEOClient = new DataForSEOClient(dataForSEOConfig);
+
+            // Make a simple API call to validate credentials
+            try {
+                // This is a minimal call to check if credentials work
+                const response = await dataForSEOClient.makeRequest(
+                    "/v3/serp/google/tasks_ready"
+                );
+
+                res.status(200).json({
+                    valid: true,
+                    message: "Credentials are valid",
+                    username: req.username,
+                    timestamp: new Date().toISOString(),
+                });
+            } catch (error: any) {
+                console.error("Credential validation failed:", error);
+
+                if (error.response?.status === 401) {
+                    res.status(401).json({
+                        valid: false,
+                        error: "Invalid credentials",
+                        message: "DataForSEO rejected the provided credentials",
+                    });
+                } else {
+                    res.status(200).json({
+                        valid: "unknown",
+                        error: "Unable to validate credentials",
+                        message:
+                            "DataForSEO API request failed, but credentials might be valid",
+                        details: error.message,
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Error validating credentials:", error);
+            res.status(500).json({
+                valid: false,
+                error: "Server error during validation",
+                message:
+                    "An internal error occurred while validating credentials",
+            });
+        }
+    }
+);
+
 //=============================================================================
 // HEALTH CHECK ENDPOINTS
 //=============================================================================

@@ -477,6 +477,144 @@ async function main() {
         });
     });
 
+    //=============================================================================
+    // API DOCUMENTATION AND VALIDATION ENDPOINTS
+    //=============================================================================
+
+    // API documentation endpoint
+    app.get("/api-docs", (req: Request, res: Response) => {
+        res.status(200).json({
+            service: "DataForSEO MCP Server",
+            version: version,
+            description: "Multi-user MCP server for DataForSEO API access",
+            authentication: {
+                methods: [
+                    "Bearer Token",
+                    "Basic Auth",
+                    "Environment Variables",
+                ],
+                bearer_token: {
+                    format: "Authorization: Bearer <base64-encoded-username:password>",
+                    example: "Authorization: Bearer dXNlcm5hbWU6cGFzc3dvcmQ=",
+                    note: "Base64 encode your DataForSEO 'username:password'",
+                },
+                basic_auth: {
+                    format: "Authorization: Basic <base64-encoded-username:password>",
+                    example: "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
+                    note: "Standard HTTP Basic authentication",
+                },
+                environment_variables: {
+                    note: "Server fallback if no auth header provided",
+                    variables: ["DATAFORSEO_USERNAME", "DATAFORSEO_PASSWORD"],
+                },
+            },
+            endpoints: {
+                mcp: {
+                    path: "/mcp",
+                    description: "MCP protocol endpoint",
+                    methods: ["POST"],
+                    protocol: "MCP JSON-RPC",
+                },
+                tools: {
+                    path: "/tools",
+                    description: "List available tools",
+                    methods: ["GET"],
+                    protocol: "REST API",
+                },
+                tool: {
+                    path: "/tool",
+                    description: "Execute specific tool",
+                    methods: ["POST"],
+                    protocol: "REST API",
+                },
+            },
+            multi_user_support: {
+                enabled: true,
+                description:
+                    "Each user provides their own DataForSEO credentials",
+                isolation: "Per-request credential isolation",
+                security: "Credentials are not stored server-side",
+            },
+        });
+    });
+
+    // Credential validation endpoint
+    app.post(
+        "/validate-credentials",
+        authMiddleware,
+        async (req: Request, res: Response) => {
+            try {
+                // Check if credentials are provided
+                if (!req.username && !req.password) {
+                    const envUsername = process.env.DATAFORSEO_USERNAME;
+                    const envPassword = process.env.DATAFORSEO_PASSWORD;
+
+                    if (!envUsername || !envPassword) {
+                        res.status(401).json({
+                            valid: false,
+                            error: "No credentials provided",
+                            message:
+                                "Provide DataForSEO credentials via Authorization header",
+                        });
+                        return;
+                    }
+                    req.username = envUsername;
+                    req.password = envPassword;
+                }
+
+                // Create DataForSEO client to test credentials
+                const dataForSEOConfig: DataForSEOConfig = {
+                    username: req.username || "",
+                    password: req.password || "",
+                };
+
+                const dataForSEOClient = new DataForSEOClient(dataForSEOConfig);
+
+                // Make a simple API call to validate credentials
+                try {
+                    // This is a minimal call to check if credentials work
+                    const response = await dataForSEOClient.makeRequest(
+                        "/v3/serp/google/tasks_ready"
+                    );
+
+                    res.status(200).json({
+                        valid: true,
+                        message: "Credentials are valid",
+                        username: req.username,
+                        timestamp: new Date().toISOString(),
+                    });
+                } catch (error: any) {
+                    console.error("Credential validation failed:", error);
+
+                    if (error.response?.status === 401) {
+                        res.status(401).json({
+                            valid: false,
+                            error: "Invalid credentials",
+                            message:
+                                "DataForSEO rejected the provided credentials",
+                        });
+                    } else {
+                        res.status(200).json({
+                            valid: "unknown",
+                            error: "Unable to validate credentials",
+                            message:
+                                "DataForSEO API request failed, but credentials might be valid",
+                            details: error.message,
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error validating credentials:", error);
+                res.status(500).json({
+                    valid: false,
+                    error: "Server error during validation",
+                    message:
+                        "An internal error occurred while validating credentials",
+                });
+            }
+        }
+    );
+
     // Start the server
     const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
     app.listen(PORT, () => {
