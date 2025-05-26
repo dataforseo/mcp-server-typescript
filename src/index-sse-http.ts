@@ -277,6 +277,38 @@ app.all('/mcp', basicAuth, async (req: Request, res: Response) => {
 });
 
 //=============================================================================
+// HEALTH CHECK ENDPOINTS
+//=============================================================================
+
+// Health check endpoint
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'healthy',
+    service: 'DataForSEO MCP Server (SSE)',
+    version: version,
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      sse: '/sse',
+      messages: '/messages'
+    }
+  });
+});
+
+// Health check endpoint (alternative)
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'healthy',
+    service: 'DataForSEO MCP Server (SSE)',
+    version: version,
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      sse: '/sse',
+      messages: '/messages'
+    }
+  });
+});
+
+//=============================================================================
 // DEPRECATED HTTP+SSE TRANSPORT (PROTOCOL VERSION 2024-11-05)
 //=============================================================================
 

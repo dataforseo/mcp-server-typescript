@@ -6,4 +6,4 @@ cmds = ["npm ci"]
 cmds = ["npm run build"]
 
 [start]
-cmd = "npm run http"
+cmd = "npm run sse"
