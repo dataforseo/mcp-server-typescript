@@ -154,42 +154,101 @@ function getSessionId() {
 
 async function main() {
     const app = express();
-    app.use(express.json());
-
-    // Basic Auth Middleware
-    const basicAuth = (req: Request, res: Response, next: NextFunction) => {
-        // Check for Authorization header
+    app.use(express.json()); // Auth Middleware (supports both Basic and Bearer)
+    const authMiddleware = (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
         const authHeader = req.headers.authorization;
         console.error(authHeader);
-        if (!authHeader || !authHeader.startsWith("Basic ")) {
+
+        if (!authHeader) {
             next();
             return;
         }
 
-        // Extract credentials
-        const base64Credentials = authHeader.split(" ")[1];
-        const credentials = Buffer.from(base64Credentials, "base64").toString(
-            "utf-8"
-        );
-        const [username, password] = credentials.split(":");
+        if (authHeader.startsWith("Basic ")) {
+            // Handle Basic Auth
+            const base64Credentials = authHeader.split(" ")[1];
+            const credentials = Buffer.from(
+                base64Credentials,
+                "base64"
+            ).toString("utf-8");
+            const [username, password] = credentials.split(":");
 
-        if (!username || !password) {
-            console.error("Invalid credentials");
-            res.status(401).json({
-                jsonrpc: "2.0",
-                error: {
-                    code: -32001,
-                    message: "Invalid credentials",
-                },
-                id: null,
-            });
-            return;
+            if (!username || !password) {
+                console.error("Invalid Basic auth credentials");
+                res.status(401).json({
+                    jsonrpc: "2.0",
+                    error: {
+                        code: -32001,
+                        message: "Invalid credentials",
+                    },
+                    id: null,
+                });
+                return;
+            }
+
+            req.username = username;
+            req.password = password;
+            next();
+        } else if (authHeader.startsWith("Bearer ")) {
+            // Handle Bearer Token
+            const token = authHeader.split(" ")[1];
+
+            if (!token) {
+                console.error("Invalid Bearer token");
+                res.status(401).json({
+                    jsonrpc: "2.0",
+                    error: {
+                        code: -32001,
+                        message: "Invalid Bearer token",
+                    },
+                    id: null,
+                });
+                return;
+            }
+
+            // Decode Bearer token (expecting base64 encoded "username:password")
+            try {
+                const credentials = Buffer.from(token, "base64").toString(
+                    "utf-8"
+                );
+                const [username, password] = credentials.split(":");
+
+                if (!username || !password) {
+                    console.error("Invalid Bearer token format");
+                    res.status(401).json({
+                        jsonrpc: "2.0",
+                        error: {
+                            code: -32001,
+                            message:
+                                "Invalid Bearer token format. Expected base64 encoded 'username:password'",
+                        },
+                        id: null,
+                    });
+                    return;
+                }
+
+                req.username = username;
+                req.password = password;
+                next();
+            } catch (error) {
+                console.error("Error decoding Bearer token:", error);
+                res.status(401).json({
+                    jsonrpc: "2.0",
+                    error: {
+                        code: -32001,
+                        message: "Invalid Bearer token encoding",
+                    },
+                    id: null,
+                });
+                return;
+            }
+        } else {
+            next();
         }
-
-        // Add credentials to request
-        req.username = username;
-        req.password = password;
-        next();
     };
     // Health check endpoint
     app.get("/", (req: Request, res: Response) => {
@@ -210,7 +269,7 @@ async function main() {
     });
 
     // Tools endpoint for n8n integration
-    app.get("/tools", basicAuth, async (req: Request, res: Response) => {
+    app.get("/tools", authMiddleware, async (req: Request, res: Response) => {
         try {
             // Check credentials
             if (!req.username && !req.password) {
@@ -264,7 +323,7 @@ async function main() {
     });
 
     // Tool execution endpoint for n8n
-    app.post("/tool", basicAuth, async (req: Request, res: Response) => {
+    app.post("/tool", authMiddleware, async (req: Request, res: Response) => {
         try {
             const { tool, arguments: toolArgs } = req.body;
 
@@ -330,7 +389,7 @@ async function main() {
     });
 
     // Apply basic auth to MCP endpoint
-    app.post("/mcp", basicAuth, async (req: Request, res: Response) => {
+    app.post("/mcp", authMiddleware, async (req: Request, res: Response) => {
         // In stateless mode, create a new instance of transport and server for each request
         // to ensure complete isolation. A single instance would cause request ID collisions
         // when multiple clients connect concurrently.
