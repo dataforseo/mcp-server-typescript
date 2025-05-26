@@ -167,6 +167,25 @@ async function main() {
     req.password = password;
     next();
   };
+  // Health check endpoint
+  app.get('/', (req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'healthy',
+      service: 'DataForSEO MCP Server',
+      version: version,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Health check endpoint (alternative)
+  app.get('/health', (req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'healthy',
+      service: 'DataForSEO MCP Server',
+      version: version,
+      timestamp: new Date().toISOString()
+    });
+  });
 
   // Apply basic auth to MCP endpoint
   app.post('/mcp', basicAuth, async (req: Request, res: Response) => {
