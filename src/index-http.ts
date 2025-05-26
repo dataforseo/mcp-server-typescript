@@ -199,7 +199,7 @@ async function main() {
             version: version,
             timestamp: new Date().toISOString(),
         });
-    });    // Health check endpoint (alternative)
+    }); // Health check endpoint (alternative)
     app.get("/health", (req: Request, res: Response) => {
         res.status(200).json({
             status: "healthy",
@@ -216,10 +216,10 @@ async function main() {
             if (!req.username && !req.password) {
                 const envUsername = process.env.DATAFORSEO_USERNAME;
                 const envPassword = process.env.DATAFORSEO_PASSWORD;
-                
+
                 if (!envUsername || !envPassword) {
                     res.status(401).json({
-                        error: "Authentication required. Provide DataForSEO credentials via Basic Auth or environment variables."
+                        error: "Authentication required. Provide DataForSEO credentials via Basic Auth or environment variables.",
                     });
                     return;
                 }
@@ -228,22 +228,22 @@ async function main() {
             }
 
             const server = getServer(req.username, req.password);
-            
+
             // Get tools list via MCP protocol
             const transport = new StreamableHTTPServerTransport({
-                sessionIdGenerator: undefined
+                sessionIdGenerator: undefined,
             });
-            
+
             await server.connect(transport);
-            
+
             // Create a mock request to get tools
             const toolsRequest = {
                 jsonrpc: "2.0",
                 method: "tools/list",
                 params: {},
-                id: 1
+                id: 1,
             };
-            
+
             // This is a bit hacky but we need to extract tools info
             // For now, let's return a simple list
             res.json({
@@ -251,14 +251,15 @@ async function main() {
                 version: version,
                 endpoint: "/tool",
                 usage: "POST to /tool with { tool: 'tool_name', arguments: {...} }",
-                documentation: "Use POST /tool endpoint to execute specific tools"
+                documentation:
+                    "Use POST /tool endpoint to execute specific tools",
             });
-            
+
             transport.close();
             server.close();
         } catch (error) {
-            console.error('Error listing tools:', error);
-            res.status(500).json({ error: 'Failed to list tools' });
+            console.error("Error listing tools:", error);
+            res.status(500).json({ error: "Failed to list tools" });
         }
     });
 
@@ -266,7 +267,7 @@ async function main() {
     app.post("/tool", basicAuth, async (req: Request, res: Response) => {
         try {
             const { tool, arguments: toolArgs } = req.body;
-            
+
             if (!tool) {
                 res.status(400).json({ error: "Missing 'tool' parameter" });
                 return;
@@ -276,10 +277,10 @@ async function main() {
             if (!req.username && !req.password) {
                 const envUsername = process.env.DATAFORSEO_USERNAME;
                 const envPassword = process.env.DATAFORSEO_PASSWORD;
-                
+
                 if (!envUsername || !envPassword) {
                     res.status(401).json({
-                        error: "Authentication required. Provide DataForSEO credentials via Basic Auth or environment variables."
+                        error: "Authentication required. Provide DataForSEO credentials via Basic Auth or environment variables.",
                     });
                     return;
                 }
@@ -289,41 +290,42 @@ async function main() {
 
             const server = getServer(req.username, req.password);
             const transport = new StreamableHTTPServerTransport({
-                sessionIdGenerator: undefined
+                sessionIdGenerator: undefined,
             });
-            
+
             await server.connect(transport);
-            
+
             // Create MCP tool call request
             const mcpRequest = {
                 jsonrpc: "2.0",
                 method: "tools/call",
                 params: {
                     name: tool,
-                    arguments: toolArgs || {}
+                    arguments: toolArgs || {},
                 },
-                id: Date.now()
+                id: Date.now(),
             };
-            
+
             // We need to handle this through the MCP protocol
             // For now, return instructions for using the /mcp endpoint
             res.json({
-                message: "Use the /mcp endpoint with proper MCP JSON-RPC format",
+                message:
+                    "Use the /mcp endpoint with proper MCP JSON-RPC format",
                 example: {
                     url: "POST /mcp",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Basic <base64-encoded-credentials>"
+                        Authorization: "Basic <base64-encoded-credentials>",
                     },
-                    body: mcpRequest
-                }
+                    body: mcpRequest,
+                },
             });
-            
+
             transport.close();
             server.close();
         } catch (error) {
-            console.error('Error executing tool:', error);
-            res.status(500).json({ error: 'Failed to execute tool' });
+            console.error("Error executing tool:", error);
+            res.status(500).json({ error: "Failed to execute tool" });
         }
     });
 
