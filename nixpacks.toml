@@ -1,10 +1,9 @@
 # nixpacks.toml
 [phases.install]
-commands = ["npm ci"]
+cmds = ["npm ci"]
 
 [phases.build]
-commands = ["npm run build"]
+cmds = ["npm run build"]
 
-[phases.start]
-# switch to the HTTP transport variant
-commands = ["npm run http"]
+[start]
+cmd = "npm run http"
