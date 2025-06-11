@@ -275,7 +275,14 @@ app.all('/mcp', basicAuth, async (req: Request, res: Response) => {
     }
   }
 });
-
+const val = Math.random();
+//test 
+app.get('/test', async (req: Request, res: Response) => {
+  res.status(200).json({
+    message: "Test endpoint is working",
+    val: val
+  });
+});
 //=============================================================================
 // DEPRECATED HTTP+SSE TRANSPORT (PROTOCOL VERSION 2024-11-05)
 //=============================================================================
