@@ -280,9 +280,14 @@ console.log(`Random value for testing: ${val}`);
 //test 
 app.get('/test', async (req: Request, res: Response) => {
   console.error('Received GET request to /test');
+    console.log(`Request headers:`, JSON.stringify(req.headers, null, 2));
+    console.log(`Request body type:`, typeof req.body);
+    console.log(`Request body:`, JSON.stringify(req.body, null, 2));
+
   res.status(200).json({
     message: "Test endpoint is working",
-    val: val
+    val: val,
+    headers: req.headers
   });
 });
 //=============================================================================
