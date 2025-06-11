@@ -304,47 +304,82 @@ app.get('/sse', basicAuth, async (req: Request, res: Response) => {
     req.password = envPassword;
   }
 
-  const transport = new SSEServerTransport('/messages', res);
-  
-  // Store transport with timestamp
-  transports[transport.sessionId] = {
-    transport,
-    lastActivity: Date.now()
-  };
+  try {
+    const transport = new SSEServerTransport('/messages', res);
+    
+    console.log(`SSE transport created with sessionId: ${transport.sessionId}`);
+    
+    // Store transport with timestamp
+    transports[transport.sessionId] = {
+      transport,
+      lastActivity: Date.now()
+    };
 
-  // Handle connection cleanup
-  const cleanup = () => {
-    try {
-      transport.close();
-    } catch (error) {
-      console.error(`Error closing transport for session ${transport.sessionId}:`, error);
+    console.log(`Active sessions after adding: ${Object.keys(transports).join(', ')}`);
+
+    // Handle connection cleanup
+    const cleanup = () => {
+      console.log(`Cleaning up session: ${transport.sessionId}`);
+      try {
+        transport.close();
+      } catch (error) {
+        console.error(`Error closing transport for session ${transport.sessionId}:`, error);
+      }
+      delete transports[transport.sessionId];
+      console.log(`Active sessions after cleanup: ${Object.keys(transports).join(', ')}`);
+    };
+
+    // Add multiple event listeners for different scenarios
+    res.on("close", cleanup);
+    res.on("error", cleanup);
+    req.on("error", cleanup);
+    req.socket.on("error", cleanup);
+    req.socket.on("timeout", cleanup);
+
+    // Set socket timeout
+    req.socket.setTimeout(CONNECTION_TIMEOUT);
+
+    const server = getServer(req.username, req.password);
+    await server.connect(transport);
+    
+    console.log(`Server connected to transport ${transport.sessionId}`);
+  } catch (error) {
+    console.error('Error in SSE endpoint:', error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: "2.0",
+        error: {
+          code: -32603,
+          message: "Internal server error establishing SSE connection"
+        },
+        id: null
+      });
     }
-    delete transports[transport.sessionId];
-  };
-
-  // Add multiple event listeners for different scenarios
-  res.on("close", cleanup);
-  res.on("error", cleanup);
-  req.on("error", cleanup);
-  req.socket.on("error", cleanup);
-  req.socket.on("timeout", cleanup);
-
-  // Set socket timeout
-  req.socket.setTimeout(CONNECTION_TIMEOUT);
-
-  const server = getServer(req.username, req.password);
-  await server.connect(transport);
+  }
 });
 
 app.post("/messages", basicAuth, async (req: Request, res: Response) => {
   const sessionId = req.query.sessionId as string;
+  
+  console.log(`=== POST /messages Request ===`);
+  console.log(`SessionId: ${sessionId}`);
+  console.log(`Available sessions: [${Object.keys(transports).join(', ')}]`);
+  console.log(`Total active sessions: ${Object.keys(transports).length}`);
+  console.log(`Request headers:`, JSON.stringify(req.headers, null, 2));
+  console.log(`Request body type:`, typeof req.body);
+  console.log(`Request body:`, JSON.stringify(req.body, null, 2));
   
   // Handle credentials
   if (!req.username && !req.password) {
     const envUsername = process.env.DATAFORSEO_USERNAME;
     const envPassword = process.env.DATAFORSEO_PASSWORD;
     
+    console.log(`No auth credentials in request, using env vars`);
+    console.log(`Env username exists: ${!!envUsername}`);
+    console.log(`Env password exists: ${!!envPassword}`);
+    
     if (!envUsername || !envPassword) {
+      console.error('No DataForSEO credentials available');
       res.status(401).json({
         jsonrpc: "2.0",
         error: {
@@ -357,30 +392,95 @@ app.post("/messages", basicAuth, async (req: Request, res: Response) => {
     }
     req.username = envUsername;
     req.password = envPassword;
+  } else {
+    console.log(`Using auth from request - username: ${req.username}`);
   }
 
   const transportData = transports[sessionId];
+  
   if (!transportData) {
-    res.status(400).send('No transport found for sessionId');
+    console.error(`=== TRANSPORT NOT FOUND ===`);
+    console.error(`Requested sessionId: ${sessionId}`);
+    console.error(`Available sessions: [${Object.keys(transports).join(', ')}]`);
+    console.error(`Session details:`);
+    Object.entries(transports).forEach(([id, data]) => {
+      console.error(`  - ${id}: ${data.transport.constructor.name}, lastActivity: ${new Date(data.lastActivity).toISOString()}`);
+    });
+    
+    res.status(400).json({
+      jsonrpc: "2.0",
+      error: {
+        code: -32000,
+        message: `No transport found for sessionId: ${sessionId}`,
+        data: {
+          requestedSessionId: sessionId,
+          availableSessions: Object.keys(transports),
+          totalSessions: Object.keys(transports).length,
+          timestamp: new Date().toISOString()
+        }
+      },
+      id: req.body?.id || null
+    });
     return;
   }
 
+  console.log(`Transport found for session ${sessionId}`);
+  console.log(`Transport type: ${transportData.transport.constructor.name}`);
+  console.log(`Last activity: ${new Date(transportData.lastActivity).toISOString()}`);
+  console.log(`Time since last activity: ${Date.now() - transportData.lastActivity}ms`);
+
   if (!(transportData.transport instanceof SSEServerTransport)) {
+    console.error(`Invalid transport type for SSE endpoint`);
+    console.error(`Expected: SSEServerTransport, Got: ${transportData.transport.constructor.name}`);
+    
     res.status(400).json({
       jsonrpc: '2.0',
       error: {
         code: -32000,
         message: 'Bad Request: Session exists but uses a different transport protocol',
+        data: {
+          sessionId,
+          expectedType: 'SSEServerTransport',
+          actualType: transportData.transport.constructor.name
+        }
       },
-      id: null,
+      id: req.body?.id || null,
     });
     return;
   }
 
   // Update last activity timestamp
   transportData.lastActivity = Date.now();
+  console.log(`Updated last activity timestamp for session ${sessionId}`);
   
-  await transportData.transport.handlePostMessage(req, res, req.body);
+  try {
+    console.log(`Calling handlePostMessage for session ${sessionId}`);
+    await transportData.transport.handlePostMessage(req, res, req.body);
+    console.log(`Successfully handled message for session ${sessionId}`);
+  } catch (error) {
+    console.error(`=== ERROR HANDLING MESSAGE ===`);
+    console.error(`SessionId: ${sessionId}`);
+    console.error(`Error:`, error);
+    console.error(`Stack trace:`, (error as Error).stack);
+    
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: "2.0",
+        error: {
+          code: -32603,
+          message: "Internal server error processing message",
+          data: {
+            sessionId,
+            errorMessage: (error as Error).message,
+            timestamp: new Date().toISOString()
+          }
+        },
+        id: req.body?.id || null
+      });
+    }
+  }
+  
+  console.log(`=== END POST /messages Request ===`);
 });
 
 // Start the server
