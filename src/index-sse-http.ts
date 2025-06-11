@@ -308,7 +308,12 @@ app.get('/sse', basicAuth, async (req: Request, res: Response) => {
     const transport = new SSEServerTransport('/messages', res);
     
     console.log(`SSE transport created with sessionId: ${transport.sessionId}`);
-    
+    console.log(`SessionId: ${transport.sessionId}`);
+    console.log(`Available sessions: [${Object.keys(transports).join(', ')}]`);
+    console.log(`Total active sessions: ${Object.keys(transports).length}`);
+    console.log(`Request headers:`, JSON.stringify(req.headers, null, 2));
+    console.log(`Request body type:`, typeof req.body);
+    console.log(`Request body:`, JSON.stringify(req.body, null, 2));
     // Store transport with timestamp
     transports[transport.sessionId] = {
       transport,
