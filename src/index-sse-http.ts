@@ -276,8 +276,10 @@ app.all('/mcp', basicAuth, async (req: Request, res: Response) => {
   }
 });
 const val = Math.random();
+console.log(`Random value for testing: ${val}`);
 //test 
 app.get('/test', async (req: Request, res: Response) => {
+  console.error('Received GET request to /test');
   res.status(200).json({
     message: "Test endpoint is working",
     val: val
