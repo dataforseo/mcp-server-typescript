@@ -160,8 +160,8 @@ async function main() {
       // Check if we have valid credentials
       if (!req.username && !req.password) {
         // If no request auth, check environment variables
-      const envUsername = process.env.DATAFORSEO_USERNAME || "vladomelchenko98@gmail.com";
-      const envPassword = process.env.DATAFORSEO_PASSWORD || "s9BDNczE2XKhREhn";
+      const envUsername = process.env.DATAFORSEO_USERNAME;
+      const envPassword = process.env.DATAFORSEO_PASSWORD;
         if (!envUsername || !envPassword) {
           console.error('No DataForSEO credentials provided');
           res.status(401).json({
