@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Define available module names
-export const AVAILABLE_MODULES = ['SERP', 'KEYWORDS_DATA', 'ONPAGE', 'DATAFORSEO_LABS', 'BACKLINKS', 'BUSINESS_DATA', 'DOMAIN_ANALYTICS'] as const;
+export const AVAILABLE_MODULES = ['SERP', 'KEYWORDS_DATA', 'ONPAGE', 'DATAFORSEO_LABS', 'BACKLINKS', 'BUSINESS_DATA', 'DOMAIN_ANALYTICS', 'CONTENT_ANALYSIS'] as const;
 export type ModuleName = typeof AVAILABLE_MODULES[number];
 
 // Schema for validating the ENABLED_MODULES environment variable

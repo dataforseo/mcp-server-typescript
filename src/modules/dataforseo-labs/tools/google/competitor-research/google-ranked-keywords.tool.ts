@@ -74,7 +74,8 @@ example:
 ["keyword_data.keyword_info.search_volume,desc","keyword_data.keyword_info.cpc,desc"]`
       ),
       include_subdomains: z.boolean().optional().describe("Include keywords from subdomains"),
-      include_serp_info: z.boolean().optional().describe("Include SERP information")
+      include_clickstream_data: z.boolean().optional().default(false).describe(
+        `Include or exclude data from clickstream-based metrics in the result`)
     };
   }
 
@@ -88,6 +89,8 @@ example:
         offset: params.offset,
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
+        include_subdomains: params.include_subdomains,
+        include_clickstream_data: params.include_clickstream_data
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

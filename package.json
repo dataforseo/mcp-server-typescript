@@ -1,6 +1,6 @@
 {
   "name": "dataforseo-mcp-server",
-  "version": "2.2.6",
+  "version": "2.3.0",
   "main": "build/index.js",
   "type": "module",
   "bin": {

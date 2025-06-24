@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { BacklinksApiModule } from "./modules/backlinks/backlinks-api.module.js";7
 import { BusinessDataApiModule } from "./modules/business-data-api/business-data-api.module.js";
 import { DomainAnalyticsApiModule } from "./modules/domain-analytics/domain-analytics-api.module.js";
+import { ModuleLoaderService } from "./utils/module-loader.js";
 
 interface ToolDefinition {
   description: string;
@@ -40,29 +41,7 @@ console.error('DataForSEO client initialized');
 const enabledModules = EnabledModulesSchema.parse(process.env.ENABLED_MODULES);
 
 // Initialize modules
-const modules: BaseModule[] = [];
-
-if (isModuleEnabled('SERP', enabledModules)) {
-  modules.push(new SerpApiModule(dataForSEOClient));
-}
-if (isModuleEnabled('KEYWORDS_DATA', enabledModules)) {
-  modules.push(new KeywordsDataApiModule(dataForSEOClient));
-}
-if (isModuleEnabled('ONPAGE', enabledModules)) {
-  modules.push(new OnPageApiModule(dataForSEOClient));
-}
-if (isModuleEnabled('DATAFORSEO_LABS', enabledModules)) {
-  modules.push(new DataForSEOLabsApi(dataForSEOClient));
-}
-if (isModuleEnabled('BACKLINKS', enabledModules)) {
-  modules.push(new BacklinksApiModule(dataForSEOClient));
-}
-if (isModuleEnabled('BUSINESS_DATA', enabledModules)) {
-  modules.push(new BusinessDataApiModule(dataForSEOClient));
-}
-if (isModuleEnabled('DOMAIN_ANALYTICS', enabledModules)) {
-  modules.push(new DomainAnalyticsApiModule(dataForSEOClient));
-}
+const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
 console.error('Modules initialized');
 
 // Register tools from modules

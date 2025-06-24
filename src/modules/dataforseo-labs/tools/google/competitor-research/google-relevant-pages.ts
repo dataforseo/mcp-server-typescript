@@ -85,7 +85,10 @@ set to true if you want to get highly-relevant competitors excluding the top web
             possible values:
             organic
             paid`
-        )
+        ),
+          include_clickstream_data: z.boolean().optional().default(false).describe(
+            `Include or exclude data from clickstream-based metrics in the result`)
+
     };
   }
 
@@ -99,7 +102,10 @@ set to true if you want to get highly-relevant competitors excluding the top web
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
         exclude_top_domains: params.exclude_top_domains,
-        item_types: params.item_types
+        item_types: params.item_types,
+        include_clickstream_data: params.include_clickstream_data,
+        limit: params.limit,
+        offset: params.offset
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

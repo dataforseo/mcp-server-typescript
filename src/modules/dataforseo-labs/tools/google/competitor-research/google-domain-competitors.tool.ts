@@ -73,7 +73,10 @@ example:
       exclude_top_domains: z.boolean().default(true).describe(`indicates whether to exclude world's largest websites
         optional field
         default value: false
-        set to true if you want to get highly-relevant competitors excluding the top websites`)  
+        set to true if you want to get highly-relevant competitors excluding the top websites`),
+      include_clickstream_data: z.boolean().optional().default(false).describe(
+        `Include or exclude data from clickstream-based metrics in the result`)
+
     };
   }
 
@@ -87,7 +90,8 @@ example:
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
         exclude_top_domains: params.exclude_top_domains,
-        item_types: ['organic']
+        item_types: ['organic'],
+        include_clickstream_data: params.include_clickstream_data
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

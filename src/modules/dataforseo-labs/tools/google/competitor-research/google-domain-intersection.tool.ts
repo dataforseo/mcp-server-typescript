@@ -78,7 +78,11 @@ if you set intersections to true, you will get the keywords for which both targe
 Note: this endpoint will not provide results if the number of intersecting keywords exceeds 10 million
 if you specify intersections: false, you will get the keywords for which the domain specified as target1 has results in SERP, and the domain specified as target2 doesn’t;
 thus, the corresponding SERP elements and other data will be provided for the domain specified as target1only
-default value: true`).default(true)
+default value: true`).default(true),
+      include_clickstream_data: z.boolean().optional().default(false).describe(
+        `Include or exclude data from clickstream-based metrics in the result`)
+
+
     };
   }
 
@@ -94,7 +98,10 @@ default value: true`).default(true)
         order_by: this.formatOrderBy(params.order_by),
         exclude_top_domains: params.exclude_top_domains,
         item_types: ['organic'],
-        intersections: params.intersections
+        intersections: params.intersections,
+        include_clickstream_data: params.include_clickstream_data,
+        limit: params.limit,
+        offset: params.offset
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

@@ -2,17 +2,17 @@ import { z } from 'zod';
 import { DataForSEOClient } from '../../../../../client/dataforseo.client.js';
 import { BaseTool, DataForSEOResponse } from '../../../../base.tool.js';
 
-export class GoogleKeywordOverviewTool extends BaseTool {
+export class GoogleHistoricalKeywordDataTool extends BaseTool {
   constructor(private client: DataForSEOClient) {
     super(client);
   }
 
   getName(): string {
-    return 'dataforseo_labs_google_keyword_overview';
+    return 'dataforseo_labs_google_historical_keyword_data';
   }
 
   getDescription(): string {
-    return `This endpoint provides Google keyword data for specified keywords. For each keyword, you will receive current cost-per-click, competition values for paid search, search volume, search intent, monthly searches`;
+    return `This endpoint provides Google historical keyword data for specified keywords, including search volume, cost-per-click, competition values for paid search, monthly searches, and search volume trends. You can get historical keyword data since August, 2021, depending on keywords along with location and language combination`;
   }
 
   getParams(): z.ZodRawShape {
@@ -34,19 +34,16 @@ United Kingdom`),
         `language code
         required field
         example:
-        en`),
-      include_clickstream_data: z.boolean().optional().default(false).describe(
-        `Include or exclude data from clickstream-based metrics in the result`)
+        en`)
     };
   }
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/dataforseo_labs/google/keyword_overview/live', 'POST', [{
+      const response = await this.client.makeRequest('/v3/dataforseo_labs/google/historical_keyword_data/live', 'POST', [{
         keywords: params.keywords,
         location_name: params.location_name,
-        language_code: params.language_code,
-        include_clickstream_data: params.include_clickstream_data
+        language_code: params.language_code
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

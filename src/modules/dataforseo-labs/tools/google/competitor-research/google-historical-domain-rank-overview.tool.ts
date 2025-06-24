@@ -29,8 +29,9 @@ United Kingdom`),
         example:
         en`),
       ignore_synonyms: z.boolean().default(true).describe(
-          `ignore highly similar keywords, if set to true, results will be more accurate`),
-
+          `ignore highly similar keywords, if set to true, results will be more accurate`),        
+      include_clickstream_data: z.boolean().optional().default(false).describe(
+        `Include or exclude data from clickstream-based metrics in the result`)
     };
   }
 
@@ -40,7 +41,8 @@ United Kingdom`),
         target: params.target,
         location_name: params.location_name,
         language_code: params.language_code,
-        ignore_synonyms: params.ignore_synonyms
+        ignore_synonyms: params.ignore_synonyms,
+        include_clickstream_data: params.include_clickstream_data
       }]);
       return this.validateAndFormatResponse(response);
 

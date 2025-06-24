@@ -80,7 +80,9 @@ note that you can set no more than three sorting rules in a single request
 you should use a comma to separate several sorting rules
 example:
 ["keyword_data.keyword_info.search_volume,desc","keyword_data.keyword_info.cpc,desc"]`
-      )
+      ),
+      include_clickstream_data: z.boolean().optional().default(false).describe(
+        `Include or exclude data from clickstream-based metrics in the result`)
     };
   }
 
@@ -95,6 +97,7 @@ example:
         offset: params.offset,
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
+        include_clickstream_data: params.include_clickstream_data
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

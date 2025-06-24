@@ -16,6 +16,7 @@ import express, { Request as ExpressRequest, Response, NextFunction } from "expr
 import { randomUUID } from "node:crypto";
 import { GetPromptResult, isInitializeRequest, ReadResourceResult } from "@modelcontextprotocol/sdk/types.js"
 import { name, version } from './utils/version.js';
+import { ModuleLoaderService } from "./utils/module-loader.js";
 
 // Extended request interface to include auth properties
 interface Request extends ExpressRequest {
@@ -65,29 +66,8 @@ function getServer(username: string | undefined, password: string | undefined) :
   const enabledModules = EnabledModulesSchema.parse(process.env.ENABLED_MODULES);
   
   // Initialize modules
-  const modules: BaseModule[] = [];
+  const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
   
-  if (isModuleEnabled('SERP', enabledModules)) {
-    modules.push(new SerpApiModule(dataForSEOClient));
-  }
-  if (isModuleEnabled('KEYWORDS_DATA', enabledModules)) {
-    modules.push(new KeywordsDataApiModule(dataForSEOClient));
-  }
-  if (isModuleEnabled('ONPAGE', enabledModules)) {
-    modules.push(new OnPageApiModule(dataForSEOClient));
-  }
-  if (isModuleEnabled('DATAFORSEO_LABS', enabledModules)) {
-    modules.push(new DataForSEOLabsApi(dataForSEOClient));
-  }
-  if (isModuleEnabled('BACKLINKS', enabledModules)) {
-    modules.push(new BacklinksApiModule(dataForSEOClient));
-  }
-  if (isModuleEnabled('BUSINESS_DATA', enabledModules)) {
-    modules.push(new BusinessDataApiModule(dataForSEOClient));
-  }
-  if (isModuleEnabled('DOMAIN_ANALYTICS', enabledModules)) {
-    modules.push(new DomainAnalyticsApiModule(dataForSEOClient));
-  }
   console.error('Modules initialized');
   function registerModuleTools() {
     console.error('Registering tools');
@@ -180,9 +160,8 @@ async function main() {
       // Check if we have valid credentials
       if (!req.username && !req.password) {
         // If no request auth, check environment variables
-        const envUsername = process.env.DATAFORSEO_USERNAME;
-        const envPassword = process.env.DATAFORSEO_PASSWORD;
-        
+      const envUsername = process.env.DATAFORSEO_USERNAME || "vladomelchenko98@gmail.com";
+      const envPassword = process.env.DATAFORSEO_PASSWORD || "s9BDNczE2XKhREhn";
         if (!envUsername || !envPassword) {
           console.error('No DataForSEO credentials provided');
           res.status(401).json({

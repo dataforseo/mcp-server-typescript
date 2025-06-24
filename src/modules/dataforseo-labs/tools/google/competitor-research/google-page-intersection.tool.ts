@@ -112,7 +112,9 @@ note that you can set no more than three sorting rules in a single request
 you should use a comma to separate several sorting rules
 example:
 ["intersection_result.1.rank_group,asc","intersection_result.2.rank_absolute,asc"]`
-      )
+      ),      
+      include_clickstream_data: z.boolean().optional().default(false).describe(
+        `Include or exclude data from clickstream-based metrics in the result`)
     };
   }
 
@@ -128,7 +130,10 @@ example:
         exclude_top_domains: params.exclude_top_domains,
         item_types: ['organic'],
         exclude_pages: params.exclude_pages,
-        intersection_mode: params.intersection_mode
+        intersection_mode: params.intersection_mode,
+        limit: params.limit,
+        offset: params.offset,
+        include_clickstream_data: params.include_clickstream_data
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {
