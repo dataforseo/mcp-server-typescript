@@ -64,7 +64,7 @@ export abstract class BaseTool {
     if (fieldConfig.hasConfiguration()) {
       const toolName = this.getName();
       if (fieldConfig.isToolConfigured(toolName)) {
-        var fields = fieldConfig.getFieldsForTool(toolName);
+        const fields = fieldConfig.getFieldsForTool(toolName);
         if (fields && fields.length > 0) {
           data = filterFields(data, parseFieldPaths(fields));
         }
