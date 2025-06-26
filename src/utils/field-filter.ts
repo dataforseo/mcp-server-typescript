@@ -9,92 +9,104 @@ export function filterFields(data: any, fields: FieldPath[]): any {
 
   fields.forEach(field => {
     const path = Array.isArray(field) ? field : field.split('.');
-    let current = data;
-    let target = result;
-
-    // Navigate to the target field
-    for (let i = 0; i < path.length - 1; i++) {
-      const key = path[i];
-      
-      // Handle wildcard
-      if (key === '*') {
-        if (Array.isArray(current)) {
-          // Handle array wildcard
-          current.forEach((item, index) => {
-            if (!target[index]) {
-              target[index] = {};
-            }
-            // Recursively process remaining path for each array item
-            const remainingPath = path.slice(i + 1);
-            if (remainingPath.length > 0) {
-              const nestedResult = filterFields(item, [remainingPath.join('.')]);
-              Object.assign(target[index], nestedResult);
-            } else {
-              target[index] = item;
-            }
-          });
-        } else if (typeof current === 'object' && current !== null) {
-          // Handle object wildcard
-          Object.keys(current).forEach(key => {
-            if (!target[key]) {
-              target[key] = {};
-            }
-            // Recursively process remaining path for each object property
-            const remainingPath = path.slice(i + 1);
-            if (remainingPath.length > 0) {
-              const nestedResult = filterFields(current[key], [remainingPath.join('.')]);
-              Object.assign(target[key], nestedResult);
-            } else {
-              target[key] = current[key];
-            }
-          });
-        }
-        return;
-      }
-
-      if (!current[key]) {
-        return; // Skip if path doesn't exist
-      }
-      current = current[key];
-      
-      // Create nested structure in result
-      if (!target[key]) {
-        target[key] = Array.isArray(current) ? [] : {};
-      }
-      target = target[key];
-    }
-
-    const lastKey = path[path.length - 1];
-    
-    // Handle arrays
-    if (Array.isArray(current)) {
-      if (!Array.isArray(target)) {
-        target = [];
-      }
-      
-      if (lastKey === '*') {
-        // Copy entire array
-        target.push(...current);
-      } else {
-        // Filter specific fields from array objects
-        current.forEach((item, index) => {
-          if (item[lastKey] !== undefined) {
-            if (!target[index]) {
-              target[index] = {};
-            }
-            target[index][lastKey] = item[lastKey];
-          }
-        });
-      }
-    } else {
-      // Handle objects
-      if (current[lastKey] !== undefined) {
-        target[lastKey] = current[lastKey];
-      }
-    }
+    extractAndSetValue(data, result, path);
   });
 
   return result;
+}
+
+function extractAndSetValue(source: any, target: any, path: string[]): void {
+  if (path.length === 0) return;
+
+  const [currentKey, ...remainingPath] = path;
+  
+  if (remainingPath.length === 0) {
+    // This is the final key, extract the value
+    if (source && typeof source === 'object' && currentKey in source) {
+      target[currentKey] = source[currentKey];
+    }
+    return;
+  }
+
+  // Not the final key, need to go deeper
+  if (source && typeof source === 'object' && currentKey in source) {
+    const sourceValue = source[currentKey];
+    
+    if (Array.isArray(sourceValue)) {
+      // Handle array - preserve array structure
+      if (!target[currentKey]) {
+        target[currentKey] = [];
+      }
+      
+      sourceValue.forEach((item, index) => {
+        if (!target[currentKey][index]) {
+          target[currentKey][index] = {};
+        }
+        extractAndSetValue(item, target[currentKey][index], remainingPath);
+      });
+    } else if (sourceValue && typeof sourceValue === 'object') {
+      // Handle object
+      if (!target[currentKey]) {
+        target[currentKey] = {};
+      }
+      extractAndSetValue(sourceValue, target[currentKey], remainingPath);
+    }
+  }
+}
+
+function getNestedValue(obj: any, path: string[]): any {
+  let current = obj;
+  
+  for (const key of path) {
+    if (current === null || current === undefined) {
+      return undefined;
+    }
+    
+    if (key === '*') {
+      // Handle wildcard
+      if (Array.isArray(current)) {
+        return current;
+      } else if (typeof current === 'object') {
+        return current;
+      }
+      return undefined;
+    }
+    
+    if (Array.isArray(current)) {
+      // When we hit an array, we need to apply the remaining path to each item
+      const remainingPath = path.slice(path.indexOf(key));
+      return current.map(item => getNestedValue(item, remainingPath)).filter(val => val !== undefined);
+    }
+    
+    if (typeof current === 'object' && key in current) {
+      current = current[key];
+    } else {
+      return undefined;
+    }
+  }
+  
+  return current;
+}
+
+function setNestedValue(obj: any, path: string[], value: any): void {
+  if (value === undefined) {
+    return;
+  }
+  
+  let current = obj;
+  
+  // Navigate to the parent of the target key
+  for (let i = 0; i < path.length - 1; i++) {
+    const key = path[i];
+    
+    if (!(key in current)) {
+      current[key] = {};
+    }
+    current = current[key];
+  }
+  
+  const lastKey = path[path.length - 1];
+  current[lastKey] = value;
 }
 
 export function parseFieldPaths(fields: string[]): FieldPath[] {
@@ -106,4 +118,4 @@ export function parseFieldPaths(fields: string[]): FieldPath[] {
     }
     return field;
   });
-} 
+}

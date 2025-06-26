@@ -6,18 +6,15 @@ import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from 'zod';
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { DataForSEOClient, DataForSEOConfig } from './client/dataforseo.client.js';
-import { SerpApiModule } from './modules/serp/serp-api.module.js';
-import { KeywordsDataApiModule } from './modules/keywords-data/keywords-data-api.module.js';
-import { OnPageApiModule } from './modules/onpage/onpage-api.module.js';
-import { DataForSEOLabsApi } from './modules/dataforseo-labs/dataforseo-labs-api.module.js';
 import { EnabledModulesSchema, isModuleEnabled } from './config/modules.config.js';
 import { BaseModule, ToolDefinition } from './modules/base.module.js';
-import { BacklinksApiModule } from "./modules/backlinks/backlinks-api.module.js";
-import { BusinessDataApiModule } from "./modules/business-data-api/business-data-api.module.js";
-import { DomainAnalyticsApiModule } from "./modules/domain-analytics/domain-analytics-api.module.js";
 import { name, version } from './utils/version.js';
 import { InMemoryEventStore } from '@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js';
 import { ModuleLoaderService } from './utils/module-loader.js';
+import { initializeFieldConfiguration } from './config/field-configuration.js';
+
+// Initialize field configuration if provided
+initializeFieldConfiguration();
 
 /**
  * This example server demonstrates backwards compatibility with both:

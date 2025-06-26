@@ -17,6 +17,10 @@ import { randomUUID } from "node:crypto";
 import { GetPromptResult, isInitializeRequest, ReadResourceResult } from "@modelcontextprotocol/sdk/types.js"
 import { name, version } from './utils/version.js';
 import { ModuleLoaderService } from "./utils/module-loader.js";
+import { initializeFieldConfiguration } from './config/field-configuration.js';
+
+// Initialize field configuration if provided
+initializeFieldConfiguration();
 
 // Extended request interface to include auth properties
 interface Request extends ExpressRequest {

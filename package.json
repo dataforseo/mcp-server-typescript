@@ -1,6 +1,6 @@
 {
   "name": "dataforseo-mcp-server",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "main": "build/index.js",
   "type": "module",
   "bin": {
@@ -12,7 +12,8 @@
     "dev": "tsc --watch",
     "prepare": "npm run build",
     "http": "node build/index-http.js",
-    "sse": "node build/index-sse-http.js"
+    "sse": "node build/index-sse-http.js",
+    "cli": "node build/cli.js"
   },
   "files": [
     "build"

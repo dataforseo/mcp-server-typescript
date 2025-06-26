@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { DataForSEOClient } from '../client/dataforseo.client.js';
 import { defaultGlobalToolConfig } from '../config/global.tool.js';
 import { filterFields, parseFieldPaths } from '../utils/field-filter.js';
+import { FieldConfigurationManager } from '../config/field-configuration.js';
 
 export interface DataForSEOFullResponse {
   version: string;
@@ -59,6 +60,16 @@ export abstract class BaseTool {
   }
 
   protected formatResponse(data: any): { content: Array<{ type: string; text: string }> } {
+    var fieldConfig = FieldConfigurationManager.getInstance();
+    if (fieldConfig.hasConfiguration()) {
+      const toolName = this.getName();
+      if (fieldConfig.isToolConfigured(toolName)) {
+        var fields = fieldConfig.getFieldsForTool(toolName);
+        if (fields && fields.length > 0) {
+          data = filterFields(data, parseFieldPaths(fields));
+        }
+      }
+    }
     return {
       content: [
         {

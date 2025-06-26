@@ -23,8 +23,7 @@ export class GoogleTrendsCategoriesTool extends BaseTool {
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.dataForSEOClient.makeRequest('/v3/keywords_data/google_trends/categories/live', 'GET', [{        
-      }]);
+      const response = await this.dataForSEOClient.makeRequest('/v3/keywords_data/google_trends/categories/live', 'GET');
       return this.validateAndFormatResponse(response);
     } catch (error) {
       return this.formatErrorResponse(error);

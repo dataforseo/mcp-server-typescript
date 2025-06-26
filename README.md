@@ -266,6 +266,103 @@ if (isModuleEnabled('YOUR_MODULE_NAME', enabledModules)) {
 }
 ```
 
+## Field Configuration
+
+The MCP server supports field filtering to customize which data fields are returned in API responses. This helps reduce response size and focus on the most relevant data for your use case.
+
+### Configuration File Format
+
+Create a JSON configuration file with the following structure:
+
+```json
+{
+  "supported_fields": {
+    "tool_name": ["field1", "field2", "field3"],
+    "another_tool": ["field1", "field2"]
+  }
+}
+```
+
+### Using Field Configuration
+
+Pass the configuration file using the `--configuration` parameter:
+
+```bash
+# With npm
+npm run cli -- http --configuration field-config.json
+
+# With npx
+npx dataforseo-mcp-server http --configuration field-config.json
+
+# Local mode
+npx dataforseo-mcp-server local --configuration field-config.json
+```
+
+### Configuration Behavior
+
+- **If a tool is configured**: Only the specified fields will be returned in the response
+- **If a tool is not configured**: All available fields will be returned (default behavior)
+- **If no configuration file is provided**: All tools return all available fields
+
+### Example Configuration File
+
+The repository includes an example configuration file `field-config.example.json` with optimized field selections for common tools:
+
+```json
+{
+  "supported_fields": {
+    "backlinks_backlinks": [
+      "url_from",
+      "url_to", 
+      "domain_from",
+      "domain_to",
+      "page_from_rank",
+      "page_to_rank",
+      "rank",
+      "backlink_spam_score",
+      "anchor",
+      "image_url",
+      "link_attribute",
+      "semantic_location",
+      "first_seen",
+      "last_seen",
+      "item_type"
+    ],
+    ...
+  }
+}
+```
+
+### Nested Field Support
+
+The configuration supports nested field paths using dot notation:
+
+- `"rating.value"` - Access the `value` field within the `rating` object
+- `"items.demography.age.keyword"` - Access deeply nested fields
+- `"meta.description"` - Access nested object properties
+
+### Field Discovery
+
+To discover available fields for any tool:
+
+1. Run the tool without field configuration to see the full response
+2. Identify the fields you need from the API response
+3. Add those field paths to your configuration file
+
+### Creating Your Own Configuration
+
+1. Copy the example file:
+```bash
+cp field-config.example.json my-config.json
+```
+
+2. Modify the field selections based on your needs
+
+3. Use your custom configuration:
+```bash
+npx dataforseo-mcp-server http --configuration my-config.json
+```
+
 ## What endpoints/APIs do you want us to support next?
 
 We're always looking to expand the capabilities of this MCP server. If you have specific DataForSEO endpoints or APIs you'd like to see supported, please:
