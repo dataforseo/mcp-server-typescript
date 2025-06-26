@@ -21,11 +21,9 @@ if (configPath) {
 
 // Prepare arguments to pass to the spawned process (excluding --configuration args)
 const argsWithoutMode = args.slice(1);
-const childArgs = argsWithoutMode.filter((arg, index) => {
-    const configIndexInArgs = argsWithoutMode.indexOf('--configuration');
-    return arg !== '--configuration' && !(configIndexInArgs !== -1 && index === configIndexInArgs + 1);
-});
-
+const childArgs = argsWithoutMode.filter((_, index) => {
+    return index !== configIndex - 1 && index !== configIndex;});
+    
 if (mode === 'http') {
     const httpServer = join(__dirname, 'index-http.js');
     spawn('node', [httpServer, ...childArgs], { 
