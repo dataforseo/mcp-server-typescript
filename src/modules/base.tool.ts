@@ -60,7 +60,7 @@ export abstract class BaseTool {
   }
 
   protected formatResponse(data: any): { content: Array<{ type: string; text: string }> } {
-    var fieldConfig = FieldConfigurationManager.getInstance();
+    const fieldConfig = FieldConfigurationManager.getInstance();
     if (fieldConfig.hasConfiguration()) {
       const toolName = this.getName();
       if (fieldConfig.isToolConfigured(toolName)) {

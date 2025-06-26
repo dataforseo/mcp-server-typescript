@@ -20,9 +20,11 @@ if (configPath) {
 }
 
 // Prepare arguments to pass to the spawned process (excluding --configuration args)
-const childArgs = args.filter((arg, index) => {
-    return arg !== '--configuration' && !(configIndex !== -1 && index === configIndex + 1);
-}).slice(1); // Remove the mode argument
+const argsWithoutMode = args.slice(1);
+const childArgs = argsWithoutMode.filter((arg, index) => {
+    const configIndexInArgs = argsWithoutMode.indexOf('--configuration');
+    return arg !== '--configuration' && !(configIndexInArgs !== -1 && index === configIndexInArgs + 1);
+});
 
 if (mode === 'http') {
     const httpServer = join(__dirname, 'index-http.js');

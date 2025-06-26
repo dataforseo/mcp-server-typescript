@@ -54,61 +54,6 @@ function extractAndSetValue(source: any, target: any, path: string[]): void {
   }
 }
 
-function getNestedValue(obj: any, path: string[]): any {
-  let current = obj;
-  
-  for (const key of path) {
-    if (current === null || current === undefined) {
-      return undefined;
-    }
-    
-    if (key === '*') {
-      // Handle wildcard
-      if (Array.isArray(current)) {
-        return current;
-      } else if (typeof current === 'object') {
-        return current;
-      }
-      return undefined;
-    }
-    
-    if (Array.isArray(current)) {
-      // When we hit an array, we need to apply the remaining path to each item
-      const remainingPath = path.slice(path.indexOf(key));
-      return current.map(item => getNestedValue(item, remainingPath)).filter(val => val !== undefined);
-    }
-    
-    if (typeof current === 'object' && key in current) {
-      current = current[key];
-    } else {
-      return undefined;
-    }
-  }
-  
-  return current;
-}
-
-function setNestedValue(obj: any, path: string[], value: any): void {
-  if (value === undefined) {
-    return;
-  }
-  
-  let current = obj;
-  
-  // Navigate to the parent of the target key
-  for (let i = 0; i < path.length - 1; i++) {
-    const key = path[i];
-    
-    if (!(key in current)) {
-      current[key] = {};
-    }
-    current = current[key];
-  }
-  
-  const lastKey = path[path.length - 1];
-  current[lastKey] = value;
-}
-
 export function parseFieldPaths(fields: string[]): FieldPath[] {
   return fields.map(field => {
     // Handle array notation
