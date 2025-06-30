@@ -143,115 +143,89 @@ const basicAuth = (req: Request, res: Response, next: NextFunction) => {
 // STREAMABLE HTTP TRANSPORT (PROTOCOL VERSION 2025-03-26)
 //=============================================================================
 
-app.all('/mcp', basicAuth, async (req: Request, res: Response) => {
-  console.log(`Received ${req.method} request to /mcp`);
-
-  try {
-    const sessionId = req.headers['mcp-session-id'] as string | undefined;
-    let transport: StreamableHTTPServerTransport;
-
-    // Handle credentials
-    if (!req.username && !req.password) {
-      const envUsername = process.env.DATAFORSEO_USERNAME;
-      const envPassword = process.env.DATAFORSEO_PASSWORD;
+app.post('/http', basicAuth, async (req: Request, res: Response) => {
+    // In stateless mode, create a new instance of transport and server for each request
+    // to ensure complete isolation. A single instance would cause request ID collisions
+    // when multiple clients connect concurrently.
+    
+    try {
+      console.error(Date.now().toLocaleString())
       
-      if (!envUsername || !envPassword) {
-        res.status(401).json({
-          jsonrpc: "2.0",
-          error: {
-            code: -32001,
-            message: "Authentication required. Provide DataForSEO credentials."
-          },
-          id: null
-        });
-        return;
+    // Handle credentials
+      if (!req.username && !req.password) {
+        const envUsername = process.env.DATAFORSEO_USERNAME;
+        const envPassword = process.env.DATAFORSEO_PASSWORD;
+        if (!envUsername || !envPassword) {
+          console.error('No DataForSEO credentials provided');
+          res.status(401).json({
+            jsonrpc: "2.0",
+            error: {
+              code: -32001,
+              message: "Authentication required. Provide DataForSEO credentials."
+            },
+            id: null
+          });
+          return;
+        }
+        req.username = envUsername;
+        req.password = envPassword;
       }
-      req.username = envUsername;
-      req.password = envPassword;
-    }
+      
+      const server = getServer(req.username, req.password); 
+      console.error(Date.now().toLocaleString())
 
-    if (sessionId && transports[sessionId]) {
-      const transportData = transports[sessionId];
-      if (transportData.transport instanceof StreamableHTTPServerTransport) {
-        transport = transportData.transport;
-        transportData.lastActivity = Date.now();
-      } else {
-        console.error('Session exists but uses a different transport protocol');
-        res.status(400).json({
+      const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined
+      });
+
+      await server.connect(transport);
+      console.error('handle request');
+      await transport.handleRequest(req , res, req.body);
+      console.error('end handle request');
+      req.on('close', () => {
+        console.error('Request closed');
+        transport.close();
+        server.close();
+      });
+
+    } catch (error) {
+      console.error('Error handling MCP request:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
           jsonrpc: '2.0',
           error: {
-            code: -32000,
-            message: 'Bad Request: Session exists but uses a different transport protocol',
+            code: -32603,
+            message: 'Internal server error',
           },
           id: null,
         });
-        return;
       }
-    } else if (!sessionId && req.method === 'POST' && isInitializeRequest(req.body)) {
-      const eventStore = new InMemoryEventStore();
-      transport = new StreamableHTTPServerTransport({
-        sessionIdGenerator: () => randomUUID(),
-        eventStore,
-        onsessioninitialized: (sessionId: string) => {
-          console.log(`StreamableHTTP session initialized with ID: ${sessionId}`);
-          transports[sessionId] = {
-            transport,
-            lastActivity: Date.now()
-          };
-        }
-      });
-
-      const cleanup = () => {
-        const sid = transport.sessionId;
-        if (sid && transports[sid]) {
-          console.log(`Transport closed for session ${sid}, removing from transports map`);
-          try {
-            transport.close();
-          } catch (error) {
-            console.error(`Error closing transport for session ${sid}:`, error);
-          }
-          delete transports[sid];
-        }
-      };
-
-      transport.onclose = cleanup;
-      req.socket.setTimeout(CONNECTION_TIMEOUT);
-      req.socket.on("error", cleanup);
-      req.socket.on("timeout", cleanup);
-      req.on("error", cleanup);
-      res.on("error", cleanup);
-      res.on("close", cleanup);
-
-      const server = getServer(req.username, req.password);
-      await server.connect(transport);
-    } else {
-      console.error('No valid session ID provided');
-      res.status(400).json({
-        jsonrpc: '2.0',
-        error: {
-          code: -32000,
-          message: 'Bad Request: No valid session ID provided',
-        },
-        id: null,
-      });
-      return;
     }
+  });
 
-    await transport.handleRequest(req, res, req.body);
-  } catch (error) {
-    console.error('Error handling MCP request:', error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        jsonrpc: '2.0',
-        error: {
-          code: -32603,
-          message: 'Internal server error',
-        },
-        id: null,
-      });
-    }
-  }
-});
+app.get('/http', async (req: Request, res: Response) => {
+    console.error('Received GET MCP request');
+    res.status(405).json({
+      jsonrpc: "2.0",
+      error: {
+        code: -32000,
+        message: "Method not allowed."
+      },
+      id: null
+    });
+  });
+
+  app.delete('/http', async (req: Request, res: Response) => {
+    console.error('Received DELETE MCP request');
+    res.status(405).json({
+      jsonrpc: "2.0",
+      error: {
+        code: -32000,
+        message: "Method not allowed."
+      },
+      id: null
+    });
+  });
 
 //=============================================================================
 // DEPRECATED HTTP+SSE TRANSPORT (PROTOCOL VERSION 2024-11-05)

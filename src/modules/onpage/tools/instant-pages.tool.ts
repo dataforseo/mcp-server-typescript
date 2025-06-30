@@ -21,7 +21,9 @@ export class InstantPagesTool extends BaseTool {
       enable_javascript: z.boolean().optional().describe("Enable JavaScript rendering"),
       custom_js: z.string().optional().describe("Custom JavaScript code to execute"),
       custom_user_agent: z.string().optional().describe("Custom User-Agent header"),
-      accept_language: z.string().optional().describe("Accept-Language header value"),
+      accept_language: z.string().optional().describe(`language header for accessing the website
+        all locale formats are supported (xx, xx-XX, xxx-XX, etc.)
+        Note: if you do not specify this parameter, some websites may deny access; in this case, pages will be returned with the "type":"broken in the response array`),
     };
   }
 

@@ -39,6 +39,9 @@ Note: the max_crawl_pages and depth parameters complement each other`),
 optional field
 can take the values:desktop, mobile
 default value: desktop`),
+      people_also_ask_click_depth: z.number().min(1).max(4).optional()
+      .describe(`clicks on the corresponding element
+        specify the click depth on the people_also_ask element to get additional people_also_ask_element items;`)
     };
   }
 
@@ -51,7 +54,8 @@ default value: desktop`),
         keyword: params.keyword,
         depth: params.depth,
         max_crawl_pages: params.max_crawl_pages,
-        device: params.device
+        device: params.device,
+        people_also_ask_click_depth: params.people_also_ask_click_depth && params.people_also_ask_click_depth > 0 ? params.people_also_ask_click_depth : undefined,
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

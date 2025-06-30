@@ -117,7 +117,7 @@ async function main() {
   };
 
   // Apply basic auth to MCP endpoint
-  app.post('/mcp', basicAuth, async (req: Request, res: Response) => {
+  app.post('/http', basicAuth, async (req: Request, res: Response) => {
     // In stateless mode, create a new instance of transport and server for each request
     // to ensure complete isolation. A single instance would cause request ID collisions
     // when multiple clients connect concurrently.
@@ -179,7 +179,7 @@ async function main() {
     }
   });
 
-  app.get('/mcp', async (req: Request, res: Response) => {
+  app.get('/http', async (req: Request, res: Response) => {
     console.error('Received GET MCP request');
     res.status(405).json({
       jsonrpc: "2.0",
@@ -191,7 +191,7 @@ async function main() {
     });
   });
 
-  app.delete('/mcp', async (req: Request, res: Response) => {
+  app.delete('/http', async (req: Request, res: Response) => {
     console.error('Received DELETE MCP request');
     res.status(405).json({
       jsonrpc: "2.0",
