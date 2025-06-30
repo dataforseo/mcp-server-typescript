@@ -165,7 +165,7 @@ async function main() {
       });
 
     } catch (error) {
-      console.error('Error handling MCP request:', error);
+      console.error('Error handling HTTP request:', error);
       if (!res.headersSent) {
         res.status(500).json({
           jsonrpc: '2.0',
@@ -180,7 +180,7 @@ async function main() {
   });
 
   app.get('/http', async (req: Request, res: Response) => {
-    console.error('Received GET MCP request');
+    console.error('Received GET HTTP request');
     res.status(405).json({
       jsonrpc: "2.0",
       error: {
@@ -192,7 +192,7 @@ async function main() {
   });
 
   app.delete('/http', async (req: Request, res: Response) => {
-    console.error('Received DELETE MCP request');
+    console.error('Received DELETE HTTP request');
     res.status(405).json({
       jsonrpc: "2.0",
       error: {

@@ -341,13 +341,7 @@ const server = app.listen(PORT, () => {
 SUPPORTED TRANSPORT OPTIONS:
 
 1. Streamable Http (Protocol version: 2025-03-26)
-   Endpoint: /mcp
-   Methods: GET, POST, DELETE
-   Usage: 
-     - Initialize with POST to /mcp
-     - Establish SSE stream with GET to /mcp
-     - Send requests with POST to /mcp
-     - Terminate session with DELETE to /mcp
+   Endpoint: /http (POST)
 
 2. Http + SSE (Protocol version: 2024-11-05)
    Endpoints: /sse (GET) and /messages (POST)
