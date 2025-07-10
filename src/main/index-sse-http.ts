@@ -5,13 +5,13 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from 'zod';
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
-import { DataForSEOClient, DataForSEOConfig } from './client/dataforseo.client.js';
-import { EnabledModulesSchema, isModuleEnabled } from './config/modules.config.js';
-import { BaseModule, ToolDefinition } from './modules/base.module.js';
-import { name, version } from './utils/version.js';
+import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
+import { EnabledModulesSchema, isModuleEnabled } from '../core/config/modules.config.js';
+import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
+import { name, version } from '../core/utils/version.js';
 import { InMemoryEventStore } from '@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js';
-import { ModuleLoaderService } from './utils/module-loader.js';
-import { initializeFieldConfiguration } from './config/field-configuration.js';
+import { ModuleLoaderService } from '../core/utils/module-loader.js';
+import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 
 // Initialize field configuration if provided
 initializeFieldConfiguration();

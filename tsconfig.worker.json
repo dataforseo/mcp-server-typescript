@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["@cloudflare/workers-types", "./worker-configuration.d.ts"],
+    "types": ["@cloudflare/workers-types", "./src/worker/worker-configuration.d.ts"],
     "lib": ["ES2022", "WebWorker"]
   },
   "include": [

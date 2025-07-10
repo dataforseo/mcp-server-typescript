@@ -1,10 +1,10 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from 'zod';
-import { DataForSEOClient, DataForSEOConfig } from '../client/dataforseo.client.js';
-import { EnabledModulesSchema } from '../config/modules.config.js';
-import { BaseModule, ToolDefinition } from '../modules/base.module.js';
-import { ModuleLoaderService } from '../utils/module-loader.js';
+import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
+import { EnabledModulesSchema } from '../core/config/modules.config.js';
+import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
+import { ModuleLoaderService } from '../core/utils/module-loader.js';
 import { version, name } from './version.worker.js';
 
 /**
@@ -17,7 +17,8 @@ import { version, name } from './version.worker.js';
 // Server metadata
 const SERVER_NAME = `${name} (Worker)`;
 const SERVER_VERSION = version;
-
+globalThis.__PACKAGE_VERSION__ = version;
+globalThis.__PACKAGE_NAME__ = name;
 /**
  * DataForSEO MCP Agent for Cloudflare Workers
  */
@@ -101,7 +102,7 @@ export default {
     }
     // Check if credentials are configured
     if (!env.DATAFORSEO_USERNAME || !env.DATAFORSEO_PASSWORD) {
-      if (['/mcp', '/sse', '/messages'].includes(url.pathname)) {
+      if (['/mcp','/http', '/sse', '/messages'].includes(url.pathname)) {
         return createErrorResponse(-32001, "DataForSEO credentials not configured in worker environment variables");
       }
     }
@@ -110,7 +111,7 @@ export default {
       return DataForSEOMcpAgent.serveSSE("/sse").fetch(request, env, ctx);
     }
 
-    if (url.pathname === "/mcp") {
+    if (url.pathname === "/mcp" || url.pathname == '/http') {
       return DataForSEOMcpAgent.serve("/mcp").fetch(request, env, ctx);
     }
 

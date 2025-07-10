@@ -1,23 +1,23 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { DataForSEOClient, DataForSEOConfig } from './client/dataforseo.client.js';
-import { SerpApiModule } from './modules/serp/serp-api.module.js';
-import { KeywordsDataApiModule } from './modules/keywords-data/keywords-data-api.module.js';
-import { OnPageApiModule } from './modules/onpage/onpage-api.module.js';
-import { DataForSEOLabsApi } from './modules/dataforseo-labs/dataforseo-labs-api.module.js';
-import { EnabledModulesSchema, isModuleEnabled, defaultEnabledModules } from './config/modules.config.js';
-import { BaseModule, ToolDefinition } from './modules/base.module.js';
+import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
+import { SerpApiModule } from '../core/modules/serp/serp-api.module.js';
+import { KeywordsDataApiModule } from '../core/modules/keywords-data/keywords-data-api.module.js';
+import { OnPageApiModule } from '../core/modules/onpage/onpage-api.module.js';
+import { DataForSEOLabsApi } from '../core/modules/dataforseo-labs/dataforseo-labs-api.module.js';
+import { EnabledModulesSchema, isModuleEnabled, defaultEnabledModules } from '../core/config/modules.config.js';
+import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
 import { z } from 'zod';
-import { BacklinksApiModule } from "./modules/backlinks/backlinks-api.module.js";
-import { BusinessDataApiModule } from "./modules/business-data-api/business-data-api.module.js";
-import { DomainAnalyticsApiModule } from "./modules/domain-analytics/domain-analytics-api.module.js";
+import { BacklinksApiModule } from "../core/modules/backlinks/backlinks-api.module.js";
+import { BusinessDataApiModule } from "../core/modules/business-data-api/business-data-api.module.js";
+import { DomainAnalyticsApiModule } from "../core/modules/domain-analytics/domain-analytics-api.module.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { Request as ExpressRequest, Response, NextFunction } from "express";
 import { randomUUID } from "node:crypto";
 import { GetPromptResult, isInitializeRequest, ReadResourceResult } from "@modelcontextprotocol/sdk/types.js"
-import { name, version } from './utils/version.js';
-import { ModuleLoaderService } from "./utils/module-loader.js";
-import { initializeFieldConfiguration } from './config/field-configuration.js';
+import { name, version } from '../core/utils/version.js';
+import { ModuleLoaderService } from "../core/utils/module-loader.js";
+import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 
 // Initialize field configuration if provided
 initializeFieldConfiguration();
