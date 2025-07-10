@@ -108,6 +108,92 @@ npm run http
    export DATAFORSEO_USERNAME=your_username
    export DATAFORSEO_PASSWORD=your_password
    ```
+
+## Cloudflare Worker Deployment
+
+The DataForSEO MCP Server can be deployed as a Cloudflare Worker for serverless, edge-distributed access to DataForSEO APIs.
+
+### Worker Features
+
+- **Edge Distribution**: Deploy globally across Cloudflare's edge network
+- **Serverless**: No server management required
+- **Auto-scaling**: Handles traffic spikes automatically
+- **MCP Protocol Support**: Compatible with both Streamable HTTP and SSE transports
+- **Environment Variables**: Secure credential management through Cloudflare dashboard
+
+### Quick Start
+
+1. **Install Wrangler CLI**:
+   ```bash
+   npm install -g wrangler
+   ```
+
+2. **Configure Worker**:
+   ```bash
+   # Login to Cloudflare
+   wrangler login
+   
+   # Set environment variables
+   wrangler secret put DATAFORSEO_USERNAME
+   wrangler secret put DATAFORSEO_PASSWORD
+   ```
+
+3. **Deploy Worker**:
+   ```bash
+   # Build and deploy
+   npm run build
+   wrangler deploy --main build/index-worker.js
+   ```
+
+### Configuration
+
+The worker uses the same environment variables as the standard server:
+
+- `DATAFORSEO_USERNAME`: Your DataForSEO username
+- `DATAFORSEO_PASSWORD`: Your DataForSEO password  
+- `ENABLED_MODULES`: Comma-separated list of modules to enable
+- `DATAFORSEO_FULL_RESPONSE`: Set to "true" for full API responses
+
+### Worker Endpoints
+
+Once deployed, your worker will be available at `https://your-worker.your-subdomain.workers.dev/` with the following endpoints:
+
+- **POST /mcp**: Streamable HTTP transport (recommended)
+- **GET /sse**: SSE connection establishment (deprecated)
+- **POST /messages**: SSE message handling (deprecated)
+- **GET /health**: Health check endpoint
+- **GET /**: API documentation page
+
+### Advanced Configuration
+
+Edit `wrangler.jsonc` to customize your deployment:
+
+```jsonc
+{
+  "name": "dataforseo-mcp-worker",
+  "main": "build/index-worker.js",
+  "compatibility_date": "2025-07-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ENABLED_MODULES": "SERP,KEYWORDS_DATA,ONPAGE,DATAFORSEO_LABS"
+  }
+}
+```
+
+### Usage with Claude
+
+After deployment, configure Claude to use your worker:
+
+```json
+{
+  "name": "DataForSEO",
+  "description": "Access DataForSEO APIs via Cloudflare Worker",
+  "transport": {
+    "type": "http",
+    "baseUrl": "https://your-worker.your-subdomain.workers.dev/mcp"
+  }
+}
+```
    
 ## Available Modules
 

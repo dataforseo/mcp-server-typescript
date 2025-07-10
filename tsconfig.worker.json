@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "outDir": "./build/worker",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["@cloudflare/workers-types", "./worker-configuration.d.ts"],
+    "lib": ["ES2022", "WebWorker"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "worker-configuration.d.ts"
+  ]
+}

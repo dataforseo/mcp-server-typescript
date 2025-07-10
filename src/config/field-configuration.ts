@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 
 export interface FieldConfiguration {
   supported_fields: Record<string, string[]>;

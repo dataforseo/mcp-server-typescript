@@ -1,19 +1,22 @@
 {
   "name": "dataforseo-mcp-server",
-  "version": "2.5.2",
-  "main": "build/index.js",
+  "version": "2.6.0",
+  "main": "build/main/index.js",
   "type": "module",
   "bin": {
-    "dataforseo-mcp-server": "./build/cli.js"
-  },
+    "dataforseo-mcp-server": "./build/main/cli.js"
+  },  
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/cli.js', '755')\"",
-    "start": "node build/index.js",
+    "build": "tsc && node -e \"require('fs').chmodSync('build/main/cli.js', '755')\"",
+    "start": "node build/main/index.js",    
     "dev": "tsc --watch",
     "prepare": "npm run build",
-    "http": "node build/index-http.js",
-    "sse": "node build/index-sse-http.js",
-    "cli": "node build/cli.js"
+    "http": "node build/main/index-http.js",
+    "sse": "node build/main/index-sse-http.js",    "cli": "node build/main/cli.js",    
+    "worker:prebuild": "node scripts/generate-worker-version.cjs",
+    "worker:build": "npm run worker:prebuild && tsc --project tsconfig.worker.json",
+    "worker:dev": "npm run worker:build && wrangler dev",
+    "worker:deploy": "npm run worker:build && wrangler deploy"
   },
   "files": [
     "build"
@@ -46,6 +49,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.4.0",
-    "express": "^4.18.2"
+    "agents": "^0.0.101",
+    "express": "^4.18.2",
+    "wrangler": "^4.24.0"
   }
 }
