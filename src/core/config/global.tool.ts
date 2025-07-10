@@ -18,9 +18,7 @@ export function parseGlobalToolConfig(): GlobalToolConfig {
     debug: debugEnv === 'true'
   };
   
-  let parsed = GlobalToolConfigSchema.parse(config);
-  console.error(parsed);
-  return parsed;
+  return GlobalToolConfigSchema.parse(config);
 }
 
 // Export default config

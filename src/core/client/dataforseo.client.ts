@@ -27,7 +27,6 @@ export class DataForSEOClient {
       'User-Agent': `DataForSEO-MCP-TypeScript-SDK/${version}`
     };
 
-    console.error(headers)
     console.error(`Making request to ${url} with method ${method} and body`, body);
     const response = await fetch(url, {
       method,
