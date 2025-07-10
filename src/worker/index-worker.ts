@@ -28,7 +28,7 @@ export class DataForSEOMcpAgent extends McpAgent {
     version: SERVER_VERSION,
   });
 
-  protected constructor(ctx: DurableObjectState, protected env: Env){
+  constructor(ctx: DurableObjectState, protected env: Env){
     super(ctx, env);
   }
 
@@ -102,7 +102,7 @@ export default {
     }
     // Check if credentials are configured
     if (!env.DATAFORSEO_USERNAME || !env.DATAFORSEO_PASSWORD) {
-      if (['/mcp','/http', '/sse', '/messages'].includes(url.pathname)) {
+      if (['/mcp','/http', '/sse', '/messages','/sse/message'].includes(url.pathname)) {
         return createErrorResponse(-32001, "DataForSEO credentials not configured in worker environment variables");
       }
     }
