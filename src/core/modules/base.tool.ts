@@ -48,9 +48,10 @@ export abstract class BaseTool {
   }
 
   protected getFilterExpression() : z.ZodType<any> {
-        const filterValue = z.union([z.string(), z.number(), z.boolean()]);
+        const filterValue = z.union([z.string(), z.number(), z.boolean(), z.array(z.union([z.string(), z.number()]))])
         const simpleFilter = z.tuple([z.string(), z.string(), filterValue]);
         const logicalOperator = z.enum(["and", "or"]);
+        const binaryOperator = z.enum(['regex', 'not_regex', '<', '<=', '>', '>=', '=', '<>', 'in', 'not_in', 'ilike', 'not_ilike', 'like', 'not_like']);
         
         const filterExpression: z.ZodType<any> = z.lazy(() => 
           z.union([
