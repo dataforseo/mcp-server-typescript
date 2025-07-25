@@ -117,8 +117,7 @@ async function main() {
     next();
   };
 
-  // Apply basic auth to MCP endpoint
-  app.post('/http', basicAuth, async (req: Request, res: Response) => {
+  const handleMcpRequest = async (req: Request, res: Response) => {
     // In stateless mode, create a new instance of transport and server for each request
     // to ensure complete isolation. A single instance would cause request ID collisions
     // when multiple clients connect concurrently.
@@ -129,8 +128,8 @@ async function main() {
       // Check if we have valid credentials
       if (!req.username && !req.password) {
         // If no request auth, check environment variables
-      const envUsername = process.env.DATAFORSEO_USERNAME;
-      const envPassword = process.env.DATAFORSEO_PASSWORD;
+        const envUsername = process.env.DATAFORSEO_USERNAME;
+        const envPassword = process.env.DATAFORSEO_PASSWORD;
         if (!envUsername || !envPassword) {
           console.error('No DataForSEO credentials provided');
           res.status(401).json({
@@ -166,7 +165,7 @@ async function main() {
       });
 
     } catch (error) {
-      console.error('Error handling HTTP request:', error);
+      console.error('Error handling MCP request:', error);
       if (!res.headersSent) {
         res.status(500).json({
           jsonrpc: '2.0',
@@ -178,10 +177,10 @@ async function main() {
         });
       }
     }
-  });
+  };
 
-  app.get('/http', async (req: Request, res: Response) => {
-    console.error('Received GET HTTP request');
+  const handleNotAllowed = (method: string) => async (req: Request, res: Response) => {
+    console.error(`Received ${method} request`);
     res.status(405).json({
       jsonrpc: "2.0",
       error: {
@@ -190,19 +189,17 @@ async function main() {
       },
       id: null
     });
-  });
+  };
 
-  app.delete('/http', async (req: Request, res: Response) => {
-    console.error('Received DELETE HTTP request');
-    res.status(405).json({
-      jsonrpc: "2.0",
-      error: {
-        code: -32000,
-        message: "Method not allowed."
-      },
-      id: null
-    });
-  });
+  // Apply basic auth and shared handler to both endpoints
+  app.post('/http', basicAuth, handleMcpRequest);
+  app.post('/mcp', basicAuth, handleMcpRequest);
+
+  app.get('/http', handleNotAllowed('GET HTTP'));
+  app.get('/mcp', handleNotAllowed('GET MCP'));
+
+  app.delete('/http', handleNotAllowed('DELETE HTTP'));
+  app.delete('/mcp', handleNotAllowed('DELETE MCP'));
 
   // Start the server
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;

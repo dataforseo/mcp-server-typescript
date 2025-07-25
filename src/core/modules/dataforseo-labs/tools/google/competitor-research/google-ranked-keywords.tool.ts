@@ -41,12 +41,7 @@ United Kingdom`),
         default value: 0
         if you specify the 10 value, the first ten keywords in the results array will be omitted and the data will be provided for the successive keywords`
       ),
-      filters: z.array(
-        z.union([
-          z.array(z.union([z.string(), z.number(), z.boolean()])).length(3),
-          z.enum(["and", "or"])
-        ])
-      ).max(8).optional().describe(
+      filters: z.array(this.getFilterExpression()).max(8).optional().describe(
         `Array of filter conditions and logical operators. Each filter condition is an array of [field, operator, value].
         Maximum 8 filters allowed.
         Available operators: =, <>, <, <=, >, >=, in, not_in, like, not_like, ilike, not_ilike, regex, not_regex, match, not_match

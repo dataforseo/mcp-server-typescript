@@ -145,7 +145,7 @@ const basicAuth = (req: Request, res: Response, next: NextFunction) => {
 // STREAMABLE HTTP TRANSPORT (PROTOCOL VERSION 2025-03-26)
 //=============================================================================
 
-app.post('/http', basicAuth, async (req: Request, res: Response) => {
+const handleMcpRequest = async (req: Request, res: Response) => {
     // In stateless mode, create a new instance of transport and server for each request
     // to ensure complete isolation. A single instance would cause request ID collisions
     // when multiple clients connect concurrently.
@@ -203,10 +203,10 @@ app.post('/http', basicAuth, async (req: Request, res: Response) => {
         });
       }
     }
-  });
+  };
 
-app.get('/http', async (req: Request, res: Response) => {
-    console.error('Received GET MCP request');
+const handleNotAllowed = (method: string) => async (req: Request, res: Response) => {
+    console.error(`Received ${method} request`);
     res.status(405).json({
       jsonrpc: "2.0",
       error: {
@@ -215,19 +215,17 @@ app.get('/http', async (req: Request, res: Response) => {
       },
       id: null
     });
-  });
+  };
 
-  app.delete('/http', async (req: Request, res: Response) => {
-    console.error('Received DELETE MCP request');
-    res.status(405).json({
-      jsonrpc: "2.0",
-      error: {
-        code: -32000,
-        message: "Method not allowed."
-      },
-      id: null
-    });
-  });
+// Apply basic auth and shared handler to both endpoints
+app.post('/http', basicAuth, handleMcpRequest);
+app.post('/mcp', basicAuth, handleMcpRequest);
+
+app.get('/http', handleNotAllowed('GET HTTP'));
+app.get('/mcp', handleNotAllowed('GET MCP'));
+
+app.delete('/http', handleNotAllowed('DELETE HTTP'));
+app.delete('/mcp', handleNotAllowed('DELETE MCP'));
 
 //=============================================================================
 // DEPRECATED HTTP+SSE TRANSPORT (PROTOCOL VERSION 2024-11-05)
@@ -344,6 +342,8 @@ SUPPORTED TRANSPORT OPTIONS:
 
 1. Streamable Http (Protocol version: 2025-03-26)
    Endpoint: /http (POST)
+   Endpoint: /mcp (POST)
+
 
 2. Http + SSE (Protocol version: 2024-11-05)
    Endpoints: /sse (GET) and /messages (POST)

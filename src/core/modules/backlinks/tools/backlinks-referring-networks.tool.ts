@@ -32,12 +32,7 @@ optional field
 default value: 0
 if you specify the 10 value, the first ten domains in the results array will be omitted and the data will be provided for the successive pages`
       ),
-      filters: z.array(
-        z.union([
-          z.array(z.union([z.string(), z.number(), z.boolean()])).length(3),
-          z.enum(["and", "or"])
-        ])
-      ).max(8).optional().describe(
+      filters: z.array(this.getFilterExpression()).max(8).optional().describe(
         `array of results filtering parameters
 optional field
 you can add several filters at once (8 filters maximum)

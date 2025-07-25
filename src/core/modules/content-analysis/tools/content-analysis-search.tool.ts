@@ -39,12 +39,7 @@ export class ContentAnalysisSearchTool extends BaseTool {
       search_mode: z.enum(['as_is', 'one_per_domain']).optional().describe(`results grouping type`),
       limit: z.number().min(1).max(1000).default(10).describe(`maximum number of results to return`),
       offset: z.number().min(0).default(0).describe(`offset in the results array of returned keywords`),
-      filters: z.array(
-        z.union([
-          z.array(z.union([z.string(), z.number(), z.boolean()])).length(3),
-          z.enum(["and", "or"])
-        ])
-      ).max(8).optional().describe(
+      filters: z.array(this.getFilterExpression()).max(8).optional().describe(
         `array of results filtering parameters
 optional field
 you can add several filters at once (8 filters maximum)

@@ -47,6 +47,22 @@ export abstract class BaseTool {
     return error instanceof Error ? error.message : 'Unknown error';
   }
 
+  protected getFilterExpression() : z.ZodType<any> {
+        const filterValue = z.union([z.string(), z.number(), z.boolean()]);
+        const simpleFilter = z.tuple([z.string(), z.string(), filterValue]);
+        const logicalOperator = z.enum(["and", "or"]);
+        
+        const filterExpression: z.ZodType<any> = z.lazy(() => 
+          z.union([
+            simpleFilter,
+            z.array(z.union([filterExpression, logicalOperator])),
+            logicalOperator
+          ])
+        );
+
+        return filterExpression;
+  }
+
   protected validateAndFormatResponse (response: any): { content: Array<{ type: string; text: string }> } {
     console.error(JSON.stringify(response));
     if(defaultGlobalToolConfig.fullResponse || this.supportOnlyFullResponse()){

@@ -19,13 +19,14 @@ Along with each keyword idea, you will get its search volume rate for the last m
   }
 
   getParams(): z.ZodRawShape {
+
     return {
       keywords: z.array(z.string()).describe(`target keywords`),
       location_name: z.string().default("United States").describe(`full name of the location
-required field
-in format "Country"
-example:
-United Kingdom`),
+  required field
+  in format "Country"
+  example:
+  United Kingdom`),
       language_code: z.string().default("en").describe(
         `language code
         required field
@@ -38,12 +39,7 @@ United Kingdom`),
         default value: 0
         if you specify the 10 value, the first ten keywords in the results array will be omitted and the data will be provided for the successive keywords`
       ),
-      filters: z.array(
-        z.union([
-          z.array(z.union([z.string(), z.number(), z.boolean()])).length(3),
-          z.enum(["and", "or"])
-        ])
-      ).max(8).optional().describe(
+      filters: z.array(this.getFilterExpression()).max(8).optional().describe(
         `you can add several filters at once (8 filters maximum)
         you should set a logical operator and, or between the conditions
         the following operators are supported:
@@ -93,4 +89,4 @@ example:
       return this.formatErrorResponse(error);
     }
   }
-} 
+}
