@@ -1,12 +1,14 @@
 import { BaseModule, ToolDefinition } from '../base.module.js';
 import { ContentParsingTool } from './tools/content-parsing.tool.js';
 import { InstantPagesTool } from './tools/instant-pages.tool.js';
+import { LighthouseTool } from './tools/lighthouse.tool.js';
 
 export class OnPageApiModule extends BaseModule {
   getTools(): Record<string, ToolDefinition> {
     const tools = [
       new ContentParsingTool(this.dataForSEOClient),
       new InstantPagesTool(this.dataForSEOClient),
+      new LighthouseTool(this.dataForSEOClient),
       // Add more tools here
     ];
 
