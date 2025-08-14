@@ -1,5 +1,7 @@
 import { DataForSEOClient } from '../../client/dataforseo.client.js';
 import { BaseModule, ToolDefinition } from '../base.module.js';
+import { PromptDefinition } from '../prompt-definition.js';
+import { backlinksPrompts } from './backlinks.prompt.js';
 import { BacklinksAnchorTool } from './tools/backlinks-anchor.tool.js';
 import { BacklinksTool } from './tools/backlinks-backlinks.tool.js';
 import { BacklinksBulkBacklinksTool } from './tools/backlinks-bulk-backlinks.tool.js';
@@ -60,4 +62,18 @@ export class BacklinksApiModule extends BaseModule {
       },
     }), {});
   }
+
+    getPrompts(): Record<string, PromptDefinition> {
+      return backlinksPrompts.reduce((acc, prompt) => ({
+        ...acc,
+        [prompt.name]: {
+          description: prompt.description,
+          params: prompt.params,
+          handler: (params: any) => {
+
+            return prompt.handler(params);
+          },
+        },
+      }), {});
+    }
 } 

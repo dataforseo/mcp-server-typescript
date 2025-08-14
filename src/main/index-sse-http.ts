@@ -89,8 +89,9 @@ function getServer(username: string | undefined, password: string | undefined): 
   const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
   
 
-  // Register module tools
+  // Register modules
   modules.forEach(module => {
+    
     const tools = module.getTools();
     Object.entries(tools).forEach(([name, tool]) => {
       const typedTool = tool as ToolDefinition;
@@ -102,7 +103,20 @@ function getServer(username: string | undefined, password: string | undefined): 
         typedTool.handler
       );
     });
+
+    const prompts = module.getPrompts();
+    Object.entries(prompts).forEach(([name, prompt]) => {
+      server.registerPrompt(
+        name,
+        {
+          description: prompt.description,
+          argsSchema: prompt.params,
+        },
+        prompt.handler
+      );
+    });
   });
+
 
   return server;
 }

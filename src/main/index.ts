@@ -35,9 +35,10 @@ const enabledModules = EnabledModulesSchema.parse(process.env.ENABLED_MODULES);
 const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
 console.error('Modules initialized');
 
-// Register tools from modules
-function registerModuleTools() {
+// Register modules
+function registerModules() {
   modules.forEach(module => {
+    
     const tools = module.getTools();
     Object.entries(tools).forEach(([name, tool]) => {
       const typedTool = tool as ToolDefinition;
@@ -49,12 +50,24 @@ function registerModuleTools() {
         typedTool.handler
       );
     });
+
+    const prompts = module.getPrompts();
+    Object.entries(prompts).forEach(([name, prompt]) => {
+      server.registerPrompt(
+        name,
+        {
+          description: prompt.description,
+          argsSchema: prompt.params,
+        },
+        prompt.handler
+      );
+    });
   });
 }
 
-// Register all tools
-registerModuleTools();
-console.error('Tools registered');
+// Register all modules
+registerModules();
+console.error('Modules registered');
 
 // Start the server
 async function main() {

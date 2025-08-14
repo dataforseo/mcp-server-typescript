@@ -1,5 +1,6 @@
 import { DataForSEOClient } from '../client/dataforseo.client.js';
 import { z } from 'zod';
+import { PromptDefinition } from './prompt-definition.js';
 
 export interface ToolDefinition {
   description: string;
@@ -41,4 +42,6 @@ export abstract class BaseModule {
   }
 
   abstract getTools(): Record<string, ToolDefinition>;
+
+  abstract getPrompts(): Record<string, PromptDefinition>;
 } 

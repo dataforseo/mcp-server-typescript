@@ -14,7 +14,7 @@ import { DomainAnalyticsApiModule } from "../core/modules/domain-analytics/domai
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { Request as ExpressRequest, Response, NextFunction } from "express";
 import { randomUUID } from "node:crypto";
-import { GetPromptResult, isInitializeRequest, ReadResourceResult } from "@modelcontextprotocol/sdk/types.js"
+import { GetPromptResult, isInitializeRequest, ReadResourceResult, ServerNotificationSchema } from "@modelcontextprotocol/sdk/types.js"
 import { name, version } from '../core/utils/version.js';
 import { ModuleLoaderService } from "../core/utils/module-loader.js";
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
@@ -53,10 +53,11 @@ function getServer(username: string | undefined, password: string | undefined) :
   const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
   
   console.error('Modules initialized');
-  function registerModuleTools() {
-    console.error('Registering tools');
+  function registerModules() {
+    console.error('Registering modules');
     console.error(modules.length);
     modules.forEach(module => {
+      
       const tools = module.getTools();
       Object.entries(tools).forEach(([name, tool]) => {
         const typedTool = tool as ToolDefinition;
@@ -68,10 +69,22 @@ function getServer(username: string | undefined, password: string | undefined) :
           typedTool.handler
         );
       });
+
+      const prompts = module.getPrompts();
+      Object.entries(prompts).forEach(([name, prompt]) => {
+        server.registerPrompt(
+          name,
+          {
+            description: prompt.description,
+            argsSchema: prompt.params,
+          },
+          prompt.handler
+        );
+      });
     });
   }
-  registerModuleTools();
-  console.error('Tools registered');
+  registerModules();
+  console.error('Modules registered');
   return server;
 }
 
@@ -123,7 +136,6 @@ async function main() {
     // when multiple clients connect concurrently.
     
     try {
-      console.error(Date.now().toLocaleString())
       
       // Check if we have valid credentials
       if (!req.username && !req.password) {

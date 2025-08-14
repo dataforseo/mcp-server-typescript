@@ -1,4 +1,5 @@
 import { BaseModule, ToolDefinition } from '../base.module.js';
+import { PromptDefinition } from '../prompt-definition.js';
 import { AiOptimizationKeywordDataLocationsAndLanguagesListTool } from './tools/keyword-data/ai-optimization-keyword-data-locations-and-languages.js';
 import { AiOptimizationKeywordDataSearchVolumeTool } from './tools/keyword-data/ai-optimization-keyword-data-search-volume.js'
 
@@ -18,4 +19,8 @@ export class AiOptimizationApiModule extends BaseModule {
       },
     }), {});
   }
+
+    getPrompts(): Record<string, PromptDefinition> {
+      return {};
+    }
 } 
