@@ -80,7 +80,9 @@ async function main() {
     // when multiple clients connect concurrently.
     
     try {
-      
+
+      console.log(`req auth -> '${req.headers['authorization']}'`);
+
       // Check if we have valid credentials
       if (!req.username && !req.password) {
         // If no request auth, check environment variables
