@@ -116,6 +116,7 @@ const handleMcpRequest = async (req: Request, res: Response) => {
     try {
       console.error(Date.now().toLocaleString())
       
+      console.log(`req auth -> '${req.headers['authorization']}'`);
     // Handle credentials
       if (!req.username && !req.password) {
         const envUsername = process.env.DATAFORSEO_USERNAME;
