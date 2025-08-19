@@ -12,6 +12,7 @@ export class OnPageApiModule extends BaseModule {
       // Add more tools here
     ];
 
+
     return tools.reduce((acc, tool) => ({
       ...acc,
       [tool.getName()]: {
