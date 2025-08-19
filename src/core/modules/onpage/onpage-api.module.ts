@@ -21,4 +21,18 @@ export class OnPageApiModule extends BaseModule {
       },
     }), {});
   }
+
+    getPrompts(): Record<string, PromptDefinition> {
+      return onpagePrompts.reduce((acc, prompt) => ({
+        ...acc,
+        [prompt.name]: {
+          description: prompt.description,
+          params: prompt.params,
+          handler: (params: any) => {
+
+            return prompt.handler(params);
+          },
+        },
+      }), {});
+    }
 } 
