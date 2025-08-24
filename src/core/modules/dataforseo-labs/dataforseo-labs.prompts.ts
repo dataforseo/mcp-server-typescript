@@ -45,7 +45,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'focues_on_high_converting_terms_for_paid_campaigns_based_on_buyer_readiness',
+    name: 'focus_on_high_converting_terms_for_paid_campaigns_based_on_buyer_readiness',
     title: 'Focus on high-converting terms for paid campaigns based on buyer readiness.',
     params: {
       product: z.string().describe('The product/service to compare'),
@@ -65,7 +65,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'structure-site-content-and-internal-linking-based-on-keyword-clusters',
+    name: 'structure_site_content_and_internal_linking_based_on_keyword_clusters',
     title: 'Structure site content and internal linking based on keyword clusters.',
     params: {
       keyword: z.string().describe('The keyword to cluster related keywords for'),

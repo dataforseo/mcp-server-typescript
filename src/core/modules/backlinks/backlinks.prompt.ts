@@ -66,7 +66,7 @@ export const backlinksPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'locate_broken_or_redirected_pages_that_waste_valuble_links',
+    name: 'locate_broken_or_redirected_pages_that_waste_valuable_links',
     title: 'Locate broken or redirected pages that waste valuable links.',
     params: {
       domain: z.string().describe('The domain to analyze'),

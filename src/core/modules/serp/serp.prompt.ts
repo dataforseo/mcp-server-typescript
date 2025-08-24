@@ -27,7 +27,7 @@ export const serpPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'monitor_bisibility_for_key_branded_searches_in_real_time',
+    name: 'monitor_visibility_for_key_branded_searches_in_real_time',
     title: 'Monitor visibility for key branded searches in real-time.',
     params: {
       domain: z.string().describe('The domain to monitor'),

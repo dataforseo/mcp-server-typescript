@@ -49,7 +49,7 @@ export abstract class BaseTool {
 
   protected getFilterExpression(): z.ZodType<any> {
     if( defaultGlobalToolConfig.simpleFilter ) {
-      return z.any();
+      return z.array(z.any());
     }
     const filterExpression = 
     z.array(
