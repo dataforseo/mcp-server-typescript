@@ -28,7 +28,7 @@ export class AiOptimizationKeywordDataLocationsAndLanguagesListTool extends Base
      try {
 
       const response = await this.dataForSEOClient.makeRequest(`/v3/ai_optimization/ai_keyword_data/locations_and_languages`, 'GET', null);
-      return this.validateAndFormatResponse(response);
+      return this.formatResponse(response);
     } catch (error) {
       return this.formatErrorResponse(error);
     }
