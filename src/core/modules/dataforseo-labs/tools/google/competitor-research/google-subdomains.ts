@@ -66,14 +66,8 @@ example:
 default rule:
 ["metrics.organic.count,desc"]`
       ),
-      item_types: z.array(z.string()).optional().describe(
-        `item types to return
-        optional field
-        default: ['organic']
-        possible values:
-        organic
-        paid`
-      ),
+      item_types: z.array(z.enum(['organic', 'paid','featured_snippet','local_pack'])).optional().describe(`display results by item type
+indicates the type of search results included in the response`).default(['organic']),
       include_clickstream_data: z.boolean().optional().default(false).describe(
         `Include or exclude data from clickstream-based metrics in the result`)
 
