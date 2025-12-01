@@ -34,7 +34,8 @@ example:
         en`),
       ignore_synonyms: z.boolean().default(true).describe(
   `ignore highly similar keywords, if set to true, results will be more accurate`),
-
+      item_types: z.array(z.enum(['organic', 'paid','featured_snippet','local_pack'])).optional().describe(`display results by item type
+indicates the type of search results included in the response`).default(['organic'])
     };
   }
 
@@ -44,7 +45,7 @@ example:
         targets: params.targets,
         location_name: params.location_name,
         language_code: params.language_code,
-        item_types: ['organic'],
+        item_types: params.item_types,
         ignore_synonyms: params.ignore_synonyms
       }]);
       return this.validateAndFormatResponse(response);

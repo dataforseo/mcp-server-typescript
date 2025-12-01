@@ -70,8 +70,9 @@ example:
         default value: false
         set to true if you want to get highly-relevant competitors excluding the top websites`),
       include_clickstream_data: z.boolean().optional().default(false).describe(
-        `Include or exclude data from clickstream-based metrics in the result`)
-
+        `Include or exclude data from clickstream-based metrics in the result`),
+      item_types: z.array(z.enum(['organic', 'paid','featured_snippet','local_pack'])).optional().describe(`display results by item type
+indicates the type of search results included in the response`).default(['organic'])
     };
   }
 
@@ -85,7 +86,7 @@ example:
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
         exclude_top_domains: params.exclude_top_domains,
-        item_types: ['organic'],
+        item_types: params.item_types,
         include_clickstream_data: params.include_clickstream_data
       }]);
       return this.validateAndFormatResponse(response);

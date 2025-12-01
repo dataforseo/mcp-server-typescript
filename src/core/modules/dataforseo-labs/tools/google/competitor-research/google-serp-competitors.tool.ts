@@ -42,15 +42,17 @@ example:
       ),
       filters: this.getFilterExpression().optional().describe(
         `you can add several filters at once (8 filters maximum)
-        you should set a logical operator and, or between the conditions
-        the following operators are supported:
-        regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
-        you can use the % operator with like and not_like, as well as ilike and not_ilike to match any string of zero or more characters
-        merge operator must be a string and connect two other arrays, availible values: or, and.
-        example:
-        ["ranked_serp_element.serp_item.rank_group","<=",10]
-        [["ranked_serp_element.serp_item.rank_group","<=",10],"or",["ranked_serp_element.serp_item.type","<>","paid"]]
-        [["keyword_data.keyword_info.search_volume","<>",0],"and",[["ranked_serp_element.serp_item.type","<>","paid"],"or",["ranked_serp_element.serp_item.is_malicious","=",false]]]`
+you should set a logical operator and, or between the conditions
+the following operators are supported:
+regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
+you can use the % operator with like and not_like, as well as ilike and not_ilike to match any string of zero or more characters
+example:
+["median_position","in",[1,10]]
+[["median_position","in",[1,10]],"and",["domain","not_like","%wikipedia.org%"]]
+
+[["domain","not_like","%wikipedia.org%"],
+"and",
+[["relevant_serp_items",">",0],"or",["median_position","in",[1,10]]]]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules
@@ -69,7 +71,9 @@ you should use a comma to separate several sorting rules
 example:
 ["avg_position,asc","etv,desc"]`
       ),
-      include_subdomains: z.boolean().optional().describe("Include keywords from subdomains")
+      include_subdomains: z.boolean().optional().describe("Include keywords from subdomains"),
+      item_types: z.array(z.enum(['organic', 'paid','featured_snippet','local_pack'])).optional().describe(`display results by item type
+indicates the type of search results included in the response`).default(['organic'])
     };
   }
 
@@ -83,6 +87,8 @@ example:
         offset: params.offset,
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
+        include_subdomains: params.include_subdomains,
+        item_types: params.item_types
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

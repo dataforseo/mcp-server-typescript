@@ -70,7 +70,9 @@ example:
       ),
       include_subdomains: z.boolean().optional().describe("Include keywords from subdomains"),
       include_clickstream_data: z.boolean().optional().default(false).describe(
-        `Include or exclude data from clickstream-based metrics in the result`)
+        `Include or exclude data from clickstream-based metrics in the result`),
+      item_types: z.array(z.enum(['organic', 'paid','featured_snippet','local_pack', 'ai_overview_reference'])).optional().describe(`display results by item type
+indicates the type of search results included in the response`).default(['organic']),
     };
   }
 
@@ -85,7 +87,8 @@ example:
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
         include_subdomains: params.include_subdomains,
-        include_clickstream_data: params.include_clickstream_data
+        include_clickstream_data: params.include_clickstream_data,
+        item_types: params.item_types
       }]);
       return this.validateAndFormatResponse(response);
     } catch (error) {

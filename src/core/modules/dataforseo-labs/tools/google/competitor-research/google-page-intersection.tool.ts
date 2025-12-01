@@ -109,8 +109,10 @@ example:
 ["intersection_result.1.rank_group,asc","intersection_result.2.rank_absolute,asc"]`
       ),      
       include_clickstream_data: z.boolean().optional().default(false).describe(
-        `Include or exclude data from clickstream-based metrics in the result`)
-    };
+        `Include or exclude data from clickstream-based metrics in the result`),
+      item_types: z.array(z.enum(['organic', 'paid','featured_snippet','local_pack'])).optional().describe(`display results by item type
+indicates the type of search results included in the response`).default(['organic'])
+    }
   }
 
   async handle(params: any): Promise<any> {
@@ -123,7 +125,7 @@ example:
         filters: this.formatFilters(params.filters),
         order_by: this.formatOrderBy(params.order_by),
         exclude_top_domains: params.exclude_top_domains,
-        item_types: ['organic'],
+        item_types: params.item_types,
         exclude_pages: params.exclude_pages,
         intersection_mode: params.intersection_mode,
         limit: params.limit,
