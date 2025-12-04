@@ -9,6 +9,8 @@ import { AiOptimizationLlmMentionsSearchTool } from './tools/llm-mentions/llm-me
 import { AiOptimizationLlmMentionsTopDomainsTool } from './tools/llm-mentions/llm-mentions-top-domains.js';
 import { AiOptimizationLlmMentionsTopPagesTool } from './tools/llm-mentions/llm-mentions-top-pages.js';
 import { AiOptimizationLlmMentionsLocationsAndLanguagesListTool } from './tools/llm-mentions/locations-and-languages.js';
+import { AiOptimizationChatGptLocationsTool } from './tools/llms/chat-gpt/cha-gpt-locations.js';
+import { AiOptimizationChatGptScraperTool } from './tools/llms/chat-gpt/chat-gpt-scraper.js';
 import { AiOptimizationLlmModelsTool } from './tools/llms/llm-models.js';
 import { AiOptimizationLlmResponseTool } from './tools/llms/llm-response.js';
 
@@ -28,6 +30,9 @@ export class AiOptimizationApiModule extends BaseModule {
       new AiOptimizationLlmMentionsCrossAggregatedMetricsTool(this.dataForSEOClient),
       new AiOptimizationLlmMentionsTopDomainsTool(this.dataForSEOClient),
       new AiOptimizationLlmMentionsTopPagesTool(this.dataForSEOClient),
+
+      new AiOptimizationChatGptScraperTool(this.dataForSEOClient),
+      new AiOptimizationChatGptLocationsTool(this.dataForSEOClient),
     ];
 
     return tools.reduce((acc, tool) => ({
