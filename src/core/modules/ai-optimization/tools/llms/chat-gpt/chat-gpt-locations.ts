@@ -13,7 +13,7 @@ export class AiOptimizationChatGptLocationsTool extends BaseTool {
     }
 
     getName(): string {
-        return "ai_optimization_chat_gpt_locations";
+        return "ai_optimization_chat_gpt_scraper_locations";
     }
 
     getDescription(): string {
@@ -23,7 +23,6 @@ export class AiOptimizationChatGptLocationsTool extends BaseTool {
     getParams(): z.ZodRawShape {
         return {
             country_iso_code: z.string().optional().describe("ISO 3166-1 alpha-2 country code, for example: US, GB, MT"),
-            location_type: z.string().optional().describe("Type of location. Possible variants: 'TV Region','Postal Code','Neighborhood','Governorate','National Park','Quarter','Canton','Airport','Okrug','Prefecture','City','Country','Province','Barrio','Sub-District','Congressional District','Municipality District','district','DMA Region','Union Territory','Territory','Colloquial Area','Autonomous Community','Borough','County','State','District','City Region','Commune','Region','Department','Division','Sub-Ward','Municipality','University'"),
             location_name: z.string().optional().describe("Name of location or it`s part.")
         };
     }
@@ -34,9 +33,6 @@ export class AiOptimizationChatGptLocationsTool extends BaseTool {
             let payload: Record<string, unknown> = {};
             if (params.country_iso_code) {
                 payload['country_iso_code'] = params.country_iso_code;
-            }
-            if (params.location_type) {
-                payload['location_type'] = params.location_type;
             }
             if (params.location_name) {
                 payload['location_name'] = params.location_name;
