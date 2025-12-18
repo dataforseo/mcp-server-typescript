@@ -21,7 +21,6 @@ export class LighthouseTool extends BaseTool {
     return {
       url: z.string().describe("URL of the page to parse"),
       enable_javascript: z.boolean().optional().describe("Enable JavaScript rendering"),
-      custom_js: z.string().optional().describe("Custom JavaScript code to execute"),
       custom_user_agent: z.string().optional().describe("Custom User-Agent header"),
       accept_language: z.string().optional().describe("Accept-Language header value"),
     };
@@ -32,7 +31,6 @@ export class LighthouseTool extends BaseTool {
         const response = await this.dataForSEOClient.makeRequest('/v3/on_page/lighthouse/live/json', 'POST', [{
           url: params.url,
           enable_javascript: params.enable_javascript,
-          custom_js: params.custom_js,
           custom_user_agent: params.custom_user_agent,
           accept_language: params.accept_language,
         }]);
