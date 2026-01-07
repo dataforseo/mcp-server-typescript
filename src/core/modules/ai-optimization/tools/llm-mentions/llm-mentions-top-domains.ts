@@ -9,7 +9,7 @@ export class AiOptimizationLlmMentionsTopDomainsTool extends BaseTool {
     }
 
     getName(): string {
-        return "ai_optimization_llm_mentions_top_domains";
+        return "ai_opt_llm_ment_top_domains";
     }
 
     getDescription(): string {

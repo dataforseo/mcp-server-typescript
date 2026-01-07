@@ -13,11 +13,11 @@ export class AiOptimizationKeywordDataLocationsAndLanguagesListTool extends Base
   }
   
   getName(): string {
-      return "ai_optimization_keyword_data_locations_and_languages";
+      return "ai_opt_kw_data_loc_and_lang";
   }
 
   getDescription(): string {
-      return "Utility tool for ai_keyword_data_search_volume to get list of availible locations and languages";
+      return "Utility tool for 'AI Optimization Keyword Data Locations and Languages' (ai_opt_kw_data_loc_and_lang) to get list of availible locations and languages";
   }
 
   getParams(): ZodRawShape {

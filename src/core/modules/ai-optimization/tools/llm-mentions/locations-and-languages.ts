@@ -13,11 +13,11 @@ export class AiOptimizationLlmMentionsLocationsAndLanguagesListTool extends Base
     }
 
     getName(): string {
-        return "ai_optimization_llm_mentions_locations_and_languages";
+        return "ai_opt_llm_ment_loc_and_lang";
     }
 
     getDescription(): string {
-        return "Utility tool for ai_llm_mentions to get list of available locations and languages";
+        return "Utility tool for 'AI Optimization LLM Mentions Locations and Languages' (ai_opt_llm_ment_loc_and_lang) to get list of available locations and languages";
     }
 
     getParams(): ZodRawShape {

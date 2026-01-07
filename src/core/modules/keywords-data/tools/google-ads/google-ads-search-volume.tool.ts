@@ -8,7 +8,7 @@ export class GoogleAdsSearchVolumeTool extends BaseTool {
   }
 
   getName(): string {
-    return 'keywords_data_google_ads_search_volume';
+    return 'kw_data_google_ads_search_volume';
   }
 
   getDescription(): string {

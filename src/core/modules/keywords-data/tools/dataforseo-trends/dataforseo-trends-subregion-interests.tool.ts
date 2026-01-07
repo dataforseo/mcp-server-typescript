@@ -8,7 +8,7 @@ export class DataForSeoTrendsSubregionInterestsTool extends BaseTool {
   }
 
   getName(): string {
-    return 'keywords_data_dataforseo_trends_subregion_interests';
+    return 'kw_data_dfs_trends_subregion_interests';
   }
 
   getDescription(): string {

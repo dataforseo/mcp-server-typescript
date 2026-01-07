@@ -9,7 +9,7 @@ export class AiOptimizationLlmMentionsAggregatedMetricsTool extends BaseTool {
     }
 
     getName(): string {
-        return "ai_optimization_llm_mentions_aggregated_metrics";
+        return "ai_opt_llm_ment_agg_metrics";
     }
 
     getDescription(): string {

@@ -8,7 +8,7 @@ export class DataForSeoTrendsExploreTool extends BaseTool {
   }
 
   getName(): string {
-    return 'keywords_data_dataforseo_trends_explore';
+    return 'kw_data_dfs_trends_explore';
   }
 
   getDescription(): string {

@@ -8,11 +8,11 @@ export class GoogleAdsLocationsListTool extends BaseTool {
   }
 
   getName(): string {
-    return 'keywords_data_google_ads_locations';
+    return 'kw_data_google_ads_locations';
   }
 
   getDescription(): string {
-    return 'Utility tool for keywords_data_google_ads_search_volume to get list of availible locations.';
+    return 'Utility tool for kw_data_google_ads_search_volume to get list of availible locations.';
   }
   
   getParams(): z.ZodRawShape {

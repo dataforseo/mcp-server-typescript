@@ -1,0 +1,50 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: set version in package.json
+        run: |
+          TAG_VERSION=${{ github.ref_name }}
+          PACKAGE_VERSION=${TAG_VERSION#v}
+          echo "Publishing version: $PACKAGE_VERSION"
+          npm version $PACKAGE_VERSION --no-git-tag-version
+          echo "✅ Updated package.json to version $PACKAGE_VERSION"
+
+      - name: Build package
+        run: npm run build
+
+      - name: Validate build output
+        run: |
+          if [ ! -d "build/main" ]; then
+            echo "❌ Build failed: build/main directory not found"
+            exit 1
+          fi
+          echo "✅ Build output validated"
+
+      - name: Publish to npm using Trusted Publisher
+        run: npm publish

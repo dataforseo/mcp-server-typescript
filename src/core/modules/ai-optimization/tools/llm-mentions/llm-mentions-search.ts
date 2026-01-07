@@ -9,7 +9,7 @@ export class AiOptimizationLlmMentionsSearchTool extends BaseTool {
     }
 
     getName(): string {
-        return "ai_optimization_llm_mentions_search";
+        return "ai_opt_llm_ment_search";
     }
 
     getDescription(): string {

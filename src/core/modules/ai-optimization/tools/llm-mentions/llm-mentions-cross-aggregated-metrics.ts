@@ -10,7 +10,7 @@ export class AiOptimizationLlmMentionsCrossAggregatedMetricsTool extends BaseToo
     }
 
     getName(): string {
-        return "ai_optimization_llm_mentions_cross_aggregated_metrics";
+        return "ai_opt_llm_ment_cross_agg_metrics";
     }
 
     getDescription(): string {

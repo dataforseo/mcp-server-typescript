@@ -8,7 +8,7 @@ export class GoogleTrendsCategoriesTool extends BaseTool {
   }
 
   getName(): string {
-    return 'keywords_data_google_trends_categories';
+    return 'kw_data_google_trends_categories';
   }
 
   getDescription(): string {
