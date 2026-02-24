@@ -5,6 +5,9 @@ import { DataForSEOResponse } from '../../base.tool.js';
 import { defaultGlobalToolConfig } from '../../../config/global.tool.js';
 
 export class LighthouseTool extends BaseTool {
+
+  private resultProperties = ["audits", "configSettings", "categories", "categoryGroups", "timing", "i18n", "stackPacks"] as const;
+
   constructor(private client: DataForSEOClient) {
     super(client);
   }
@@ -23,20 +26,32 @@ export class LighthouseTool extends BaseTool {
       enable_javascript: z.boolean().optional().describe("Enable JavaScript rendering"),
       custom_user_agent: z.string().optional().describe("Custom User-Agent header"),
       accept_language: z.string().optional().describe("Accept-Language header value"),
+      result: z.enum(this.resultProperties).optional().describe("Specify which Lighthouse result property to return: audits, configSettings, categories, categoryGroups, timing, i18n, or stackPacks")
     };
   }
 
   async handle(params: any): Promise<any> {
     try {
-        const response = await this.dataForSEOClient.makeRequest('/v3/on_page/lighthouse/live/json', 'POST', [{
+        let response = await this.dataForSEOClient.makeRequest<any>('/v3/on_page/lighthouse/live/json', 'POST', [{
           url: params.url,
           enable_javascript: params.enable_javascript,
           custom_user_agent: params.custom_user_agent,
           accept_language: params.accept_language,
         }]);
+
+        if(params.result && params.result != "") {
+          (response.items as any[]).forEach(item => {
+            Object.keys(item).forEach(key => {
+                if (key != params.result && this.resultProperties.findIndex(x => x == key) != -1) {
+                  delete item[key];
+                }
+              });
+          });
+        }
+       
         return this.validateAndFormatResponse(response);
       } catch (error) {
         return this.formatErrorResponse(error);
       }
   }
-} 
+}
