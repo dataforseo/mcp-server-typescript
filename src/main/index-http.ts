@@ -74,7 +74,7 @@ async function main() {
 
     // Validate credentials
     if (!username || !password) {
-      console.error('Missing credentials');
+      console.error('Invalid credentials');
       res.status(401).json({
         jsonrpc: "2.0",
         error: {

@@ -76,25 +76,46 @@ app.use(express.json());
 
 // Basic Auth Middleware
 const basicAuth = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Basic ')) {
+
+  if (req.body?.method === 'tools/list') {
     next();
     return;
   }
 
-  const base64Credentials = authHeader.split(' ')[1];
-  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-  const [username, password] = credentials.split(':');
+  const authHeader = req.headers.authorization;
+  const envUsername = process.env.DATAFORSEO_USERNAME;
+  const envPassword = process.env.DATAFORSEO_PASSWORD;
 
+  let username: string | undefined;
+  let password: string | undefined;
+
+  // Try to extract credentials from Authorization header
+  if (authHeader?.startsWith('Basic ')) {
+    try {
+        const base64Credentials = authHeader.slice(6);
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+        [username, password] = credentials.split(':');
+    } catch (error) {
+        console.error('Invalid Basic auth header:', error);
+    }
+  }
+
+  // Fall back to environment variables if no header credentials provided
+  if (!username || !password) {
+    username = envUsername;
+    password = envPassword;
+  }
+
+  // Validate credentials
   if (!username || !password) {
     console.error('Invalid credentials');
     res.status(401).json({
-      jsonrpc: "2.0",
-      error: {
-        code: -32001,
-        message: "Invalid credentials"
-      },
-      id: null
+        jsonrpc: "2.0",
+        error: {
+            code: -32001,
+            message: "Invalid credentials"
+        },
+        id: null
     });
     return;
   }
@@ -115,27 +136,7 @@ const handleMcpRequest = async (req: Request, res: Response) => {
     
     try {
       console.error(Date.now().toLocaleString())
-      
-    // Handle credentials
-      if (!req.username && !req.password) {
-        const envUsername = process.env.DATAFORSEO_USERNAME;
-        const envPassword = process.env.DATAFORSEO_PASSWORD;
-        if (!envUsername || !envPassword) {
-          console.error('No DataForSEO credentials provided');
-          res.status(401).json({
-            jsonrpc: "2.0",
-            error: {
-              code: -32001,
-              message: "Authentication required. Provide DataForSEO credentials."
-            },
-            id: null
-          });
-          return;
-        }
-        req.username = envUsername;
-        req.password = envPassword;
-      }
-      
+
       const server = initMcpServer(req.username, req.password); 
       console.error(Date.now().toLocaleString())
 
