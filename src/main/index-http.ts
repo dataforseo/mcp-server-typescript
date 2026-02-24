@@ -42,25 +42,43 @@ async function main() {
 
   // Basic Auth Middleware
   const basicAuth = (req: Request, res: Response, next: NextFunction) => {
-    // Check for Authorization header
-    const authHeader = req.headers.authorization;
-    console.error(authHeader)
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
+
+    if (req.body?.method === 'tools/list') {
       next();
       return;
     }
 
-    // Extract credentials
-    const base64Credentials = authHeader.split(' ')[1];
-    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-    const [username, password] = credentials.split(':');
+    const authHeader = req.headers.authorization;
+    const envUsername = process.env.DATAFORSEO_USERNAME;
+    const envPassword = process.env.DATAFORSEO_PASSWORD;
 
+    let username: string | undefined;
+    let password: string | undefined;
+
+    // Try to extract credentials from Authorization header
+    if (authHeader?.startsWith('Basic ')) {
+      try {
+        const base64Credentials = authHeader.slice(6);
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+        [username, password] = credentials.split(':');
+      } catch (error) {
+        console.error('Invalid Basic auth header:', error);
+      }
+    }
+
+    // Fall back to environment variables if no header credentials provided
     if (!username || !password) {
-      console.error('Invalid credentials');
+      username = envUsername;
+      password = envPassword;
+    }
+
+    // Validate credentials
+    if (!username || !password) {
+      console.error('Missing credentials');
       res.status(401).json({
         jsonrpc: "2.0",
         error: {
-          code: -32001, 
+          code: -32001,
           message: "Invalid credentials"
         },
         id: null
@@ -68,7 +86,6 @@ async function main() {
       return;
     }
 
-    // Add credentials to request
     req.username = username;
     req.password = password;
     next();
@@ -79,30 +96,7 @@ async function main() {
     // to ensure complete isolation. A single instance would cause request ID collisions
     // when multiple clients connect concurrently.
     
-    try {
-      
-      // Check if we have valid credentials
-      if (!req.username && !req.password) {
-        // If no request auth, check environment variables
-        const envUsername = process.env.DATAFORSEO_USERNAME;
-        const envPassword = process.env.DATAFORSEO_PASSWORD;
-        if (!envUsername || !envPassword) {
-          console.error('No DataForSEO credentials provided');
-          res.status(401).json({
-            jsonrpc: "2.0",
-            error: {
-              code: -32001,
-              message: "Authentication required. Provide DataForSEO credentials."
-            },
-            id: null
-          });
-          return;
-        }
-        // Use environment variables
-        req.username = envUsername;
-        req.password = envPassword;
-      }
-      
+    try {      
       const server = initMcpServer(req.username, req.password); 
       console.error(Date.now().toLocaleString())
 
