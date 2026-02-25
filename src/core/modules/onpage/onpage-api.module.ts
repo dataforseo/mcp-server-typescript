@@ -3,6 +3,7 @@ import { PromptDefinition } from '../prompt-definition.js';
 import { onpagePrompts } from './onpage.prompt.js';
 import { ContentParsingTool } from './tools/content-parsing.tool.js';
 import { InstantPagesTool } from './tools/instant-pages.tool.js';
+import { LighthouseHelperTool } from './tools/lighthouse-helper.tool.js';
 import { LighthouseTool } from './tools/lighthouse.tool.js';
 
 export class OnPageApiModule extends BaseModule {
@@ -11,6 +12,7 @@ export class OnPageApiModule extends BaseModule {
       new ContentParsingTool(this.dataForSEOClient),
       new InstantPagesTool(this.dataForSEOClient),
       new LighthouseTool(this.dataForSEOClient),
+      new LighthouseHelperTool(this.dataForSEOClient),
       // Add more tools here
     ];
 
