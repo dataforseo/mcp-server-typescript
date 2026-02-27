@@ -12,6 +12,7 @@ export function filterFields(data: any, fields: FieldPath[]): any {
     extractAndSetValue(data, result, path);
   });
 
+  pruneEmpty(result);
   return result;
 }
 
@@ -86,6 +87,32 @@ function extractAndSetValue(source: any, target: any, path: string[]): void {
       extractAndSetValue(sourceValue, target[currentKey], remainingPath);
     }
   }
+}
+
+
+// recursively prune empty objects/arrays created during filtering
+function pruneEmpty(obj: any): boolean {
+  if (Array.isArray(obj)) {
+    // prune items from end to start to avoid index skew
+    for (let i = obj.length - 1; i >= 0; --i) {
+      if (pruneEmpty(obj[i])) {
+        obj.splice(i, 1);
+      }
+    }
+    return obj.length === 0;
+  }
+
+  if (obj && typeof obj === 'object') {
+    Object.keys(obj).forEach(key => {
+      if (pruneEmpty(obj[key])) {
+        delete obj[key];
+      }
+    });
+    return Object.keys(obj).length === 0;
+  }
+
+  // primitives are not empty
+  return false;
 }
 
 export function parseFieldPaths(fields: string[]): FieldPath[] {

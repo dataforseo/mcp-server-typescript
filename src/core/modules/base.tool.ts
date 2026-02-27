@@ -66,23 +66,23 @@ export abstract class BaseTool {
     return filterExpression;
   }
 
-  protected validateAndFormatResponse(response: any): { content: Array<{ type: string; text: string }> } {
+  protected validateAndFormatResponse(response: any, fullData: boolean = false): { content: Array<{ type: string; text: string }> } {
     console.error(JSON.stringify(response));
     if (defaultGlobalToolConfig.fullResponse || this.supportOnlyFullResponse()) {
       let data = response as DataForSEOFullResponse;
       this.validateResponseFull(data);
       let result = data.tasks[0].result;
-      return this.formatResponse(result);
+      return this.formatResponse(result, fullData);
     }
     this.validateResponse(response);
-    return this.formatResponse(response);
+    return this.formatResponse(response, fullData);
   }
 
-  protected formatResponse(data: any): { content: Array<{ type: string; text: string }> } {
+  protected formatResponse(data: any, fullData: boolean = false): { content: Array<{ type: string; text: string }> } {
     const fieldConfig = FieldConfigurationManager.getInstance();
     if (fieldConfig.hasConfiguration()) {
       const toolName = this.getName();
-      if (fieldConfig.isToolConfigured(toolName)) {
+      if (fieldConfig.isToolConfigured(toolName) && !fullData) {
         const fields = fieldConfig.getFieldsForTool(toolName);
         if (fields && fields.length > 0) {
           data = filterFields(data, parseFieldPaths(fields));
