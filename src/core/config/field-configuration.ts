@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 
+export const DEFAULT_FIELD_CONFIG_PATH = 'mcp-server-typescript/field-config.json';
+
 export interface FieldConfiguration {
   supported_fields: Record<string, string[]>;
 }
@@ -83,7 +85,7 @@ export function loadFieldConfiguration(configPath: string): void {
 }
 
 export function initializeFieldConfiguration(): void {
-  const configPath = process.env.FIELD_CONFIG_PATH;
+  const configPath = process.env.FIELD_CONFIG_PATH ?? DEFAULT_FIELD_CONFIG_PATH;
   
   if (configPath) {
     try {
