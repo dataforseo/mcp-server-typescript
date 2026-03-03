@@ -1,6 +1,5 @@
 import * as fs from 'fs';
-
-export const DEFAULT_FIELD_CONFIG_PATH = 'mcp-server-typescript/default-field-config.json';
+import { defaultFieldConfiguration } from './default-field-configuration.js';
 
 export interface FieldConfiguration {
   supported_fields: Record<string, string[]>;
@@ -20,17 +19,10 @@ export class FieldConfigurationManager {
   }
 
   public loadFromFile(configPath: string | undefined): void {
-    try {
-      const defaultConfigContent = fs.readFileSync(DEFAULT_FIELD_CONFIG_PATH, 'utf8');
-      const defaultParsedConfig = JSON.parse(defaultConfigContent);
-
-      // Validate the default configuration structure
-      if (!defaultParsedConfig.supported_fields || typeof defaultParsedConfig.supported_fields !== 'object') {
-        throw new Error('Invalid default configuration format. Expected { "supported_fields": { "tool_name": ["field1", "field2"] } }');
-      }
-
+    try { 
+      
       if(!configPath) {
-        this.config = defaultParsedConfig;
+        this.config = defaultFieldConfiguration;
         return;
       }
 
@@ -49,9 +41,9 @@ export class FieldConfigurationManager {
 
       this.config = parsedConfig;
 
-      Object.entries(defaultParsedConfig.supported_fields).forEach(([tool, fields]) => {
+      Object.entries(defaultFieldConfiguration.supported_fields).forEach(([tool, fields]) => {
         if(!this.config?.supported_fields[tool]) {
-          this.config!.supported_fields[tool] = fields as string[];
+          this.config!.supported_fields[tool] = fields;
         }
       });
 
