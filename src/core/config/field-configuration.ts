@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { defaultFieldConfiguration } from './default-field-configuration.js';
 
 export interface FieldConfiguration {
   supported_fields: Record<string, string[]>;
@@ -17,8 +18,14 @@ export class FieldConfigurationManager {
     return FieldConfigurationManager.instance;
   }
 
-  public loadFromFile(configPath: string): void {
-    try {
+  public loadFromFile(configPath: string | undefined): void {
+    try { 
+      
+      if(!configPath) {
+        this.config = defaultFieldConfiguration;
+        return;
+      }
+
       if (!fs.existsSync(configPath)) {
         console.warn(`Configuration file not found: ${configPath}`);
         return;
@@ -33,6 +40,13 @@ export class FieldConfigurationManager {
       }
 
       this.config = parsedConfig;
+
+      Object.entries(defaultFieldConfiguration.supported_fields).forEach(([tool, fields]) => {
+        if(!this.config?.supported_fields[tool]) {
+          this.config!.supported_fields[tool] = fields;
+        }
+      });
+
       console.log(`Field configuration loaded from: ${configPath}`);
     } catch (error) {
       console.error('Error loading field configuration:', error);
@@ -78,18 +92,16 @@ export function hasFieldConfiguration(): boolean {
   return FieldConfigurationManager.getInstance().hasConfiguration();
 }
 
-export function loadFieldConfiguration(configPath: string): void {
+export function loadFieldConfiguration(configPath: string| undefined): void {
   FieldConfigurationManager.getInstance().loadFromFile(configPath);
 }
 
 export function initializeFieldConfiguration(): void {
   const configPath = process.env.FIELD_CONFIG_PATH;
   
-  if (configPath) {
-    try {
-      loadFieldConfiguration(configPath);
-    } catch (error) {
-      console.error('Failed to load field configuration:', error);
-    }
+  try {
+    loadFieldConfiguration(configPath);
+  } catch (error) {
+    console.error('Failed to load field configuration:', error);
   }
 }

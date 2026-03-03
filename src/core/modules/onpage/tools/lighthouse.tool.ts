@@ -1,13 +1,8 @@
 import { z } from 'zod';
-import { BaseTool, DataForSEOFullResponse } from '../../base.tool.js';
+import { BaseTool } from '../../base.tool.js';
 import { DataForSEOClient } from '../../../client/dataforseo.client.js';
-import { DataForSEOResponse } from '../../base.tool.js';
-import { defaultGlobalToolConfig } from '../../../config/global.tool.js';
 
 export class LighthouseTool extends BaseTool {
-
-  private resultProperties = ["audits", "configSettings", "categories", "categoryGroups", "timing", "i18n", "stackPacks"] as const;
-
   constructor(private client: DataForSEOClient) {
     super(client);
   }
@@ -26,7 +21,7 @@ export class LighthouseTool extends BaseTool {
       enable_javascript: z.boolean().optional().describe("Enable JavaScript rendering"),
       custom_user_agent: z.string().optional().describe("Custom User-Agent header"),
       accept_language: z.string().optional().describe("Accept-Language header value"),
-      result: z.enum(this.resultProperties).optional().describe("Specify which Lighthouse result property to return: audits, configSettings, categories, categoryGroups, timing, i18n, or stackPacks")
+      full_data: z.boolean().optional().describe("Return the complete API response instead of a reduced version"),
     };
   }
 
@@ -38,18 +33,8 @@ export class LighthouseTool extends BaseTool {
           custom_user_agent: params.custom_user_agent,
           accept_language: params.accept_language,
         }]);
-
-        if(params.result && params.result != "") {
-          (response.items as any[]).forEach(item => {
-            Object.keys(item).forEach(key => {
-                if (key != params.result && this.resultProperties.findIndex(x => x == key) != -1) {
-                  delete item[key];
-                }
-              });
-          });
-        }
        
-        return this.validateAndFormatResponse(response);
+        return this.validateAndFormatResponse(response, params.full_data ?? false);
       } catch (error) {
         return this.formatErrorResponse(error);
       }
