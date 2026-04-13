@@ -5,7 +5,7 @@ import { PromptDefinition } from '../prompt-definition.js';
 
 export const datalabsPrompts: PromptDefinition[] = [
   {
-    name: 'create_content_targeting_decision_stage_users',
+    name: 'dfs-decision-stage-content',
     title: 'Create content targeting decision-stage users',
     params: {
       product: z.string().describe('The product to search related keywords for')
@@ -25,7 +25,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'generate_seo_friendly_article_ideas',
+    name: 'dfs-article-ideas-generator',
     title: 'Generate SEO-friendly article ideas that directly answer user questions.',
     params: {
       topic: z.string().describe('topic'),
@@ -45,7 +45,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'focus_on_high_converting_terms_for_paid_campaigns_based_on_buyer_readiness',
+    name: 'dfs-high-intent-keywords',
     title: 'Focus on high-converting terms for paid campaigns based on buyer readiness.',
     params: {
       product: z.string().describe('The product/service to compare'),
@@ -65,7 +65,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'structure_site_content_and_internal_linking_based_on_keyword_clusters',
+    name: 'dfs-keyword-cluster-structure',
     title: 'Structure site content and internal linking based on keyword clusters.',
     params: {
       keyword: z.string().describe('The keyword to cluster related keywords for'),
@@ -85,7 +85,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
     {
-    name: 'compare_sites_by_keywords',
+    name: 'dfs-site-keyword-comparison',
     title: 'Competitor Comparison',
     params: {
       site_1: z.string().describe('The first site to compare'),
@@ -106,7 +106,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'build_content_that_aligns_with_user_research_behavior_and_ranks_easier',
+    name: 'dfs-user-intent-content',
     title: 'Build content that aligns with user research behavior and ranks easier.',
     params: {
       topic: z.string().describe('keyword/topic'),
@@ -126,7 +126,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'track_long_term_seo_performance',
+    name: 'dfs-seo-performance-tracker',
     title: 'Track long-term SEO performance, visibility shifts, and seasonal trends.',
     params: {
       domain: z.string().describe('The domain to analyze'),
@@ -148,7 +148,7 @@ export const datalabsPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'compare_monthly_organic_traffic_trends_and_ranking_distribution_against_a_competitor',
+    name: 'dfs-traffic-ranking-comparison',
     title: 'Compare monthly organic traffic trends and ranking distribution against a competitor.',
     params: {
       domain: z.string().describe('Your domain to analyze'),
