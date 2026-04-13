@@ -111,13 +111,13 @@ export abstract class BaseTool {
   }
 
   protected validateResponse(response: DataForSEOResponse): void {
-    if (response.status_code / 100 !== 200) {
+    if (Math.floor(response.status_code / 100) !== 200) {
       throw new Error(`API Error: ${response.status_message} (Code: ${response.status_code})`);
     }
   }
 
   protected validateResponseFull(response: DataForSEOFullResponse): void {
-    if (response.status_code / 100 !== 200) {
+    if (Math.floor(response.status_code / 100) !== 200) {
       throw new Error(`API Error: ${response.status_message} (Code: ${response.status_code})`);
     }
 
@@ -126,7 +126,7 @@ export abstract class BaseTool {
     }
 
     const task = response.tasks[0];
-    if (task.status_code / 100 !== 200) {
+    if (Math.floor(task.status_code / 100) !== 200) {
       throw new Error(`Task Error: ${task.status_message} (Code: ${task.status_code})`);
     }
 
