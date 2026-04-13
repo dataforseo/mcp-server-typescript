@@ -4,7 +4,7 @@ import { PromptDefinition } from '../prompt-definition.js';
 
 export const serpPrompts: PromptDefinition[] = [
   {
-    name: 'analyze_local_seo_differences_in_the_top_10_google_results_for_two_target_markets',
+    name: 'dfs-local-seo-comparison',
     title: 'Analyze local SEO differences in the top 10 Google results for two target markets.',
     params: {
       keyword: z.string().describe('The keyword to analyze'),
@@ -27,7 +27,7 @@ export const serpPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'monitor_visibility_for_key_branded_searches_in_real_time',
+    name: 'dfs-brand-visibility-monitor',
     title: 'Monitor visibility for key branded searches in real-time.',
     params: {
       domain: z.string().describe('The domain to monitor'),
@@ -49,7 +49,7 @@ export const serpPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'generate_domain_visibility_reports_and_track_ranking_changes',
+    name: 'dfs-domain-rank-overview',
     title: 'Generate domain visibility reports and track ranking changes.',
     params: {
       domain: z.string().describe('The domain to analyze'),

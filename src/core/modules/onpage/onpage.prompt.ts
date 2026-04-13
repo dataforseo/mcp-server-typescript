@@ -4,7 +4,7 @@ import { PromptDefinition } from '../prompt-definition.js';
 
 export const onpagePrompts: PromptDefinition[] = [
   {
-    name: 'identify_technical_performance_issues_affecting_crawlability_and_ranking',
+    name: 'dfs-crawlability-audit',
     title: 'Identify technical performance issues affecting crawlability and ranking',
     params: {
       url: z.string().describe('The URL of the page to analyze'),
@@ -24,7 +24,7 @@ export const onpagePrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'detect_missing_or_duplicate_meta_tags_hurting_seo',
+    name: 'dfs-meta-tags-check',
     title: 'Detect missing or duplicate meta tags hurting SEO',
     params: {
       url: z.string().describe('The URL of the page to analyze'),
@@ -44,7 +44,7 @@ export const onpagePrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'check_for_slow_load_time_and_mobile_compatibility_issues',
+    name: 'dfs-performance-mobile-check',
     title: 'Check for slow load time and mobile compatibility issues',
     params: {
       url: z.string().describe('The URL of the page to analyze'),
@@ -64,7 +64,7 @@ export const onpagePrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'evaluate_internal_linking_and_crawl_depth_for_better_indexing',
+    name: 'dfs-internal-linking-audit',
     title: 'Evaluate internal linking and crawl depth for better indexing',
     params: {
       url: z.string().describe('The URL of the page to analyze'),
@@ -84,7 +84,7 @@ export const onpagePrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'analyze_keyword_optimization_and_content_gaps',
+    name: 'dfs-keyword-content-gaps',
     title: 'Analyze keyword optimization and content gaps',
     params: {
       url: z.string().describe('The URL of the page to analyze'),

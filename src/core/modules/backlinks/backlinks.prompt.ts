@@ -4,7 +4,7 @@ import { PromptDefinition } from '../prompt-definition.js';
 
 export const backlinksPrompts: PromptDefinition[] = [
   {
-    name: 'discover_your_strongest_backlinks_for_authority_building',
+    name: 'dfs-top-backlinks',
     title: 'Discover your strongest backlinks for authority building.',
     params: {
         domain: z.string().describe('The domain to find for'),
@@ -24,7 +24,7 @@ export const backlinksPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'see_which_blog_content_earns_you_the_most_backlinks',
+    name: 'dfs-content-backlink-performer',
     title: 'See which blog content earns you the most backlinks.',
     params: {
       domain: z.string().describe('The domain to analyze'),
@@ -44,7 +44,7 @@ export const backlinksPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'find_new_link_opportunities_from_competitor_backlinks',
+    name: 'dfs-competitor-backlink-opportunities',
     title: 'Find new link opportunities from competitor backlinks.',
     params: {
       my_domain: z.string().describe('Your domain to compare against competitors'),
@@ -66,7 +66,7 @@ export const backlinksPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'locate_broken_or_redirected_pages_that_waste_valuable_links',
+    name: 'dfs-broken-links-finder',
     title: 'Locate broken or redirected pages that waste valuable links.',
     params: {
       domain: z.string().describe('The domain to analyze'),
@@ -87,7 +87,7 @@ export const backlinksPrompts: PromptDefinition[] = [
     }
   },
   {
-    name: 'benchmark_backlink_gaps_between_you_and_a_competitor',
+    name: 'dfs-backlink-gap-analysis',
     title: 'Benchmark backlink gaps between you and a competitor.',
     params: {
       my_domain: z.string().describe('Your domain to compare against a competitor'),
