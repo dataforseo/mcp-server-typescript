@@ -47,4 +47,4 @@ jobs:
           echo "✅ Build output validated"
 
       - name: Publish to npm using Trusted Publisher
-        run: npm publish
+        run: npm publish --provenance --access publi
