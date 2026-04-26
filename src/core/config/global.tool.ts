@@ -19,9 +19,9 @@ export function parseGlobalToolConfig(): GlobalToolConfig {
     debug: debugEnv === 'true',
     simpleFilter: simpleFilterEnv === 'true'
   };
-  
+
   return GlobalToolConfigSchema.parse(config);
 }
 
 // Export default config
-export const defaultGlobalToolConfig = parseGlobalToolConfig(); 
+export const defaultGlobalToolConfig = parseGlobalToolConfig();
