@@ -11,7 +11,7 @@
     "DATAFORSEO_PASSWORD": "YOUR_PASSWORD",
     "ENABLED_MODULES": null,
     "DATAFORSEO_FULL_RESPONSE": "false",
-	"DATAFORSEO_SIMPLE_FILTER":"false"
+	"DATAFORSEO_SIMPLE_FILTER":"false",
   },
   	"durable_objects": {
 		"bindings": [
