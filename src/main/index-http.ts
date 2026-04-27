@@ -36,17 +36,19 @@ function getSessionId() {
   return randomUUID().toString();
 }
 
+const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL ?? 'http://localhost:8000';
+
 async function main() {
   const app = express();
   app.use(express.json());
 
   // Basic Auth Middleware
-  const basicAuth = (req: Request, res: Response, next: NextFunction) => {
+  const basicAuth = async (req: Request, res: Response, next: NextFunction) => {
 
-    if (req.body?.method === 'tools/list') {
-      next();
-      return;
-    }
+    // if (req.body?.method === 'tools/list') {
+    //   next();
+    //   return;
+    // }
 
     const authHeader = req.headers.authorization;
     const envUsername = process.env.DATAFORSEO_USERNAME;
@@ -63,6 +65,16 @@ async function main() {
         [username, password] = credentials.split(':');
       } catch (error) {
         console.error('Invalid Basic auth header:', error);
+      }
+    }
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      const oauthToken = req.headers.authorization?.replace("Bearer ", "") ?? '';
+      if (oauthToken) {
+        const credentials = await exchangeOAuthToken(oauthToken);
+        if (credentials) {
+          [username, password] = credentials;
+        }
       }
     }
 
@@ -140,6 +152,38 @@ async function main() {
       id: null
     });
   };
+  
+  const apiTokenCache = new Map<string, { username: string, password: string }>();
+  
+  async function exchangeOAuthToken(oauthToken: string): Promise<string[] | null> {
+    const cached = apiTokenCache.get(oauthToken);
+    if (cached) return [cached.username, cached.password];
+    
+    try {
+      const res = await fetch(`${AUTH_SERVER_URL}/api/mcp/token`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${oauthToken}` },
+      });
+      if (!res.ok) return null;
+      const data = await res.json() as { login: string; password: string };
+      const username = data.login || undefined;
+      const password = data.password || undefined;
+      if (username && password) {
+        apiTokenCache.set(oauthToken, {username, password});
+        return [username, password];
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+  
+  if (!process.env.username && !process.env.password) {
+    app.get('/.well-known/oauth-protected-resource', (req, res) => {
+      const resource = `${req.protocol}://${req.get('host')}`;
+      res.json({ resource, authorization_servers: [AUTH_SERVER_URL] });
+    });
+  }
 
   // Apply basic auth and shared handler to both endpoints
   app.post('/http', basicAuth, handleMcpRequest);
