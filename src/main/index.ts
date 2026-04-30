@@ -1,11 +1,5 @@
 #!/usr/bin/env node
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
-import { EnabledModulesSchema, isModuleEnabled, defaultEnabledModules } from '../core/config/modules.config.js';
-import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
-import { z } from 'zod';
-import { ModuleLoaderService } from "../core/utils/module-loader.js";
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { name, version } from '../core/utils/version.js';
 import { initMcpServer } from "./init-mcp-server.js";
