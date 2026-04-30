@@ -29,22 +29,12 @@ default value: 0
 if you specify the 10 value, the first ten anchors in the results array will be omitted and the data will be provided for the successive anchors`
       ),
       filters: this.getFilterExpression().optional().describe(
-        `array of results filtering parameters
-optional field
-you can add several filters at once (8 filters maximum)
-you should set a logical operator and, or between the conditions
-the following operators are supported:
-regex, not_regex, =, <>, in, not_in, like, not_like, ilike, not_ilike, match, not_match
-you can use the % operator with like and not_like to match any string of zero or more characters
-example:
-["referring_links_types.anchors",">","1"]
-[["broken_pages",">","2"],
-"and",
-["backlinks",">","10"]]
-
-[["first_seen",">","2017-10-23 11:31:45 +00:00"],
-"and",
-[["anchor","like","%seo%"],"or",["referring_domains",">","10"]]]`
+        `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, =, <>, in, not_in, like, not_like, ilike, not_ilike, match, not_match
+Use % with like/not_like to match any string of zero or more characters.
+Examples:
+  Single: ["referring_links_types.anchors",">","1"]
+  Combined: [["broken_pages",">","2"],"and",["backlinks",">","10"]]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules

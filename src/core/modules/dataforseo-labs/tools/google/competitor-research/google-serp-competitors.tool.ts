@@ -41,18 +41,13 @@ example:
         if you specify the 10 value, the first ten keywords in the results array will be omitted and the data will be provided for the successive keywords`
       ),
       filters: this.getFilterExpression().optional().describe(
-        `you can add several filters at once (8 filters maximum)
-you should set a logical operator and, or between the conditions
-the following operators are supported:
-regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
-you can use the % operator with like and not_like, as well as ilike and not_ilike to match any string of zero or more characters
-example:
-["median_position","in",[1,10]]
-[["median_position","in",[1,10]],"and",["domain","not_like","%wikipedia.org%"]]
-
-[["domain","not_like","%wikipedia.org%"],
-"and",
-[["relevant_serp_items",">",0],"or",["median_position","in",[1,10]]]]`
+        `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
+Use % with like/not_like/ilike/not_ilike as a wildcard.
+Examples:
+  Single: ["median_position", "in", [1, 10]]
+  Combined: [["median_position", "in", [1, 10]], "and", ["domain", "not_like", "%wikipedia.org%"]]
+  Nested: [["domain", "not_like", "%wikipedia.org%"], "and", [["relevant_serp_items", ">", 0], "or", ["median_position", "in", [1, 10]]]]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules

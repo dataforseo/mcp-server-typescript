@@ -39,16 +39,13 @@ example:
         if you specify the 10 value, the first ten keywords in the results array will be omitted and the data will be provided for the successive keywords`
       ),
       filters: this.getFilterExpression().optional().describe(
-        `you can add several filters at once (8 filters maximum)
-        you should set a logical operator and, or between the conditions
-        the following operators are supported:
-        regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
-        you can use the % operator with like and not_like, as well as ilike and not_ilike to match any string of zero or more characters
-        merge operator must be a string and connect two other arrays, availible values: or, and.
-        example:
-        ["keyword_data.keyword_info.search_volume","in",[100,1000]]
-        [["first_domain_serp_element.etv",">",0],"and",["first_domain_serp_element.description","like","%goat%"]]
-        [["keyword_data.keyword_info.search_volume",">",100],"and",[["first_domain_serp_element.description","like","%goat%"],"or",["second_domain_serp_element.type","=","organic"]]]`
+        `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
+Use % with like/not_like/ilike/not_ilike as a wildcard.
+Examples:
+  Single: ["keyword_data.keyword_info.search_volume", "in", [100, 1000]]
+  Combined: [["first_domain_serp_element.etv", ">", 0], "and", ["first_domain_serp_element.description", "like", "%goat%"]]
+  Nested: [["keyword_data.keyword_info.search_volume", ">", 100], "and", [["first_domain_serp_element.description", "like", "%goat%"], "or", ["second_domain_serp_element.type", "=", "organic"]]]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules
