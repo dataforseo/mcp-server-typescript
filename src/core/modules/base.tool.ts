@@ -51,7 +51,7 @@ export abstract class BaseTool {
     if( defaultGlobalToolConfig.simpleFilter ) {
       // Permissive filter schema for LLM tool compatibility (e.g., OpenAI/ChatGPT).
       // If you modify this behavior, re-verify compatibility with OpenAI tools.
-      return z.any();
+      return z.array(z.any());
     }
     const filterExpression = 
     z.array(
