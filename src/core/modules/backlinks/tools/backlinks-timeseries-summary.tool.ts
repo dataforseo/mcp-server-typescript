@@ -3,7 +3,7 @@ import { DataForSEOClient } from '../../../client/dataforseo.client.js';
 import { BaseTool } from '../../base.tool.js';
 
 export class BacklinksTimeseriesSummaryTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -58,7 +58,7 @@ if there is no data for a certain day/week/month/year, we will return 0`).defaul
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/backlinks/timeseries_summary/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/backlinks/timeseries_summary/live', 'POST', [{
         target: params.target,
         date_from: params.date_from,
         date_to: params.date_to,

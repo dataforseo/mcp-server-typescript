@@ -3,7 +3,7 @@ import { DataForSEOClient } from '../../../client/dataforseo.client.js';
 import { BaseTool } from '../../base.tool.js';
 
 export class BacklinksSummaryTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -32,7 +32,7 @@ if set to false, internal links will be included in the results`).default(true)
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/backlinks/summary/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/backlinks/summary/live', 'POST', [{
         target: params.target,
         include_subdomains: params.include_subdomains,
         exclude_internal_backlinks: params.exclude_internal_backlinks
