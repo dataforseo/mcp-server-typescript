@@ -60,6 +60,7 @@ export class DataForSEOMcpAgent extends McpAgent {
         const schema = z.object(typedTool.params);
         this.server.tool(
           name,
+          typedTool.description,
           schema.shape,
           typedTool.handler
         );
