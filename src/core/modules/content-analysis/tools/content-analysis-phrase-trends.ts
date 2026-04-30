@@ -37,22 +37,13 @@ export class ContentAnalysisPhraseTrendsTool extends BaseTool {
       ),
       page_type: z.array(z.enum(['ecommerce','news','blogs', 'message-boards','organization'])).optional().describe(`target page types`),
       initial_dataset_filters: this.getFilterExpression().optional().describe(
-        `initial dataset filtering parameters
-        initial filtering parameters that apply to fields in the Search endpoint;
-        you can add several filters at once (8 filters maximum);
-        you should set a logical operator and, or between the conditions;
-        the following operators are supported:
-        regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like,not_like, has, has_not, match, not_match
-        you can use the % operator with like and not_like to match any string of zero or more characters;
-        example:
-        ["domain","<>", "logitech.com"]
-        [["domain","<>","logitech.com"],"and",["content_info.connotation_types.negative",">",1000]]
-
-        [["domain","<>","logitech.com"]],
-        "and",
-        [["content_info.connotation_types.negative",">",1000],
-        "or",
-        ["content_info.text_category","has",10994]]`
+        `Array-based initial dataset filter expression applied to Search endpoint fields. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like, not_like, has, has_not, match, not_match
+Use % with like/not_like as a wildcard.
+Examples:
+  Single: ["domain", "<>", "logitech.com"]
+  Combined: [["domain", "<>", "logitech.com"], "and", ["content_info.connotation_types.negative", ">", 1000]]
+  Nested: [["domain", "<>", "logitech.com"], "and", [["content_info.connotation_types.negative", ">", 1000], "or", ["content_info.text_category", "has", 10994]]]`
       ),
       date_from: z.string().describe(`starting date of the time range
         date format: "yyyy-mm-dd"`),

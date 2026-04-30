@@ -40,22 +40,13 @@ export class ContentAnalysisSearchTool extends BaseTool {
       limit: z.number().min(1).max(1000).default(10).describe(`maximum number of results to return`),
       offset: z.number().min(0).default(0).describe(`offset in the results array of returned keywords`),
       filters: this.getFilterExpression().optional().describe(
-        `array of results filtering parameters
-optional field
-you can add several filters at once (8 filters maximum)
-you should set a logical operator and, or between the conditions
-the following operators are supported:
-regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like,not_like, match, not_match
-you can use the % operator with like and not_like to match any string of zero or more characters
-example:
-["country","=", "US"]
-[["domain_rank",">",800],"and",["content_info.connotation_types.negative",">",0.9]]
-
-[["domain_rank",">",800],
-"and",
-[["page_types","has","ecommerce"],
-"or",
-["content_info.text_category","has",10994]]`
+        `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like, not_like, match, not_match
+Use % with like/not_like as a wildcard.
+Examples:
+  Single: ["country", "=", "US"]
+  Combined: [["domain_rank", ">", 800], "and", ["content_info.connotation_types.negative", ">", 0.9]]
+  Nested: [["domain_rank", ">", 800], "and", [["page_types", "has", "ecommerce"], "or", ["content_info.text_category", "has", 10994]]]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules

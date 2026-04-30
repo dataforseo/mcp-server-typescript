@@ -38,14 +38,11 @@ export class AiOptimizationLlmMentionsTopDomainsTool extends BaseTool {
             platform: z.enum(['chat_gpt', 'google']).optional().describe("Platform to search for LLM mentions"),
             links_scope: z.enum(['sources', 'search_results']).optional().describe("specifies which links will be used to extract domains and aggregation"),
             initial_dataset_filters: this.getFilterExpression().optional().describe(
-                `you can add several filters at once (8 filters maximum)
-   you should set a logical operator and, or between the conditions
-   the following operators are supported:
-   regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
-   you can use the % operator with like and not_like, as well as ilike and not_ilike to match any string of zero or more characters
-   merge operator must be a string and connect two other arrays, availible values: or, and.
-   example:
-["ai_search_volume",">","1000"]
+                `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
+Use % with like/not_like/ilike/not_ilike as a wildcard.
+Example:
+  Single: ["ai_search_volume", ">", "1000"]
 The full list of possible filters is available in 'ai_optimization_llm_mentions_filters' tool`
             ),
             items_list_limit: z.number().min(1).max(10).optional().describe("maximum number of results in the items array, min value is 1, max value is 10"),
