@@ -1,16 +1,7 @@
 import express, { Request as ExpressRequest, Response, NextFunction } from 'express';
-import { randomUUID } from "node:crypto";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { z } from 'zod';
-import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
-import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
-import { EnabledModulesSchema, isModuleEnabled } from '../core/config/modules.config.js';
-import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
 import { name, version } from '../core/utils/version.js';
-import { InMemoryEventStore } from '@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js';
-import { ModuleLoaderService } from '../core/utils/module-loader.js';
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { initMcpServer } from './init-mcp-server.js';
 
@@ -135,10 +126,9 @@ const handleMcpRequest = async (req: Request, res: Response) => {
     // when multiple clients connect concurrently.
     
     try {
-      console.error(Date.now().toLocaleString())
-
-      const server = initMcpServer(req.username, req.password); 
-      console.error(Date.now().toLocaleString())
+      const initStart = performance.now();
+      const server = initMcpServer(req.username, req.password);
+      console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`)
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined

@@ -4,7 +4,7 @@ import { BaseTool, DataForSEOFullResponse, DataForSEOResponse } from '../../../.
 import { defaultGlobalToolConfig } from '../../../../../config/global.tool.js';
 
 export class GoogleHistoricalSERP extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -34,7 +34,7 @@ example:
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/dataforseo_labs/google/historical_serps/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/dataforseo_labs/google/historical_serps/live', 'POST', [{
         keyword: params.keyword,
         location_name: params.location_name,
         language_code: params.language_code
