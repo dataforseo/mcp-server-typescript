@@ -2,27 +2,24 @@ import { defaultGlobalToolConfig } from '../config/global.tool.js';
 
 export class DataForSEOClient {
   private config: DataForSEOConfig;
-  private authHeader: string;
 
   constructor(config: DataForSEOConfig) {
     this.config = config;
-    if(defaultGlobalToolConfig.debug) {
+    if (defaultGlobalToolConfig.debug) {
       console.error('DataForSEOClient initialized with config:', config);
     }
-    const token = btoa(`${config.username}:${config.password}`);
-    this.authHeader = `Basic ${token}`;
   }
 
   async makeRequest<T>(endpoint: string, method: string = 'POST', body?: any, forceFull: boolean = false): Promise<T> {
-    let url = `${this.config.baseUrl || "https://api.dataforseo.com"}${endpoint}`;    
-    if(!defaultGlobalToolConfig.fullResponse && !forceFull){
+    let url = `${this.config.baseUrl || "https://api.dataforseo.com"}${endpoint}`;
+    if (!defaultGlobalToolConfig.fullResponse && !forceFull) {
       url += '.ai';
     }
     // Import version dynamically to avoid circular dependencies
     const { version } = await import('../utils/version.js');
-    
+
     const headers = {
-      'Authorization': this.authHeader,
+      'Authorization': this.config.authHeader,
       'Content-Type': 'application/json',
       'User-Agent': `DataForSEO-MCP-TypeScript-SDK/${version}`
     };
@@ -40,10 +37,13 @@ export class DataForSEOClient {
 
     return response.json();
   }
-} 
+}
 
 export interface DataForSEOConfig {
-  username: string;
-  password: string;
+  authHeader: string;
   baseUrl?: string;
+}
+
+export function buildBasicAuthHeader(username: string, password: string): string {
+  return `Basic ${btoa(`${username}:${password}`)}`;
 }

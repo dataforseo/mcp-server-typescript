@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
+import { buildBasicAuthHeader } from '../core/client/dataforseo.client.js';
 import { EnabledModulesSchema, isModuleEnabled, defaultEnabledModules } from '../core/config/modules.config.js';
 import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
 import { z } from 'zod';
@@ -15,7 +15,12 @@ initializeFieldConfiguration();
 console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
 
-const server = initMcpServer(process.env.DATAFORSEO_USERNAME, process.env.DATAFORSEO_PASSWORD);
+const server = initMcpServer(
+  buildBasicAuthHeader(
+    process.env.DATAFORSEO_USERNAME ?? '',
+    process.env.DATAFORSEO_PASSWORD ?? '',
+  ),
+);
 
 // Start the server
 async function main() {

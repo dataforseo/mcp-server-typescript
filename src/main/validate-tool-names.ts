@@ -1,15 +1,16 @@
-import { DataForSEOClient, DataForSEOConfig } from "../core/client/dataforseo.client.js";
+import { DataForSEOClient, buildBasicAuthHeader } from "../core/client/dataforseo.client.js";
 import { EnabledModulesSchema } from "../core/config/modules.config.js";
 import { BaseModule } from "../core/modules/base.module.js";
 import { ModuleLoaderService } from "../core/utils/module-loader.js";
 
 export function ValidateToolNames(): void {
   const enabledModules = EnabledModulesSchema.parse(process.env.ENABLED_MODULES);
-  const dataForSEOConfig: DataForSEOConfig = {
-    username: process.env.DATAFORSEO_USERNAME || "",
-    password: process.env.DATAFORSEO_PASSWORD || "",
-  };
-  const dataForSEOClient = new DataForSEOClient(dataForSEOConfig);
+  const dataForSEOClient = new DataForSEOClient({
+    authHeader: buildBasicAuthHeader(
+      process.env.DATAFORSEO_USERNAME || "",
+      process.env.DATAFORSEO_PASSWORD || "",
+    ),
+  });
   const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
   const toolNames = new Set<string>();
 

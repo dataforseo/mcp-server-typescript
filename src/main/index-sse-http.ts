@@ -5,7 +5,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from 'zod';
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
-import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
+import { buildBasicAuthHeader } from '../core/client/dataforseo.client.js';
 import { EnabledModulesSchema, isModuleEnabled } from '../core/config/modules.config.js';
 import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
 import { name, version } from '../core/utils/version.js';
@@ -36,8 +36,7 @@ const CLEANUP_INTERVAL = 60000; // 1 minute
 
 // Extended request interface to include auth properties
 interface Request extends ExpressRequest {
-  username?: string;
-  password?: string;
+  authHeader?: string;
 }
 
 // Transport interface with timestamp
@@ -74,54 +73,36 @@ const cleanupInterval = setInterval(cleanupStaleConnections, CLEANUP_INTERVAL);
 const app = express();
 app.use(express.json());
 
-// Basic Auth Middleware
-const basicAuth = (req: Request, res: Response, next: NextFunction) => {
-
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   if (req.body?.method === 'tools/list') {
     next();
     return;
   }
 
   const authHeader = req.headers.authorization;
-  const envUsername = process.env.DATAFORSEO_USERNAME;
-  const envPassword = process.env.DATAFORSEO_PASSWORD;
 
-  let username: string | undefined;
-  let password: string | undefined;
-
-  // Try to extract credentials from Authorization header
-  if (authHeader?.startsWith('Basic ')) {
-    try {
-        const base64Credentials = authHeader.slice(6);
-        const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-        [username, password] = credentials.split(':');
-    } catch (error) {
-        console.error('Invalid Basic auth header:', error);
-    }
+  if (authHeader?.startsWith('Basic ') || authHeader?.startsWith('Bearer ')) {
+    req.authHeader = authHeader;
+  } else if (process.env.DATAFORSEO_USERNAME && process.env.DATAFORSEO_PASSWORD) {
+    req.authHeader = buildBasicAuthHeader(
+      process.env.DATAFORSEO_USERNAME,
+      process.env.DATAFORSEO_PASSWORD,
+    );
   }
 
-  // Fall back to environment variables if no header credentials provided
-  if (!username || !password) {
-    username = envUsername;
-    password = envPassword;
-  }
-
-  // Validate credentials
-  if (!username || !password) {
+  if (!req.authHeader) {
     console.error('Invalid credentials');
     res.status(401).json({
-        jsonrpc: "2.0",
-        error: {
-            code: -32001,
-            message: "Invalid credentials"
-        },
-        id: null
+      jsonrpc: "2.0",
+      error: {
+        code: -32001,
+        message: "Invalid credentials"
+      },
+      id: null
     });
     return;
   }
 
-  req.username = username;
-  req.password = password;
   next();
 };
 
@@ -137,7 +118,7 @@ const handleMcpRequest = async (req: Request, res: Response) => {
     try {
       console.error(Date.now().toLocaleString())
 
-      const server = initMcpServer(req.username, req.password); 
+      const server = initMcpServer(req.authHeader!);
       console.error(Date.now().toLocaleString())
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
@@ -181,9 +162,8 @@ const handleNotAllowed = (method: string) => async (req: Request, res: Response)
     });
   };
 
-// Apply basic auth and shared handler to both endpoints
-app.post('/http', basicAuth, handleMcpRequest);
-app.post('/mcp', basicAuth, handleMcpRequest);
+app.post('/http', authMiddleware, handleMcpRequest);
+app.post('/mcp', authMiddleware, handleMcpRequest);
 
 app.get('/http', handleNotAllowed('GET HTTP'));
 app.get('/mcp', handleNotAllowed('GET MCP'));
@@ -195,28 +175,20 @@ app.delete('/mcp', handleNotAllowed('DELETE MCP'));
 // DEPRECATED HTTP+SSE TRANSPORT (PROTOCOL VERSION 2024-11-05)
 //=============================================================================
 
-app.get('/sse', basicAuth, async (req: Request, res: Response) => {
+app.get('/sse', authMiddleware, async (req: Request, res: Response) => {
   console.log('Received GET request to /sse (deprecated SSE transport)');
 
-  // Handle credentials
-  if (!req.username && !req.password) {
-    const envUsername = process.env.DATAFORSEO_USERNAME;
-    const envPassword = process.env.DATAFORSEO_PASSWORD;
-    
-    if (!envUsername || !envPassword) {
-      console.error('No DataForSEO credentials provided');
-      res.status(401).json({
-        jsonrpc: "2.0",
-        error: {
-          code: -32001,
-          message: "Authentication required. Provide DataForSEO credentials."
-        },
-        id: null
-      });
-      return;
-    }
-    req.username = envUsername;
-    req.password = envPassword;
+  if (!req.authHeader) {
+    console.error('No DataForSEO credentials provided');
+    res.status(401).json({
+      jsonrpc: "2.0",
+      error: {
+        code: -32001,
+        message: "Authentication required. Provide DataForSEO credentials."
+      },
+      id: null
+    });
+    return;
   }
 
   const transport = new SSEServerTransport('/messages', res);
@@ -245,31 +217,23 @@ app.get('/sse', basicAuth, async (req: Request, res: Response) => {
   // Set socket timeout
   req.socket.setTimeout(CONNECTION_TIMEOUT);
 
-  const server = initMcpServer(req.username, req.password);
+  const server = initMcpServer(req.authHeader);
   await server.connect(transport);
 });
 
-app.post("/messages", basicAuth, async (req: Request, res: Response) => {
+app.post("/messages", authMiddleware, async (req: Request, res: Response) => {
   const sessionId = req.query.sessionId as string;
-  
-  // Handle credentials
-  if (!req.username && !req.password) {
-    const envUsername = process.env.DATAFORSEO_USERNAME;
-    const envPassword = process.env.DATAFORSEO_PASSWORD;
-    
-    if (!envUsername || !envPassword) {
-      res.status(401).json({
-        jsonrpc: "2.0",
-        error: {
-          code: -32001,
-          message: "Authentication required. Provide DataForSEO credentials."
-        },
-        id: null
-      });
-      return;
-    }
-    req.username = envUsername;
-    req.password = envPassword;
+
+  if (!req.authHeader) {
+    res.status(401).json({
+      jsonrpc: "2.0",
+      error: {
+        code: -32001,
+        message: "Authentication required. Provide DataForSEO credentials."
+      },
+      id: null
+    });
+    return;
   }
 
   const transportData = transports[sessionId];
