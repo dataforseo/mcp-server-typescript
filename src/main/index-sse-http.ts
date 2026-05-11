@@ -108,10 +108,10 @@ const handleMcpRequest = async (req: Request, res: Response) => {
     // when multiple clients connect concurrently.
     
     try {
-      console.error(Date.now().toLocaleString())
+      console.error(new Date().toLocaleString())
 
       const server = initMcpServer(req.authHeader!);
-      console.error(Date.now().toLocaleString())
+      console.error(new Date().toLocaleString())
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined
