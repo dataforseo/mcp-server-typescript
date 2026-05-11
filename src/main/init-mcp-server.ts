@@ -37,11 +37,13 @@ export function initMcpServer(username: string | undefined, password: string | u
     Object.entries(tools).forEach(([name, tool]) => {
       const typedTool = tool as ToolDefinition;
       const schema = z.object(typedTool.params);
-      server.tool(
+      server.registerTool(
         name,
-        typedTool.description,
-        schema.shape,
-        typedTool.handler
+        {
+          description: typedTool.description,
+          inputSchema: schema.shape,
+        },
+        (args) => typedTool.handler(args)
       );
     });
 
