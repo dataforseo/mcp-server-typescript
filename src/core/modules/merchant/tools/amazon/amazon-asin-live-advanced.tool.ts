@@ -28,8 +28,7 @@ required field
 Location format - hierarchical, comma-separated (from most specific to least)
  Can be one of:
  1. Country only: "United States"
- 2. Region,Country: "California,United States"
- 3. Postal Code,Region,Country: "90210,California,United States"`),
+ 2. Postal Code,Region,Country: "90210,California,United States"`),
       language_code: z.string().default('en_US').describe(`language code
 required field
 example: "en_US"

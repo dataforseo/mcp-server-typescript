@@ -28,6 +28,12 @@ You can optionally filter the list by country ISO code.`;
 optional field
 example: "US", "GB", "DE"
 if omitted, the full list of available Amazon locations is returned`),
+      "location_name_contains": z.string().optional().describe(`filter locations by a substring match on location_name
+optional field
+example: "New York", "London"
+if omitted, no name filtering is applied`),
+      "limit": z.number().optional().describe(`maximum number of locations to return`),
+      "offset": z.number().optional().describe(`offset in the results array of returned locations`)      
     };
   }
 
@@ -37,7 +43,16 @@ if omitted, the full list of available Amazon locations is returned`),
       const endpoint = country
         ? `/v3/merchant/amazon/locations/${encodeURIComponent(country)}`
         : '/v3/merchant/amazon/locations';
-      const response = await this.dataForSEOClient.makeRequest(endpoint, 'GET', null);
+      const response = await this.dataForSEOClient.makeRequest<any>(endpoint, 'GET', null);
+      if (response.items && response.items.length > 0) {
+        const nameFilter = typeof params?.location_name_contains === 'string' ? params.location_name_contains.trim().toLowerCase() : '';
+        if (nameFilter) {
+          response.items = response.items.filter((item: any) =>
+            typeof item.location_name === 'string' && item.location_name.toLowerCase().includes(nameFilter)
+          );
+        }
+        response.items = response.items.slice(params.offset || 0, (params.offset || 0) + (params.limit || 100));
+      }
       return this.formatResponse(response);
     } catch (error) {
       return this.formatErrorResponse(error);
