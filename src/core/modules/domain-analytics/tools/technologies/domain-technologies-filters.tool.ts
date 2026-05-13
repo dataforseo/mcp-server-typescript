@@ -26,7 +26,7 @@ export class DomainTechnologiesFiltersTool extends BaseTool {
     'domain_analytics_technologies_domains_by_html_terms': 'domains_by_html_terms'
   };
 
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -60,7 +60,7 @@ Please, keep in mind that filters are associated with a certain object in the re
     }
 
     // Fetch fresh data
-    const response = await this.client.makeRequest('/v3/domain_analytics/technologies/available_filters', 'GET', null, true) as DataForSEOFullResponse;
+    const response = await this.dataForSEOClient.makeRequest('/v3/domain_analytics/technologies/available_filters', 'GET', null, true) as DataForSEOFullResponse;
     this.validateResponseFull(response);
 
     // Transform the response into our cache format

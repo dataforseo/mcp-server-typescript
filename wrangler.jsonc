@@ -6,12 +6,13 @@
   "compatibility_date": "2025-07-05",
   "compatibility_flags": ["nodejs_compat"],
   "minify": true,
+  "secrets": {
+    "required": ["DATAFORSEO_USERNAME", "DATAFORSEO_PASSWORD"]
+  },
   "vars": {
-    "DATAFORSEO_USERNAME": "YOUR_LOGIN",
-    "DATAFORSEO_PASSWORD": "YOUR_PASSWORD",
     "ENABLED_MODULES": null,
     "DATAFORSEO_FULL_RESPONSE": "false",
-	"DATAFORSEO_SIMPLE_FILTER":"false"
+	"DATAFORSEO_SIMPLE_FILTER":"true"
   },
   	"durable_objects": {
 		"bindings": [

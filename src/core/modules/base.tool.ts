@@ -51,7 +51,7 @@ export abstract class BaseTool {
     if( defaultGlobalToolConfig.simpleFilter ) {
       // Permissive filter schema for LLM tool compatibility (e.g., OpenAI/ChatGPT).
       // If you modify this behavior, re-verify compatibility with OpenAI tools.
-      return z.any();
+      return z.array(z.any());
     }
     const filterExpression = 
     z.array(
@@ -67,7 +67,9 @@ export abstract class BaseTool {
   }
 
   protected validateAndFormatResponse(response: any, fullData: boolean = false): { content: Array<{ type: string; text: string }> } {
-    console.error(JSON.stringify(response));
+    if (defaultGlobalToolConfig.debug) {
+      console.log(JSON.stringify(response));
+    }
     if (defaultGlobalToolConfig.fullResponse || this.supportOnlyFullResponse()) {
       let data = response as DataForSEOFullResponse;
       this.validateResponseFull(data);

@@ -3,7 +3,7 @@ import { DataForSEOClient } from '../../../../client/dataforseo.client.js';
 import { BaseTool, DataForSEOResponse } from '../../../base.tool.js';
 
 export class BusinessDataBusinessListingsSearchTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -46,15 +46,11 @@ default value: 0
 if you specify the 10 value, the first ten entities in the results array will be omitted and the data will be provided for the successive entities`
       ),
       filters: this.getFilterExpression().optional().describe(
-        `array of results filtering parameters
-optional field
-you can add several filters at once (8 filters maximum)
-you should set a logical operator and, or between the conditions
-the following operators are supported:
-regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like, not_like, match, not_match
-you can use the % operator with like and not_like to match any string of zero or more characters
-example:
-["rating.value",">",3]`
+        `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like, not_like, match, not_match
+Use % with like/not_like as a wildcard.
+Example:
+  Single: ["rating.value", ">", 3]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules
@@ -76,7 +72,7 @@ example:
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/business_data/business_listings/search/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/business_data/business_listings/search/live', 'POST', [{
         description: params.description,
         title: params.title,
         categories: params.categories,

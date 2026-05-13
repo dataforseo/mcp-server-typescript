@@ -1,8 +1,6 @@
 #!/usr/bin/env node
-import { buildBasicAuthHeader } from '../core/client/dataforseo.client.js';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { Request as ExpressRequest, Response, NextFunction } from "express";
-import { randomUUID } from "node:crypto";
 import { name, version } from '../core/utils/version.js';
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { initMcpServer } from "./init-mcp-server.js";
@@ -17,10 +15,6 @@ interface Request extends ExpressRequest {
 
 console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
-
-function getSessionId() {
-  return randomUUID().toString();
-}
 
 const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL ?? 'https://data.dataforseo.com';
 
@@ -73,9 +67,10 @@ async function main() {
     // to ensure complete isolation. A single instance would cause request ID collisions
     // when multiple clients connect concurrently.
 
-    try {
+    try {      
+      const initStart = performance.now();
       const server = initMcpServer(req.authHeader!);
-      console.error(new Date().toLocaleString())
+      console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`);
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined
