@@ -22,7 +22,7 @@ function getSessionId() {
   return randomUUID().toString();
 }
 
-const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL ?? 'http://localhost:8000';
+const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL ?? 'https://data.dataforseo.com';
 
 async function main() {
   const app = express();
