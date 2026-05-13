@@ -12,7 +12,7 @@
   "vars": {
     "ENABLED_MODULES": null,
     "DATAFORSEO_FULL_RESPONSE": "false",
-	"DATAFORSEO_SIMPLE_FILTER":"false"
+	"DATAFORSEO_SIMPLE_FILTER":"true"
   },
   	"durable_objects": {
 		"bindings": [

@@ -43,23 +43,13 @@ example:
         if you specify the 10 value, the first ten keywords in the results array will be omitted and the data will be provided for the successive keywords`
       ),
       filters: this.getFilterExpression().optional().describe(
-        `you can add several filters at once (8 filters maximum)
-        you should set a logical operator and, or between the conditions
-        the following operators are supported:
-        regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
-        you can use the % operator with like and not_like, as well as ilike and not_ilike to match any string of zero or more characters
-        merge operator must be a string and connect two other arrays, availible values: or, and.
-example:
-["keyword_data.keyword_info.search_volume",">",0]
-[["keyword_info.search_volume","in",[0,1000]],
-"and",
-["keyword_data.keyword_info.competition_level","=","LOW"]]
-
-[["keyword_data.keyword_info.search_volume",">",100],
-"and",
-[["keyword_data.keyword_info.cpc","<",0.5],
-"or",
-["keyword_data.keyword_info.high_top_of_page_bid","<=",0.5]]]`
+        `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
+Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, match, not_match, ilike, not_ilike, like, not_like
+Use % with like/not_like/ilike/not_ilike as a wildcard.
+Examples:
+  Single: ["keyword_data.keyword_info.search_volume", ">", 0]
+  Combined: [["keyword_info.search_volume", "in", [0, 1000]], "and", ["keyword_data.keyword_info.competition_level", "=", "LOW"]]
+  Nested: [["keyword_data.keyword_info.search_volume", ">", 100], "and", [["keyword_data.keyword_info.cpc", "<", 0.5], "or", ["keyword_data.keyword_info.high_top_of_page_bid", "<=", 0.5]]]`
       ),
       order_by: z.array(z.string()).optional().describe(
         `results sorting rules
