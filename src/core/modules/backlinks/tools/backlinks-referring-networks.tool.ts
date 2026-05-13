@@ -3,7 +3,7 @@ import { DataForSEOClient } from '../../../client/dataforseo.client.js';
 import { BaseTool } from '../../base.tool.js';
 
 export class BacklinksReferringNetworksTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -70,7 +70,7 @@ example:
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/backlinks/referring_networks/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/backlinks/referring_networks/live', 'POST', [{
         target: params.target,
         limit: params.limit,
         offset: params.offset,

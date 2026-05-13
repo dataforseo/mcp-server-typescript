@@ -52,7 +52,10 @@ export class DataForSEOMcpAgent extends McpAgent {
     // Initialize and load modules
     const modules: BaseModule[] = ModuleLoaderService.loadModules(dataForSEOClient, enabledModules);
     
-    // Register tools from all modules
+    const enabledPromptsRaw = (workerEnv as unknown as Record<string, string>)['ENABLED_PROMPTS'] as string | undefined;
+    const enabledPrompts = enabledPromptsRaw ? enabledPromptsRaw.split(',').map(name => name.trim()) : [];
+
+    // Register tools and prompts from all modules
     modules.forEach(module => {
       const tools = module.getTools();
       Object.entries(tools).forEach(([name, tool]) => {
@@ -60,8 +63,25 @@ export class DataForSEOMcpAgent extends McpAgent {
         const schema = z.object(typedTool.params);
         this.server.tool(
           name,
+          typedTool.description,
           schema.shape,
           typedTool.handler
+        );
+      });
+
+      const prompts = module.getPrompts();
+      const allowedPrompts = enabledPrompts.length === 0
+        ? prompts
+        : Object.fromEntries(Object.entries(prompts).filter(([promptName]) => enabledPrompts.includes(promptName)));
+
+      Object.entries(allowedPrompts).forEach(([name, prompt]) => {
+        this.server.registerPrompt(
+          name,
+          {
+            description: prompt.description,
+            argsSchema: prompt.params,
+          },
+          prompt.handler
         );
       });
     });

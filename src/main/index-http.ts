@@ -1,22 +1,7 @@
 #!/usr/bin/env node
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
-import { SerpApiModule } from '../core/modules/serp/serp-api.module.js';
-import { KeywordsDataApiModule } from '../core/modules/keywords-data/keywords-data-api.module.js';
-import { OnPageApiModule } from '../core/modules/onpage/onpage-api.module.js';
-import { DataForSEOLabsApi } from '../core/modules/dataforseo-labs/dataforseo-labs-api.module.js';
-import { EnabledModulesSchema, isModuleEnabled, defaultEnabledModules } from '../core/config/modules.config.js';
-import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
-import { z } from 'zod';
-import { BacklinksApiModule } from "../core/modules/backlinks/backlinks-api.module.js";
-import { BusinessDataApiModule } from "../core/modules/business-data-api/business-data-api.module.js";
-import { DomainAnalyticsApiModule } from "../core/modules/domain-analytics/domain-analytics-api.module.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { Request as ExpressRequest, Response, NextFunction } from "express";
-import { randomUUID } from "node:crypto";
-import { GetPromptResult, isInitializeRequest, ReadResourceResult, ServerNotificationSchema } from "@modelcontextprotocol/sdk/types.js"
 import { name, version } from '../core/utils/version.js';
-import { ModuleLoaderService } from "../core/utils/module-loader.js";
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { initMcpServer } from "./init-mcp-server.js";
 
@@ -31,10 +16,6 @@ interface Request extends ExpressRequest {
 
 console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
-
-function getSessionId() {
-  return randomUUID().toString();
-}
 
 async function main() {
   const app = express();
@@ -97,8 +78,9 @@ async function main() {
     // when multiple clients connect concurrently.
     
     try {      
-      const server = initMcpServer(req.username, req.password); 
-      console.error(Date.now().toLocaleString())
+      const initStart = performance.now();
+      const server = initMcpServer(req.username, req.password);
+      console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`)
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined

@@ -3,7 +3,7 @@ import { DataForSEOClient } from '../../../../../client/dataforseo.client.js';
 import { BaseTool, DataForSEOResponse } from '../../../../base.tool.js';
 
 export class GoogleHistoricalDomainRankOverviewTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -37,7 +37,7 @@ example:
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/dataforseo_labs/google/historical_rank_overview/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/dataforseo_labs/google/historical_rank_overview/live', 'POST', [{
         target: params.target,
         location_name: params.location_name,
         language_code: params.language_code,

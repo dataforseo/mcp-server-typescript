@@ -10,7 +10,7 @@ export class AiOptimizationLlmMentionsFiltersTool extends BaseTool {
   private static lastFetchTime: number = 0;
   private static readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
   
@@ -36,7 +36,7 @@ export class AiOptimizationLlmMentionsFiltersTool extends BaseTool {
       }
   
       // Fetch fresh data
-      const response = await this.client.makeRequest('/v3/ai_optimization/llm_mentions/available_filters', 'GET', null, true) as DataForSEOFullResponse;
+      const response = await this.dataForSEOClient.makeRequest('/v3/ai_optimization/llm_mentions/available_filters', 'GET', null, true) as DataForSEOFullResponse;
       this.validateResponseFull(response);
   
       const result = response.tasks[0].result[0];

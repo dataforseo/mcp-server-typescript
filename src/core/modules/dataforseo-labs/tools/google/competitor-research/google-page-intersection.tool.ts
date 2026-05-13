@@ -4,7 +4,7 @@ import { BaseTool } from '../../../../base.tool.js';
 import { mapArrayToNumberedKeys } from '../../../../../utils/map-array-to-numbered-keys.js';
 
 export class GooglePageIntersectionsTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
+  constructor(client: DataForSEOClient) {
     super(client);
   }
 
@@ -117,7 +117,7 @@ indicates the type of search results included in the response`).default(['organi
 
   async handle(params: any): Promise<any> {
     try {
-      const response = await this.client.makeRequest('/v3/dataforseo_labs/google/page_intersection/live', 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest('/v3/dataforseo_labs/google/page_intersection/live', 'POST', [{
         pages: mapArrayToNumberedKeys(params.pages),
         location_name: params.location_name,
         language_code: params.language_code,
