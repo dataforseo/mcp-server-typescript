@@ -5,12 +5,16 @@ import { buildBasicAuthHeader } from '../core/client/dataforseo.client.js';
 import { name, version } from '../core/utils/version.js';
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { initMcpServer } from './init-mcp-server.js';
+import { defaultGlobalToolConfig } from '../core/config/global.tool.js';
+import { getTokenExpiration } from '../core/utils/auth.js';
 
 // Initialize field configuration if provided
 initializeFieldConfiguration();
 console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
 
+
+const CLOCK_SKEW_MS = 60_000
 /**
  * This example server demonstrates backwards compatibility with both:
  * 1. The deprecated HTTP+SSE transport (protocol version 2024-11-05)
@@ -65,25 +69,57 @@ const cleanupInterval = setInterval(cleanupStaleConnections, CLEANUP_INTERVAL);
 const app = express();
 app.use(express.json());
 
+// Auth middleware: passthrough Authorization header (Basic or Bearer) as-is,
+// or build a Basic header from env credentials as fallback.
+// Bearer tokens are issued by AUTH_SERVER_URL via OAuth (see /.well-known
+// endpoint below) and forwarded directly to DataForSEO without exchange.
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  if (req.body?.method === 'tools/list') {
-    next();
-    return;
-  }
+
+  const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
+  // if (req.body?.method === 'tools/list') {
+  //   next();
+  //   return;
+  // }
 
   const authHeader = req.headers.authorization;
 
-  if (authHeader?.startsWith('Basic ') || authHeader?.startsWith('Bearer ')) {
-    req.authHeader = authHeader;
-  } else if (process.env.DATAFORSEO_USERNAME && process.env.DATAFORSEO_PASSWORD) {
+    if (authHeader?.startsWith('Basic ')) {
+      req.authHeader = authHeader;
+    } 
+    else if (authHeader?.startsWith('Bearer ')) {
+      const expirationDate = getTokenExpiration(authHeader);
+      if (expirationDate && expirationDate.getTime() <= Date.now() - CLOCK_SKEW_MS) {
+        if (defaultGlobalToolConfig.debug) {
+          console.log('bearer token expired, return 401')
+        }
+        res.setHeader(
+          'WWW-Authenticate',
+          `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
+        );
+        res.status(401).json({
+          error: 'invalid_token',
+          error_description: 'expired bearer token'
+        });
+        return;
+      }
+
+      req.authHeader = authHeader;
+    }
+    else if (process.env.DATAFORSEO_USERNAME && process.env.DATAFORSEO_PASSWORD) {
+    // Fall back to environment variables if no header credentials provided
     req.authHeader = buildBasicAuthHeader(
       process.env.DATAFORSEO_USERNAME,
       process.env.DATAFORSEO_PASSWORD,
     );
   }
 
+  // Validate credentials
   if (!req.authHeader) {
-    console.error('Invalid credentials');
+    res.setHeader(
+      'WWW-Authenticate',
+      `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
+    );
+
     res.status(401).json({
       jsonrpc: "2.0",
       error: {
@@ -153,6 +189,17 @@ const handleNotAllowed = (method: string) => async (req: Request, res: Response)
     });
   };
 
+// OAuth 2.0 Protected Resource discovery endpoint (RFC 9728).
+// MCP clients hit this on a 401 to find out which authorization server
+// issues Bearer tokens for this resource. Only exposed when the server
+// is not pre-configured with static credentials.
+if (!process.env.DATAFORSEO_USERNAME && !process.env.DATAFORSEO_PASSWORD) {
+  app.get('/.well-known/oauth-protected-resource', (req, res) => {
+    const resource = `${req.protocol}://${req.get('host')}`;
+    res.json({ resource, authorization_servers: [defaultGlobalToolConfig.authServer] });
+  });
+}
+
 app.post('/http', authMiddleware, handleMcpRequest);
 app.post('/mcp', authMiddleware, handleMcpRequest);
 
@@ -171,6 +218,11 @@ app.get('/sse', authMiddleware, async (req: Request, res: Response) => {
 
   if (!req.authHeader) {
     console.error('No DataForSEO credentials provided');
+    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
+    res.setHeader(
+      'WWW-Authenticate',
+      `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
+    );
     res.status(401).json({
       jsonrpc: "2.0",
       error: {
@@ -214,17 +266,40 @@ app.get('/sse', authMiddleware, async (req: Request, res: Response) => {
 
 app.post("/messages", authMiddleware, async (req: Request, res: Response) => {
   const sessionId = req.query.sessionId as string;
+  const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
 
   if (!req.authHeader) {
+    res.setHeader(
+      'WWW-Authenticate',
+      `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
+    );
     res.status(401).json({
       jsonrpc: "2.0",
       error: {
         code: -32001,
-        message: "Authentication required. Provide DataForSEO credentials."
+        message: "Authentication required"
       },
       id: null
     });
     return;
+  }
+
+  if (req.authHeader?.startsWith('Bearer ')) {
+      const expirationDate = getTokenExpiration(req.authHeader);
+      if (expirationDate && expirationDate.getTime() <= Date.now() - CLOCK_SKEW_MS) {
+        if (defaultGlobalToolConfig.debug) {
+          console.log('bearer token expired, return 401')
+        }
+        res.setHeader(
+          'WWW-Authenticate',
+          `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
+        );
+        res.status(401).json({
+          error: 'invalid_token',
+          error_description: 'expired bearer token'
+        });
+        return;
+      }
   }
 
   const transportData = transports[sessionId];

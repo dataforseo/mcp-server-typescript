@@ -5,6 +5,8 @@ import { name, version } from '../core/utils/version.js';
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { initMcpServer } from "./init-mcp-server.js";
 import { buildBasicAuthHeader } from "../core/client/dataforseo.client.js";
+import { getTokenExpiration } from "../core/utils/auth.js";
+import { defaultGlobalToolConfig } from "../core/config/global.tool.js";
 
 // Initialize field configuration if provided
 initializeFieldConfiguration();
@@ -17,7 +19,7 @@ interface Request extends ExpressRequest {
 console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
 
-const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL ?? 'https://data.dataforseo.com';
+const CLOCK_SKEW_MS = 60_000
 
 async function main() {
   const app = express();
@@ -29,6 +31,7 @@ async function main() {
   // endpoint below) and forwarded directly to DataForSEO without exchange.
   const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
+    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
     // if (req.body?.method === 'tools/list') {
     //   next();
     //   return;
@@ -36,9 +39,33 @@ async function main() {
 
     const authHeader = req.headers.authorization;
 
-    if (authHeader?.startsWith('Basic ') || authHeader?.startsWith('Bearer ')) {
+    if (authHeader?.startsWith('Basic ')) {
       req.authHeader = authHeader;
-    } else if (process.env.DATAFORSEO_USERNAME && process.env.DATAFORSEO_PASSWORD) {
+    } 
+    else if (authHeader?.startsWith('Bearer ')) {
+      const expirationDate = getTokenExpiration(authHeader);
+      if (expirationDate && expirationDate.getTime() <= Date.now() - CLOCK_SKEW_MS) {
+        if (defaultGlobalToolConfig.debug) {
+          console.log('bearer token expired, return 401')
+        }
+        res.setHeader(
+          'WWW-Authenticate',
+          `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
+        );
+        res.status(401).json({
+          error: 'invalid_token',
+          error_description: 'expired bearer token'
+        });
+        return;
+      }
+
+      if (defaultGlobalToolConfig.debug) {
+        console.log('set bearer token')
+      }
+
+      req.authHeader = authHeader;
+    }
+    else if (process.env.DATAFORSEO_USERNAME && process.env.DATAFORSEO_PASSWORD) {
       // Fall back to environment variables if no header credentials provided
       req.authHeader = buildBasicAuthHeader(
         process.env.DATAFORSEO_USERNAME,
@@ -48,17 +75,16 @@ async function main() {
 
     // Validate credentials
     if (!req.authHeader) {
-      const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
       res.setHeader(
         'WWW-Authenticate',
-        `Bearer realm="DataForSEO MCP", resource_metadata="${resourceMetadataUrl}"`
+        `Bearer error="invalid_token", error_description="token is null or empty", resource_metadata="${resourceMetadataUrl}"`
       );
 
       res.status(401).json({
         jsonrpc: "2.0",
         error: {
           code: -32001,
-          message: "Invalid credentials"
+          message: "Invalid auth"
         },
         id: null
       });
@@ -82,7 +108,7 @@ async function main() {
         sessionIdGenerator: undefined
       });
 
-      await server.connect(transport);
+    await server.connect(transport);
       console.error('handle request');
       await transport.handleRequest(req , res, req.body);
       console.error('end handle request');
@@ -126,7 +152,7 @@ async function main() {
   if (!process.env.DATAFORSEO_USERNAME && !process.env.DATAFORSEO_PASSWORD) {
     app.get('/.well-known/oauth-protected-resource', (req, res) => {
       const resource = `${req.protocol}://${req.get('host')}`;
-      res.json({ resource, authorization_servers: [AUTH_SERVER_URL] });
+      res.json({ resource, authorization_servers: [defaultGlobalToolConfig.authServer] });
     });
   }
 
