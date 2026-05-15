@@ -155,7 +155,7 @@ async function main() {
       let payload = { resource, authorization_servers: [defaultGlobalToolConfig.authServer] };
 
       if (defaultGlobalToolConfig.debug) {
-        console.log(`.well-known/oauth-protected-resourc resp payload: ${JSON.stringify(payload)}`)
+        console.log(`.well-known/oauth-protected-resource resp payload: ${JSON.stringify(payload)}`)
       }
       res.json(payload);
     });
@@ -169,7 +169,7 @@ async function main() {
         registration_endpoint: `${defaultGlobalToolConfig.authServer}/register`,
       };
       if (defaultGlobalToolConfig.debug) {
-        console.log(`.well-known/oauth-protected-resourc resp payload: ${JSON.stringify(payload)}`)
+        console.log(`.well-known/oauth-authorization-server resp payload: ${JSON.stringify(payload)}`)
       }
       res.json(payload)
     })
