@@ -196,7 +196,12 @@ const handleNotAllowed = (method: string) => async (req: Request, res: Response)
 if (!process.env.DATAFORSEO_USERNAME && !process.env.DATAFORSEO_PASSWORD) {
   app.get('/.well-known/oauth-protected-resource', (req, res) => {
     const resource = `${req.protocol}://${req.get('host')}`;
-    res.json({ resource, authorization_servers: [defaultGlobalToolConfig.authServer] });
+    let payload = { resource, authorization_servers: [defaultGlobalToolConfig.authServer] };
+
+    if (defaultGlobalToolConfig.debug) {
+      console.log(`well-known resp payload: ${JSON.stringify(payload)}`)
+    }
+    res.json(payload);
   });
 }
 
