@@ -10,8 +10,6 @@ export class DataForSEOClient {
     if (defaultGlobalToolConfig.debug) {
       console.error('DataForSEOClient initialized with config:', config);
     }
-    const token = btoa(`${config.username}:${config.password}`);
-    this.authHeader = `Basic ${token}`;
     this.userAgent = `DataForSEO-MCP-TypeScript-SDK/${version}`;
   }
 

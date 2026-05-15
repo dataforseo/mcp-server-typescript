@@ -4,6 +4,7 @@ import express, { Request as ExpressRequest, Response, NextFunction } from "expr
 import { name, version } from '../core/utils/version.js';
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { initMcpServer } from "./init-mcp-server.js";
+import { buildBasicAuthHeader } from "../core/client/dataforseo.client.js";
 
 // Initialize field configuration if provided
 initializeFieldConfiguration();
@@ -47,7 +48,12 @@ async function main() {
 
     // Validate credentials
     if (!req.authHeader) {
-      console.error('Invalid credentials');
+      const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
+      res.setHeader(
+        'WWW-Authenticate',
+        `Bearer realm="DataForSEO MCP", resource_metadata="${resourceMetadataUrl}"`
+      );
+
       res.status(401).json({
         jsonrpc: "2.0",
         error: {

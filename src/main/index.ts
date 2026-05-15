@@ -3,6 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { initializeFieldConfiguration } from '../core/config/field-configuration.js';
 import { name, version } from '../core/utils/version.js';
 import { initMcpServer } from "./init-mcp-server.js";
+import { buildBasicAuthHeader } from "../core/client/dataforseo.client.js";
 
 // Initialize field configuration if provided
 initializeFieldConfiguration();
