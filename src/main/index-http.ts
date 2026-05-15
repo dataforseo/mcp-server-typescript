@@ -152,7 +152,12 @@ async function main() {
   if (!process.env.DATAFORSEO_USERNAME && !process.env.DATAFORSEO_PASSWORD) {
     app.get('/.well-known/oauth-protected-resource', (req, res) => {
       const resource = `${req.protocol}://${req.get('host')}`;
-      let payload = { resource, authorization_servers: [defaultGlobalToolConfig.authServer] };
+      let payload = { 
+        resource, 
+        authorization_servers: [defaultGlobalToolConfig.authServer],
+        scopes_supported: ["read", "write"],
+        bearer_methods_supported: ["header"],
+      };
 
       if (defaultGlobalToolConfig.debug) {
         console.log(`.well-known/oauth-protected-resource resp payload: ${JSON.stringify(payload)}`)
@@ -167,6 +172,8 @@ async function main() {
         authorization_endpoint: `${defaultGlobalToolConfig.authServer}/authorize`,
         token_endpoint: `${defaultGlobalToolConfig.authServer}/token`,
         registration_endpoint: `${defaultGlobalToolConfig.authServer}/register`,
+        response_types_supported: ["code"],
+        grant_types_supported: ["authorization_code", "refresh_token"],
       };
       if (defaultGlobalToolConfig.debug) {
         console.log(`.well-known/oauth-authorization-server resp payload: ${JSON.stringify(payload)}`)
