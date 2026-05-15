@@ -155,10 +155,24 @@ async function main() {
       let payload = { resource, authorization_servers: [defaultGlobalToolConfig.authServer] };
 
       if (defaultGlobalToolConfig.debug) {
-        console.log(`well-known resp payload: ${JSON.stringify(payload)}`)
+        console.log(`.well-known/oauth-protected-resourc resp payload: ${JSON.stringify(payload)}`)
       }
       res.json(payload);
     });
+
+    app.get('/.well-known/oauth-authorization-server', (req, res) => {
+      const resource = `${req.protocol}://${req.get('host')}`;
+      let payload = {
+        issuer: resource,
+        authorization_endpoint: `${defaultGlobalToolConfig.authServer}/authorize`,
+        token_endpoint: `${defaultGlobalToolConfig.authServer}/token`,
+        registration_endpoint: `${defaultGlobalToolConfig.authServer}/register`,
+      };
+      if (defaultGlobalToolConfig.debug) {
+        console.log(`.well-known/oauth-protected-resourc resp payload: ${JSON.stringify(payload)}`)
+      }
+      res.json(payload)
+    })
   }
 
   // Apply auth middleware and shared handler to both endpoints
