@@ -25,6 +25,16 @@ async function main() {
   const app = express();
   app.use(express.json());
 
+  // Request logging middleware: logs path, method, headers and payload.
+  app.use((req: Request, _res: Response, next: NextFunction) => {
+    console.log('--- incoming request ---');
+    console.log(`${req.method} ${req.originalUrl}`);
+    console.log('headers:', JSON.stringify(req.headers, null, 2));
+    console.log('payload:', JSON.stringify(req.body, null, 2));
+    console.log('------------------------');
+    next();
+  });
+
   // Auth middleware: passthrough Authorization header (Basic or Bearer) as-is,
   // or build a Basic header from env credentials as fallback.
   // Bearer tokens are issued by AUTH_SERVER_URL via OAuth (see /.well-known
