@@ -179,7 +179,6 @@ async function main() {
       const payload = {
         resource,
         authorization_servers: [defaultGlobalToolConfig.authServer],
-        scopes_supported: ["read", "write"],
         bearer_methods_supported: ["header"],
       };
 
