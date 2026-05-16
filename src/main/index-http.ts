@@ -23,6 +23,14 @@ const CLOCK_SKEW_MS = 60_000
 
 async function main() {
   const app = express();
+
+   const trustProxy = process.env.TRUST_PROXY
+   if (trustProxy) {
+    // Behind a reverse proxy / ingress that terminates TLS: trust X-Forwarded-*
+    // so req.protocol reflects https and OAuth metadata URLs are correct.
+    console.log(`activated 'trust proxy'`)
+    app.set('trust proxy', true);
+   }
   app.use(express.json());
 
   // Request logging middleware: logs path, method, headers and payload.
@@ -160,10 +168,16 @@ async function main() {
   // issues Bearer tokens for this resource. Only exposed when the server
   // is not pre-configured with static credentials.
   if (!process.env.DATAFORSEO_USERNAME && !process.env.DATAFORSEO_PASSWORD) {
-    app.get('/.well-known/oauth-protected-resource', (req, res) => {
-      const resource = `${req.protocol}://${req.get('host')}`;
-      let payload = { 
-        resource, 
+    // RFC 9728 well-known is formed by inserting the metadata segment before
+    // the resource path, so an MCP endpoint at https://host/mcp is discovered
+    // at https://host/.well-known/oauth-protected-resource/mcp. Serve both the
+    // root and the path-scoped variants; the returned `resource` MUST be the
+    // canonical URI the client actually connects to (incl. the /mcp or /http path).
+    const protectedResourceHandler = (resourcePath: string) => (req: Request, res: Response) => {
+      const base = `${req.protocol}://${req.get('host')}`;
+      const resource = resourcePath ? `${base}/${resourcePath}` : base;
+      const payload = {
+        resource,
         authorization_servers: [defaultGlobalToolConfig.authServer],
         scopes_supported: ["read", "write"],
         bearer_methods_supported: ["header"],
@@ -173,7 +187,11 @@ async function main() {
         console.log(`.well-known/oauth-protected-resource resp payload: ${JSON.stringify(payload)}`)
       }
       res.json(payload);
-    });
+    };
+
+    app.get('/.well-known/oauth-protected-resource', protectedResourceHandler(''));
+    app.get('/.well-known/oauth-protected-resource/mcp', protectedResourceHandler('mcp'));
+    app.get('/.well-known/oauth-protected-resource/http', protectedResourceHandler('http'));
 
     app.get('/.well-known/oauth-authorization-server', (req, res) => {
       const resource = `${req.protocol}://${req.get('host')}`;
