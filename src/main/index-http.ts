@@ -25,7 +25,7 @@ async function main() {
   const app = express();
 
    const trustProxy = process.env.TRUST_PROXY
-   if (trustProxy) {
+   if (trustProxy == "true") {
     // Behind a reverse proxy / ingress that terminates TLS: trust X-Forwarded-*
     // so req.protocol reflects https and OAuth metadata URLs are correct.
     console.log(`activated 'trust proxy'`)
