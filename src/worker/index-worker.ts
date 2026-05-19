@@ -1,7 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from 'zod';
-import { DataForSEOClient, DataForSEOConfig } from '../core/client/dataforseo.client.js';
+import { DataForSEOClient, buildBasicAuthHeader } from '../core/client/dataforseo.client.js';
 import { EnabledModulesSchema } from '../core/config/modules.config.js';
 import { BaseModule, ToolDefinition } from '../core/modules/base.module.js';
 import { ModuleLoaderService } from '../core/utils/module-loader.js';
@@ -38,13 +38,12 @@ export class DataForSEOMcpAgent extends McpAgent {
       throw new Error(`Worker environment not available`);
     }
 
-    // Initialize DataForSEO client
-    const dataForSEOConfig: DataForSEOConfig = {
-      username: workerEnv.DATAFORSEO_USERNAME || "",
-      password: workerEnv.DATAFORSEO_PASSWORD || "",
-    };
-    
-    const dataForSEOClient = new DataForSEOClient(dataForSEOConfig);
+    const dataForSEOClient = new DataForSEOClient({
+      authHeader: buildBasicAuthHeader(
+        workerEnv.DATAFORSEO_USERNAME || "",
+        workerEnv.DATAFORSEO_PASSWORD || "",
+      ),
+    });
     
     // Parse enabled modules from environment
     const enabledModules = EnabledModulesSchema.parse(workerEnv.ENABLED_MODULES);

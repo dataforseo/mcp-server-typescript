@@ -7,3 +7,4 @@ instruct.txt
 src/main/test2.ts
 .vscode/launch.json
 .vscode/tasks.json
+.idea/*

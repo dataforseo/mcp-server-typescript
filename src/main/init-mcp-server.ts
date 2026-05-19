@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { DataForSEOClient, DataForSEOConfig } from "../core/client/dataforseo.client.js";
+import { DataForSEOClient } from "../core/client/dataforseo.client.js";
 import { EnabledModulesSchema } from "../core/config/modules.config.js";
 import { ModuleLoaderService } from "../core/utils/module-loader.js";
 import { BaseModule, ToolDefinition } from "../core/modules/base.module.js";
@@ -7,19 +7,13 @@ import { z } from 'zod';
 import { name, version } from '../core/utils/version.js';
 
 
-export function initMcpServer(username: string | undefined, password: string | undefined): McpServer {
+export function initMcpServer(authHeader: string): McpServer {
   const server = new McpServer({
     name,
     version,
   }, { capabilities: { logging: {} } });
 
-  // Initialize DataForSEO client
-  const dataForSEOConfig: DataForSEOConfig = {
-    username: username || "",
-    password: password || "",
-  };
-  
-  const dataForSEOClient = new DataForSEOClient(dataForSEOConfig);
+  const dataForSEOClient = new DataForSEOClient({ authHeader });
   console.error('DataForSEO client initialized');
   
   // Parse enabled modules from environment
@@ -37,11 +31,13 @@ export function initMcpServer(username: string | undefined, password: string | u
     Object.entries(tools).forEach(([name, tool]) => {
       const typedTool = tool as ToolDefinition;
       const schema = z.object(typedTool.params);
-      server.tool(
+      server.registerTool(
         name,
-        typedTool.description,
-        schema.shape,
-        typedTool.handler
+        {
+          description: typedTool.description,
+          inputSchema: schema.shape,
+        },
+        (args) => typedTool.handler(args)
       );
     });
 

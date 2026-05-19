@@ -3,16 +3,13 @@ import { version } from '../utils/version.js';
 
 export class DataForSEOClient {
   private config: DataForSEOConfig;
-  private authHeader: string;
   private userAgent: string;
 
   constructor(config: DataForSEOConfig) {
     this.config = config;
-    if(defaultGlobalToolConfig.debug) {
+    if (defaultGlobalToolConfig.debug) {
       console.error('DataForSEOClient initialized with config:', config);
     }
-    const token = btoa(`${config.username}:${config.password}`);
-    this.authHeader = `Basic ${token}`;
     this.userAgent = `DataForSEO-MCP-TypeScript-SDK/${version}`;
   }
 
@@ -23,7 +20,7 @@ export class DataForSEOClient {
     }
 
     const headers = {
-      'Authorization': this.authHeader,
+      'Authorization': this.config.authHeader,
       'Content-Type': 'application/json',
       'User-Agent': this.userAgent
     };
@@ -43,10 +40,13 @@ export class DataForSEOClient {
 
     return response.json();
   }
-} 
+}
 
 export interface DataForSEOConfig {
-  username: string;
-  password: string;
+  authHeader: string;
   baseUrl?: string;
+}
+
+export function buildBasicAuthHeader(username: string, password: string): string {
+  return `Basic ${btoa(`${username}:${password}`)}`;
 }
