@@ -14,7 +14,7 @@ console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
 
 
-const CLOCK_SKEW_MS = 60_000
+const CLOCK_SKEW_MS = 10_000;
 /**
  * This example server demonstrates backwards compatibility with both:
  * 1. The deprecated HTTP+SSE transport (protocol version 2024-11-05)
@@ -67,6 +67,13 @@ const cleanupInterval = setInterval(cleanupStaleConnections, CLEANUP_INTERVAL);
 
 // Create Express application
 const app = express();
+
+const trustProxy = process.env.TRUST_PROXY
+if (trustProxy == "true") {
+  // Behind a reverse proxy / ingress that terminates TLS: trust X-Forwarded-*
+  // so req.protocol reflects https and OAuth metadata URLs are correct.
+  app.set('trust proxy', true);
+}
 app.use(express.json());
 
 // Auth middleware: passthrough Authorization header (Basic or Bearer) as-is,
@@ -75,20 +82,15 @@ app.use(express.json());
 // endpoint below) and forwarded directly to DataForSEO without exchange.
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
-  const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
-  // if (req.body?.method === 'tools/list') {
-  //   next();
-  //   return;
-  // }
-
+  const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource${req.path}`;
   const authHeader = req.headers.authorization;
 
     if (authHeader?.startsWith('Basic ')) {
       req.authHeader = authHeader;
-    } 
+    }
     else if (authHeader?.startsWith('Bearer ')) {
       const expirationDate = getTokenExpiration(authHeader);
-      if (expirationDate && expirationDate.getTime() <= Date.now() - CLOCK_SKEW_MS) {
+      if (expirationDate && expirationDate.getTime() + CLOCK_SKEW_MS <= Date.now()) {
         if (defaultGlobalToolConfig.debug) {
           console.log('bearer token expired, return 401')
         }
@@ -103,35 +105,35 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         return;
       }
 
+      if (defaultGlobalToolConfig.debug) {
+        console.log('set bearer token')
+      }
+
       req.authHeader = authHeader;
     }
     else if (process.env.DATAFORSEO_USERNAME && process.env.DATAFORSEO_PASSWORD) {
-    // Fall back to environment variables if no header credentials provided
-    req.authHeader = buildBasicAuthHeader(
-      process.env.DATAFORSEO_USERNAME,
-      process.env.DATAFORSEO_PASSWORD,
-    );
-  }
+      // Fall back to environment variables if no header credentials provided
+      req.authHeader = buildBasicAuthHeader(
+        process.env.DATAFORSEO_USERNAME,
+        process.env.DATAFORSEO_PASSWORD,
+      );
+    }
 
-  // Validate credentials
-  if (!req.authHeader) {
-    res.setHeader(
-      'WWW-Authenticate',
-      `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
-    );
+    // Validate credentials
+    if (!req.authHeader) {
+      res.setHeader(
+        'WWW-Authenticate',
+        `Bearer error="invalid_token", error_description="token is null or empty", resource_metadata="${resourceMetadataUrl}"`
+      );
 
-    res.status(401).json({
-      jsonrpc: "2.0",
-      error: {
-        code: -32001,
-        message: "Invalid credentials"
-      },
-      id: null
-    });
-    return;
-  }
+      res.status(401).json({
+        error: "invalid auth",
+        error_description: "invalid auth"
+      });
+      return;
+    }
 
-  next();
+    next();
 };
 
 //=============================================================================
@@ -146,7 +148,10 @@ const handleMcpRequest = async (req: Request, res: Response) => {
     try {
       const initStart = performance.now();
       const server = initMcpServer(req.authHeader!);
-      console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`)
+
+      if (defaultGlobalToolConfig.debug) {
+        console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`)
+      }
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined
@@ -194,15 +199,34 @@ const handleNotAllowed = (method: string) => async (req: Request, res: Response)
 // issues Bearer tokens for this resource. Only exposed when the server
 // is not pre-configured with static credentials.
 if (!process.env.DATAFORSEO_USERNAME && !process.env.DATAFORSEO_PASSWORD) {
-  app.get('/.well-known/oauth-protected-resource', (req, res) => {
-    const resource = `${req.protocol}://${req.get('host')}`;
-    let payload = { resource, authorization_servers: [defaultGlobalToolConfig.authServer] };
+  // RFC 9728 well-known is formed by inserting the metadata segment before
+  // the resource path, so an MCP endpoint at https://host/mcp is discovered
+  // at https://host/.well-known/oauth-protected-resource/mcp. Serve both the
+  // root and the path-scoped variants; the returned `resource` MUST be the
+  // canonical URI the client actually connects to (incl. the endpoint path).
+  const protectedResourceHandler = (resourcePath: string) => (req: Request, res: Response) => {
+    const base = `${req.protocol}://${req.get('host')}`;
+    const resource = resourcePath
+      ? `${base}/${resourcePath}`
+      : base;
+
+    const payload = {
+      resource,
+      authorization_servers: [defaultGlobalToolConfig.authServer],
+      bearer_methods_supported: ["header"],
+    };
 
     if (defaultGlobalToolConfig.debug) {
-      console.log(`well-known resp payload: ${JSON.stringify(payload)}`)
+      console.log(`.well-known/oauth-protected-resource resp payload: ${JSON.stringify(payload)}`)
     }
     res.json(payload);
-  });
+  };
+
+  app.get('/.well-known/oauth-protected-resource', protectedResourceHandler(''));
+  app.get('/.well-known/oauth-protected-resource/mcp', protectedResourceHandler('mcp'));
+  app.get('/.well-known/oauth-protected-resource/http', protectedResourceHandler('http'));
+  app.get('/.well-known/oauth-protected-resource/sse', protectedResourceHandler('sse'));
+  app.get('/.well-known/oauth-protected-resource/messages', protectedResourceHandler('messages'));
 }
 
 app.post('/http', authMiddleware, handleMcpRequest);
@@ -223,7 +247,7 @@ app.get('/sse', authMiddleware, async (req: Request, res: Response) => {
 
   if (!req.authHeader) {
     console.error('No DataForSEO credentials provided');
-    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
+    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource${req.path}`;
     res.setHeader(
       'WWW-Authenticate',
       `Bearer error="invalid_token", error_description="access token expired", resource_metadata="${resourceMetadataUrl}"`
@@ -271,7 +295,7 @@ app.get('/sse', authMiddleware, async (req: Request, res: Response) => {
 
 app.post("/messages", authMiddleware, async (req: Request, res: Response) => {
   const sessionId = req.query.sessionId as string;
-  const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
+  const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource${req.path}`;
 
   if (!req.authHeader) {
     res.setHeader(
@@ -291,7 +315,7 @@ app.post("/messages", authMiddleware, async (req: Request, res: Response) => {
 
   if (req.authHeader?.startsWith('Bearer ')) {
       const expirationDate = getTokenExpiration(req.authHeader);
-      if (expirationDate && expirationDate.getTime() <= Date.now() - CLOCK_SKEW_MS) {
+      if (expirationDate && expirationDate.getTime() + CLOCK_SKEW_MS <= Date.now()) {
         if (defaultGlobalToolConfig.debug) {
           console.log('bearer token expired, return 401')
         }

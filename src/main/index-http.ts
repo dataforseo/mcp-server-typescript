@@ -19,7 +19,7 @@ interface Request extends ExpressRequest {
 console.error('Starting DataForSEO MCP Server...');
 console.error(`Server name: ${name}, version: ${version}`);
 
-const CLOCK_SKEW_MS = 60_000
+const CLOCK_SKEW_MS =  10_000;
 
 async function main() {
   const app = express();
@@ -28,20 +28,9 @@ async function main() {
    if (trustProxy == "true") {
     // Behind a reverse proxy / ingress that terminates TLS: trust X-Forwarded-*
     // so req.protocol reflects https and OAuth metadata URLs are correct.
-    console.log(`activated 'trust proxy'`)
     app.set('trust proxy', true);
    }
   app.use(express.json());
-
-  // Request logging middleware: logs path, method, headers and payload.
-  app.use((req: Request, _res: Response, next: NextFunction) => {
-    console.log('--- incoming request ---');
-    console.log(`${req.method} ${req.originalUrl}`);
-    console.log('headers:', JSON.stringify(req.headers, null, 2));
-    console.log('payload:', JSON.stringify(req.body, null, 2));
-    console.log('------------------------');
-    next();
-  });
 
   // Auth middleware: passthrough Authorization header (Basic or Bearer) as-is,
   // or build a Basic header from env credentials as fallback.
@@ -49,12 +38,7 @@ async function main() {
   // endpoint below) and forwarded directly to DataForSEO without exchange.
   const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
-    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
-    // if (req.body?.method === 'tools/list') {
-    //   next();
-    //   return;
-    // }
-
+    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource${req.path}`;
     const authHeader = req.headers.authorization;
 
     if (authHeader?.startsWith('Basic ')) {
@@ -62,7 +46,7 @@ async function main() {
     } 
     else if (authHeader?.startsWith('Bearer ')) {
       const expirationDate = getTokenExpiration(authHeader);
-      if (expirationDate && expirationDate.getTime() <= Date.now() - CLOCK_SKEW_MS) {
+      if (expirationDate && expirationDate.getTime() + CLOCK_SKEW_MS <= Date.now()) {
         if (defaultGlobalToolConfig.debug) {
           console.log('bearer token expired, return 401')
         }
@@ -99,12 +83,8 @@ async function main() {
       );
 
       res.status(401).json({
-        jsonrpc: "2.0",
-        error: {
-          code: -32001,
-          message: "Invalid auth"
-        },
-        id: null
+        error: "invalid auth",
+        error_description: "invalid auth"
       });
       return;
     }
@@ -120,7 +100,10 @@ async function main() {
     try {      
       const initStart = performance.now();
       const server = initMcpServer(req.authHeader!);
-      console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`);
+
+      if (defaultGlobalToolConfig.debug) {
+        console.log(`MCP server initialized in ${(performance.now() - initStart).toFixed(1)}ms`);
+      }
 
       const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined
@@ -175,7 +158,10 @@ async function main() {
     // canonical URI the client actually connects to (incl. the /mcp or /http path).
     const protectedResourceHandler = (resourcePath: string) => (req: Request, res: Response) => {
       const base = `${req.protocol}://${req.get('host')}`;
-      const resource = resourcePath ? `${base}/${resourcePath}` : base;
+      const resource = resourcePath 
+        ? `${base}/${resourcePath}`
+        : base;
+
       const payload = {
         resource,
         authorization_servers: [defaultGlobalToolConfig.authServer],
@@ -191,22 +177,6 @@ async function main() {
     app.get('/.well-known/oauth-protected-resource', protectedResourceHandler(''));
     app.get('/.well-known/oauth-protected-resource/mcp', protectedResourceHandler('mcp'));
     app.get('/.well-known/oauth-protected-resource/http', protectedResourceHandler('http'));
-
-    app.get('/.well-known/oauth-authorization-server', (req, res) => {
-      const resource = `${req.protocol}://${req.get('host')}`;
-      let payload = {
-        issuer: resource,
-        authorization_endpoint: `${defaultGlobalToolConfig.authServer}/authorize`,
-        token_endpoint: `${defaultGlobalToolConfig.authServer}/token`,
-        registration_endpoint: `${defaultGlobalToolConfig.authServer}/register`,
-        response_types_supported: ["code"],
-        grant_types_supported: ["authorization_code", "refresh_token"],
-      };
-      if (defaultGlobalToolConfig.debug) {
-        console.log(`.well-known/oauth-authorization-server resp payload: ${JSON.stringify(payload)}`)
-      }
-      res.json(payload)
-    })
   }
 
   // Apply auth middleware and shared handler to both endpoints
