@@ -47,7 +47,7 @@ export class FieldConfigurationManager {
         }
       });
 
-      console.log(`Field configuration loaded from: ${configPath}`);
+      console.error(`Field configuration loaded from: ${configPath}`);
     } catch (error) {
       console.error('Error loading field configuration:', error);
       throw error;

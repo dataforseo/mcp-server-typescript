@@ -26,7 +26,7 @@ export class DataForSEOClient {
     };
 
     if(defaultGlobalToolConfig.debug) {
-      console.log(`Making request to ${url} with method ${method} and body`, body);
+      console.error(`Making request to ${url} with method ${method} and body`, body);
     }
     const response = await fetch(url, {
       method,

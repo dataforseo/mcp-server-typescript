@@ -68,7 +68,7 @@ export abstract class BaseTool {
 
   protected validateAndFormatResponse(response: any, fullData: boolean = false): { content: Array<{ type: string; text: string }> } {
     if (defaultGlobalToolConfig.debug) {
-      console.log(JSON.stringify(response));
+      console.error(JSON.stringify(response));
     }
     if (defaultGlobalToolConfig.fullResponse || this.supportOnlyFullResponse()) {
       let data = response as DataForSEOFullResponse;

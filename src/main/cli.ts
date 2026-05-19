@@ -28,8 +28,6 @@ const argsWithoutMode = args.slice(1);
 const childArgs = argsWithoutMode.filter((_, index) => {
     return index !== configIndex - 1 && index !== configIndex;});
     
-console.log(`start with config: ${JSON.stringify(defaultGlobalToolConfig)}`)
-
 if (mode === 'http') {
     const httpServer = join(__dirname, 'index-http.js');
     spawn('node', [httpServer, ...childArgs], { 
