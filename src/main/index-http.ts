@@ -30,6 +30,7 @@ async function main() {
     // so req.protocol reflects https and OAuth metadata URLs are correct.
     if (defaultGlobalToolConfig.debug) {
       console.log(`'trust proxy' enabled`)
+      console.log('test b')
     }
     app.set('trust proxy', true);
    }
