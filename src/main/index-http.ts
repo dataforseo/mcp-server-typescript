@@ -33,6 +33,16 @@ async function main() {
     }
     app.set('trust proxy', true);
    }
+
+  app.use((req: Request, _res: Response, next: NextFunction) => {
+    console.log('--- incoming request ---');
+    console.log(`${req.method} ${req.originalUrl}`);
+    console.log('headers:', JSON.stringify(req.headers, null, 2));
+    console.log('payload:', JSON.stringify(req.body, null, 2));
+    console.log('------------------------');
+    next();
+  });
+
   app.use(express.json());
 
   // Auth middleware: passthrough Authorization header (Basic or Bearer) as-is,
