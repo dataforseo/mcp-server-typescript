@@ -35,15 +35,6 @@ async function main() {
    }
   app.use(express.json());
 
-  app.use((req: Request, _res: Response, next: NextFunction) => {
-    console.log('--- incoming request ---');
-    console.log(`${req.method} ${req.originalUrl}`);
-    console.log('headers:', JSON.stringify(req.headers, null, 2));
-    console.log('payload:', JSON.stringify(req.body, null, 2));
-    console.log('------------------------');
-    next();
-  });
-
   // Auth middleware: passthrough Authorization header (Basic or Bearer) as-is,
   // or build a Basic header from env credentials as fallback.
   // Bearer tokens are issued by AUTH_SERVER_URL via OAuth (see /.well-known
@@ -189,22 +180,6 @@ async function main() {
     app.get('/.well-known/oauth-protected-resource', protectedResourceHandler(''));
     app.get('/.well-known/oauth-protected-resource/mcp', protectedResourceHandler('mcp'));
     app.get('/.well-known/oauth-protected-resource/http', protectedResourceHandler('http'));
-
-    app.get('/.well-known/oauth-authorization-server', (req, res) => {
-      const resource = `${req.protocol}://${req.get('host')}`;
-      let payload = {
-        issuer: resource,
-        authorization_endpoint: `${defaultGlobalToolConfig.authServer}/authorize`,
-        token_endpoint: `${defaultGlobalToolConfig.authServer}/token`,
-        registration_endpoint: `${defaultGlobalToolConfig.authServer}/register`,
-        response_types_supported: ["code"],
-        grant_types_supported: ["authorization_code", "refresh_token"],
-      };
-      if (defaultGlobalToolConfig.debug) {
-        console.log(`.well-known/oauth-authorization-server resp payload: ${JSON.stringify(payload)}`)
-      }
-      res.json(payload)
-    })
   }
 
   // Apply auth middleware and shared handler to both endpoints
