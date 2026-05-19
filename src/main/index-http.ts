@@ -177,6 +177,22 @@ async function main() {
     app.get('/.well-known/oauth-protected-resource', protectedResourceHandler(''));
     app.get('/.well-known/oauth-protected-resource/mcp', protectedResourceHandler('mcp'));
     app.get('/.well-known/oauth-protected-resource/http', protectedResourceHandler('http'));
+
+    app.get('/.well-known/oauth-authorization-server', (req, res) => {
+      const resource = `${req.protocol}://${req.get('host')}`;
+      let payload = {
+        issuer: resource,
+        authorization_endpoint: `${defaultGlobalToolConfig.authServer}/authorize`,
+        token_endpoint: `${defaultGlobalToolConfig.authServer}/token`,
+        registration_endpoint: `${defaultGlobalToolConfig.authServer}/register`,
+        response_types_supported: ["code"],
+        grant_types_supported: ["authorization_code", "refresh_token"],
+      };
+      if (defaultGlobalToolConfig.debug) {
+        console.log(`.well-known/oauth-authorization-server resp payload: ${JSON.stringify(payload)}`)
+      }
+      res.json(payload)
+    })
   }
 
   // Apply auth middleware and shared handler to both endpoints
