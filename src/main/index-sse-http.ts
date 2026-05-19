@@ -72,6 +72,9 @@ const trustProxy = process.env.TRUST_PROXY
 if (trustProxy == "true") {
   // Behind a reverse proxy / ingress that terminates TLS: trust X-Forwarded-*
   // so req.protocol reflects https and OAuth metadata URLs are correct.
+  if (defaultGlobalToolConfig.debug) {
+    console.log(`'trust proxy' enabled`)
+  }
   app.set('trust proxy', true);
 }
 app.use(express.json());
