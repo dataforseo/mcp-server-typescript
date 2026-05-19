@@ -38,7 +38,7 @@ async function main() {
   // endpoint below) and forwarded directly to DataForSEO without exchange.
   const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
-    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource${req.path}`;
+    const resourceMetadataUrl = `${req.protocol}://${req.get('host')}/.well-known/oauth-protected-resource`;
     const authHeader = req.headers.authorization;
 
     if (authHeader?.startsWith('Basic ')) {
