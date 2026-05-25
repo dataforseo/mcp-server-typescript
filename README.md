@@ -13,6 +13,7 @@ Model Context Protocol (MCP) server implementation for DataForSEO, enabling AI a
 - **BUSINESS DATA API**: publicly available data on any business entity;
 - **DOMAIN ANALYTICS API**: data on website traffic, technologies, and Whois details;
 - **CONTENT ANALYSIS API**: robust source of data for brand monitoring, sentiment analysis, and citation management;
+- **MERCHANT API**: provides essential data and metrics for comprehensive competitor analysis, price monitoring, and market research across Google Shopping, Amazon etc.
 
 ## Prerequisites
 
@@ -62,13 +63,13 @@ export DATAFORSEO_SIMPLE_FILTER="false"
 You can install the package globally:
 
 ```bash
-npm install -g dataforseo-mcp-server
+npm install -g dataforseo-mcp-server@latest
 ```
 
 Or run it directly without installation:
 
 ```bash
-npx dataforseo-mcp-server
+npx dataforseo-mcp-server@latest
 ```
 
 Remember to set environment variables before running the command:
@@ -79,7 +80,7 @@ export DATAFORSEO_USERNAME=your_username
 export DATAFORSEO_PASSWORD=your_password
 
 # Run with npx
-npx dataforseo-mcp-server
+npx dataforseo-mcp-server@latest
 ```
 
 ## Building and Running
@@ -92,10 +93,10 @@ npm run build
 Run the server:
 ```bash
 # Start local server (direct MCP communication)
-npx dataforseo-mcp-server
+npx dataforseo-mcp-server@latest
 
 # Start HTTP server
-npx dataforseo-mcp-server http
+npx dataforseo-mcp-server@latest http
 ```
 
 ## HTTP Server Configuration
@@ -227,6 +228,7 @@ The following modules are available to be enabled/disabled:
 - `BUSINESS_DATA`: based on business reviews and business information publicly shared on the following platforms: Google, Trustpilot, Tripadvisor;
 - `DOMAIN_ANALYTICS`: helps identify all possible technologies used for building websites and offers Whois data;
 - `CONTENT_ANALYSIS`: help you discover citations of the target keyword or brand and analyze the sentiments around it;
+- `MERCHANT`: helps retrieve product data, prices, and seller information from Google Shopping and Amazon etc.;
 
 ## Adding New Tools/Modules
 
@@ -242,6 +244,7 @@ Each module corresponds to a specific DataForSEO API:
 - `BUSINESS_DATA`: module → [Business Data API](https://docs.dataforseo.com/v3/business_data/overview)
 - `DOMAIN_ANALYTICS`: module → [Domain Analytics API](https://docs.dataforseo.com/v3/domain_analytics/overview)
 - `CONTENT_ANALYSIS`: module → [Content Analysis API](https://docs.dataforseo.com/v3/content_analysis/overview)
+- - `MERCHANT`: module -> [Metchant API](https://docs.dataforseo.com/v3/merchant/overview)
 
 ### Implementation Options
 
@@ -399,10 +402,10 @@ Pass the configuration file using the `--configuration` parameter:
 npm run cli -- http --configuration field-config.json
 
 # With npx
-npx dataforseo-mcp-server http --configuration field-config.json
+npx dataforseo-mcp-server@latest http --configuration field-config.json
 
 # Local mode
-npx dataforseo-mcp-server local --configuration field-config.json
+npx dataforseo-mcp-server@latest local --configuration field-config.json
 ```
 
 ### Configuration Behavior
@@ -495,7 +498,7 @@ cp field-config.example.json my-config.json
 
 3. Use your custom configuration:
 ```bash
-npx dataforseo-mcp-server http --configuration my-config.json
+npx dataforseo-mcp-server@latest http --configuration my-config.json
 ```
 
 ## What endpoints/APIs do you want us to support next?
