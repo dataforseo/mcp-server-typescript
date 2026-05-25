@@ -244,7 +244,7 @@ Each module corresponds to a specific DataForSEO API:
 - `BUSINESS_DATA`: module → [Business Data API](https://docs.dataforseo.com/v3/business_data/overview)
 - `DOMAIN_ANALYTICS`: module → [Domain Analytics API](https://docs.dataforseo.com/v3/domain_analytics/overview)
 - `CONTENT_ANALYSIS`: module → [Content Analysis API](https://docs.dataforseo.com/v3/content_analysis/overview)
-- - `MERCHANT`: module -> [Metchant API](https://docs.dataforseo.com/v3/merchant/overview)
+- `MERCHANT`: module -> [Metchant API](https://docs.dataforseo.com/v3/merchant/overview)
 
 ### Implementation Options
 
