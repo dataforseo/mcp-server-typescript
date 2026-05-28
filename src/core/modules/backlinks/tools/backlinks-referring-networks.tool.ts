@@ -15,6 +15,10 @@ export class BacklinksReferringNetworksTool extends BaseTool {
     return "This endpoint will provide you with a detailed overview of referring domains pointing to the target you specify";
   }
 
+  getTitle(): string {
+    return 'Backlinks Referring Networks';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain, subdomain or webpage to get backlinks for

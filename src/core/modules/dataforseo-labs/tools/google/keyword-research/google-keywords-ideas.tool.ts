@@ -18,6 +18,10 @@ Along with each keyword idea, you will get its search volume rate for the last m
 `;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Keyword Ideas';
+  }
+
   getParams(): z.ZodRawShape {
 
     return {

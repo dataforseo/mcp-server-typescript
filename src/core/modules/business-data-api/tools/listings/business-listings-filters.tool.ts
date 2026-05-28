@@ -32,6 +32,10 @@ export class BusinessListingsFiltersTool extends BaseTool {
     return 'business_data_business_listings_filters';
   }
 
+  getTitle(): string {
+    return 'Business Data Business Listings Filters';
+  }
+
   getDescription(): string {
     return `Here you will find all the necessary information about filters that can be used with Business Data API business listings endpoints.
 

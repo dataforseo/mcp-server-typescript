@@ -15,6 +15,10 @@ export class DataForSeoTrendsDemographyTool extends BaseTool {
     return `This endpoint will provide you with the demographic breakdown (by age and gender) of keyword popularity per each specified term based on DataForSEO Trends data`;
   }
 
+  getTitle(): string {
+    return 'Keywords Data DataForSEO Trends Demography';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       location_name: z.string().nullable().default(null).describe(`full name of the location

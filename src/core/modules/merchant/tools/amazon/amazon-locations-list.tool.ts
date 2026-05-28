@@ -7,6 +7,10 @@ export class MerchantAmazonLocationsListTool extends BaseTool {
     super(dataForSEOClient);
   }
 
+  getTitle(): string {
+    return 'Merchant Amazon Locations';
+  }
+
   protected supportOnlyFullResponse(): boolean {
     return true;
   }

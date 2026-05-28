@@ -60,11 +60,15 @@ export class DataForSEOMcpAgent extends McpAgent {
       Object.entries(tools).forEach(([name, tool]) => {
         const typedTool = tool as ToolDefinition;
         const schema = z.object(typedTool.params);
-        this.server.tool(
+        this.server.registerTool(
           name,
-          typedTool.description,
-          schema.shape,
-          typedTool.handler
+          {
+            title: typedTool.title,
+            description: typedTool.description,
+            inputSchema: schema.shape,
+            annotations: typedTool.annotations,
+          },
+          (args) => typedTool.handler(args)
         );
       });
 

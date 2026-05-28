@@ -15,6 +15,10 @@ export class SerpYoutubeVideoInfoLiveAdvancedTool extends BaseTool {
     return 'provides data on the video you specify';
   }
 
+  getTitle(): string {
+    return 'SERP YouTube Video Info Live Advanced';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       video_id: z.string().describe("ID of the video"),

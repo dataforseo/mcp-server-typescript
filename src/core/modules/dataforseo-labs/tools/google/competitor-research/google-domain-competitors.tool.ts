@@ -15,6 +15,10 @@ export class GoogleDomainCompetitorsTool extends BaseTool {
     return `This endpoint will provide you with a full overview of ranking and traffic data of the competitor domains from organic and paid search. In addition to that, you will get the metrics specific to the keywords both competitor domains and your domain rank for within the same SERP.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Competitors Domain';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`target domain`),

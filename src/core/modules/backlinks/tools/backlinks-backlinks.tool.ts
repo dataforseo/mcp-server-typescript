@@ -15,6 +15,10 @@ export class BacklinksTool extends BaseTool {
     return "This endpoint will provide you with a list of backlinks and relevant data for the specified domain, subdomain, or webpage";
   }
 
+  getTitle(): string {
+    return 'Backlinks Backlinks';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain, subdomain or webpage to get backlinks for

@@ -17,6 +17,10 @@ Returns seller names, ratings, prices, shipping conditions, and product offers
 available from each merchant for the requested ASIN.`;
   }
 
+  getTitle(): string {
+    return 'Merchant Amazon Sellers Live Advanced';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       asin: z.string().describe(`product identifier (ASIN) on Amazon

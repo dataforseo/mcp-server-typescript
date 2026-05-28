@@ -15,6 +15,10 @@ export class ContentAnalysisSummaryTool extends BaseTool {
     return `This endpoint will provide you with an overview of citation data available for the target keyword`;
   }
 
+  getTitle(): string {
+    return 'Content Analysis Summary';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`target keyword

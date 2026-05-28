@@ -63,6 +63,10 @@ export class DataForSeoLabsFilterTool extends BaseTool {
     return 'dataforseo_labs_available_filters';
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Available Filters';
+  }
+
   getDescription(): string {
     return `Here you will find all the necessary information about filters that can be used with DataForSEO Labs API endpoints.
 

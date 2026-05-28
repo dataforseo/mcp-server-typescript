@@ -15,6 +15,10 @@ export class ContentAnalysisPhraseTrendsTool extends BaseTool {
     return `This endpoint will provide you with data on all citations of the target keyword for the indicated date range`;
   }
 
+  getTitle(): string {
+    return 'Content Analysis Phrase Trends';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`target keyword

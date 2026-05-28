@@ -15,6 +15,10 @@ export class DataForSeoTrendsExploreTool extends BaseTool {
     return `This endpoint will provide you with the keyword popularity data from DataForSEO Trends. You can check keyword trends for Google Search, Google News, and Google Shopping`;
   }
 
+  getTitle(): string {
+    return 'Keywords Data DataForSEO Trends Explore';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       location_name: z.string().nullable().default(null).describe(`full name of the location

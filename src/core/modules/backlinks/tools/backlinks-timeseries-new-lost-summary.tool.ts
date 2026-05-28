@@ -19,6 +19,10 @@ Data from this endpoint will be especially helpful for building time-series grap
 `;
   }
 
+  getTitle(): string {
+    return 'Backlinks Timeseries New Lost Summary';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain to get data for

@@ -17,6 +17,10 @@ export class AiOptimizationLlmMentionsCrossAggregatedMetricsTool extends BaseToo
         return "This endpoint provides aggregated metrics grouped by custom keys for mentions of the keywords or domains specified in the target array of the request";
     }
 
+    getTitle(): string {
+        return 'AI Optimization LLM Mentions Cross Aggregated Metrics';
+    }
+
     getParams(): z.ZodRawShape {
         return {
             targets: z.array(z.object({

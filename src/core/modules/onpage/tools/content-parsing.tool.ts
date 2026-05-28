@@ -17,6 +17,10 @@ export class ContentParsingTool extends BaseTool {
     return 'This endpoint allows parsing the content on any page you specify and will return the structured content of the target page, including link URLs, anchors, headings, and textual content.';
   }
 
+  getTitle(): string {
+    return 'On Page Content Parsing';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       url: z.string().describe("URL of the page to parse"),

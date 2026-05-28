@@ -16,6 +16,10 @@ export class BacklinksTimeseriesSummaryTool extends BaseTool {
 Data from this endpoint will be especially helpful for building time-series graphs of daily, weekly, monthly, and yearly link-building progress`;
   }
 
+  getTitle(): string {
+    return 'Backlinks Timeseries Summary';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain to get data for

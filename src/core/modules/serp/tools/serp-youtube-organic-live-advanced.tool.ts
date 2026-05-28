@@ -15,6 +15,10 @@ export class SerpYoutubeOrganicLiveAdvancedTool extends BaseTool {
     return 'provides top 20 blocks of youtube search engine results for a keyword';
   }
 
+  getTitle(): string {
+    return 'SERP YouTube Organic Live Advanced';
+  }
+  
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe("Search keyword"),

@@ -16,6 +16,10 @@ export class AiOptimizationLlmMentionsTopDomainsTool extends BaseTool {
         return "This endpoint provides aggregated LLM mentions metrics grouped by the most frequently mentioned domains for the specified target";
     }
 
+    getTitle(): string {
+        return 'AI Optimization LLM Mentions Top Domains';
+    }
+
     getParams(): z.ZodRawShape {
         return {
             target: z.array(

@@ -15,6 +15,10 @@ export class GoogleBulkTrafficEstimationTool extends BaseTool {
     return `This endpoint will provide you with estimated monthly traffic volumes for up to 1,000 domains, subdomains, or webpages. Along with organic search traffic estimations, you will also get separate values for paid search, featured snippet, and local pack results.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Bulk Traffic Estimation';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       targets: z.array(z.string()).describe(`target domains, subdomains, and webpages.

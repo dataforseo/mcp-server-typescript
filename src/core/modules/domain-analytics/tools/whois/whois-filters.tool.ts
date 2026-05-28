@@ -37,6 +37,10 @@ export class WhoisFiltersTool extends BaseTool {
 Please, keep in mind that filters are associated with a certain object in the result array, and should be specified accordingly.`;
   }
 
+  getTitle(): string {
+    return 'Domain Analytics WHOIS Available Filters';
+  }
+
   protected supportOnlyFullResponse(): boolean {
     return true;
   }

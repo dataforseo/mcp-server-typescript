@@ -16,6 +16,10 @@ export class BacklinksPageIntersectionTool extends BaseTool {
     return "This endpoint will provide you with the list of domains pointing to the specified websites. This endpoint is especially useful for creating a Link Gap feature that shows what domains link to your competitors but do not link out to your website";
   }
 
+  getTitle(): string {
+    return 'Backlinks Page Intersection';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       targets: z.array(z.string()).describe(`domains, subdomains or webpages to get links for

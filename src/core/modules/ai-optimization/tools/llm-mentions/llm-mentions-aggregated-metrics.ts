@@ -16,6 +16,10 @@ export class AiOptimizationLlmMentionsAggregatedMetricsTool extends BaseTool {
         return "This endpoint provides aggregated metrics for mentions of the keywords or domains specified in the target array of the request.";
     }
 
+    getTitle(): string {
+        return 'AI Optimization LLM Mentions Aggregated Metrics';
+    }
+
     getParams(): z.ZodRawShape {
         return {
             target: z.array(

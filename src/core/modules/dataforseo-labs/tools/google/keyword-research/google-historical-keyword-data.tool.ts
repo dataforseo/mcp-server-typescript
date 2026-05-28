@@ -15,6 +15,10 @@ export class GoogleHistoricalKeywordDataTool extends BaseTool {
     return `This endpoint provides Google historical keyword data for specified keywords, including search volume, cost-per-click, competition values for paid search, monthly searches, and search volume trends. You can get historical keyword data since August, 2021, depending on keywords along with location and language combination`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Historical Keyword Data';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keywords: z.array(z.string()).describe(`keywords

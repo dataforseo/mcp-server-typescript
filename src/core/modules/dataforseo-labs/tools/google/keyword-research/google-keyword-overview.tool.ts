@@ -15,6 +15,10 @@ export class GoogleKeywordOverviewTool extends BaseTool {
     return `This endpoint provides Google keyword data for specified keywords. For each keyword, you will receive current cost-per-click, competition values for paid search, search volume, search intent, monthly searches`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Keyword Overview';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keywords: z.array(z.string()).describe(`keywords

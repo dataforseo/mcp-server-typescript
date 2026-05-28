@@ -17,6 +17,10 @@ export class AiOptimizationKeywordDataSearchVolumeTool extends BaseTool {
       return "This endpoint provides search volume data for your target keywords, reflecting their estimated usage in AI LLMs";
   }
 
+  getTitle(): string {
+    return 'AI Optimization Keyword Data Search Volume';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keywords: z.array(z.string()).describe("Keywords. The maximum number of keywords you can specify: 1000"),

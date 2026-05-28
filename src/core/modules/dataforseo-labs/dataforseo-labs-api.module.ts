@@ -1,5 +1,5 @@
 import { DataForSEOClient } from '../../client/dataforseo.client.js';
-import { BaseModule, ToolDefinition } from '../base.module.js';
+import { BaseModule, buildToolsRecord, ToolDefinition } from '../base.module.js';
 import { PromptDefinition } from '../prompt-definition.js';
 import { GoogleDomainCompetitorsTool } from './tools/google/competitor-research/google-domain-competitors.tool.js';
 import { GoogleDomainRankOverviewTool } from './tools/google/competitor-research/google-domain-rank-overview.tool.js';
@@ -55,17 +55,7 @@ export class DataForSEOLabsApi extends BaseModule {
       // Add more tools here
     ];
 
-    return tools.reduce((acc, tool) => ({
-      ...acc,
-      [tool.getName()]: {
-        description: tool.getDescription(),
-        params: tool.getParams(),
-        handler: (params: any) => {
-
-          return tool.handle(params);
-        },
-      },
-    }), {});
+    return buildToolsRecord(tools);
   }
 
     getPrompts(): Record<string, PromptDefinition> {

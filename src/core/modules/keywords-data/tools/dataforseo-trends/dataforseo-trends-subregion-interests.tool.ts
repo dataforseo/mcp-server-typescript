@@ -15,6 +15,10 @@ export class DataForSeoTrendsSubregionInterestsTool extends BaseTool {
     return `This endpoint will provide you with location-specific keyword popularity data from DataForSEO Trends`;
   }
 
+  getTitle(): string {
+    return 'Keywords Data DataForSEO Trends Subregion Interests';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       location_name: z.string().nullable().default(null).describe(`full name of the location

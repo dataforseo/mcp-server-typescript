@@ -15,6 +15,10 @@ export class GoogleDomainIntersectionsTool extends BaseTool {
     return `This endpoint will provide you with the keywords for which both specified domains rank within the same SERP. You will get search volume, competition, cost-per-click and impressions data on each intersecting keyword. Along with that, you will get data on the first and second domain's SERP element discovered for this keyword, as well as the estimated traffic volume and cost of ad traffic.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Domain Intersection';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target1: z.string().describe(`target domain 1`),

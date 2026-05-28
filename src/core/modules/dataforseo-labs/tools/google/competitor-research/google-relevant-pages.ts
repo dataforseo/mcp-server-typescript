@@ -15,6 +15,10 @@ export class GoogleRelevantPagesTool extends BaseTool {
     return `This endpoint will provide you with rankings and traffic data for the web pages of the specified domain. You will be able to review each page’s ranking distribution and estimated monthly traffic volume from both organic and paid searches.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Relevant Pages';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`target domain`),

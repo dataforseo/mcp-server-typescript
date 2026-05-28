@@ -13,45 +13,49 @@ export class AiOptimizationLlmMentionsFiltersTool extends BaseTool {
   constructor(client: DataForSEOClient) {
     super(client);
   }
-  
+
   getName(): string {
-      return "ai_optimization_llm_mentions_filters";
+    return "ai_optimization_llm_mentions_filters";
   }
 
   getDescription(): string {
-      return "This endpoint provides all the necessary information about filters that can be used with AI Optimization LLM Mentions API endpoints";
+    return "This endpoint provides all the necessary information about filters that can be used with AI Optimization LLM Mentions API endpoints";
+  }
+
+  getTitle(): string {
+    return 'AI Optimization LLM Mentions Filters';
   }
 
   getParams(): z.ZodRawShape {
-    return { };
+    return {};
   }
 
-    private async fetchAndCacheFilters(): Promise<{ [field: string]: string }> {
-      const now = Date.now();
-      
-      // Return cached data if it's still valid
-      if (AiOptimizationLlmMentionsFiltersTool.cache && 
-          (now - AiOptimizationLlmMentionsFiltersTool.lastFetchTime) < AiOptimizationLlmMentionsFiltersTool.CACHE_TTL) {
-        return AiOptimizationLlmMentionsFiltersTool.cache;
-      }
-  
-      // Fetch fresh data
-      const response = await this.dataForSEOClient.makeRequest('/v3/ai_optimization/llm_mentions/available_filters', 'GET', null, true) as DataForSEOFullResponse;
-      this.validateResponseFull(response);
-  
-      const result = response.tasks[0].result[0];
-      const filters = result['search'];
-      
-      // Update cache
-      AiOptimizationLlmMentionsFiltersTool.cache = filters;
-      AiOptimizationLlmMentionsFiltersTool.lastFetchTime = now;
-  
-      return filters;
+  private async fetchAndCacheFilters(): Promise<{ [field: string]: string }> {
+    const now = Date.now();
+
+    // Return cached data if it's still valid
+    if (AiOptimizationLlmMentionsFiltersTool.cache &&
+      (now - AiOptimizationLlmMentionsFiltersTool.lastFetchTime) < AiOptimizationLlmMentionsFiltersTool.CACHE_TTL) {
+      return AiOptimizationLlmMentionsFiltersTool.cache;
     }
+
+    // Fetch fresh data
+    const response = await this.dataForSEOClient.makeRequest('/v3/ai_optimization/llm_mentions/available_filters', 'GET', null, true) as DataForSEOFullResponse;
+    this.validateResponseFull(response);
+
+    const result = response.tasks[0].result[0];
+    const filters = result['search'];
+
+    // Update cache
+    AiOptimizationLlmMentionsFiltersTool.cache = filters;
+    AiOptimizationLlmMentionsFiltersTool.lastFetchTime = now;
+
+    return filters;
+  }
 
   async handle(params: any): Promise<any> {
     try {
-        
+
       const filters = await this.fetchAndCacheFilters();
       return this.formatResponse(filters);
 

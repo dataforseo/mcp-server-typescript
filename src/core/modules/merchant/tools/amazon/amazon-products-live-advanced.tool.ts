@@ -17,6 +17,10 @@ Returns product titles, ASINs, prices, ratings, images, sponsored placements,
 and other SERP-like results for the specified keyword on Amazon.`;
   }
 
+  getTitle(): string {
+    return 'Merchant Amazon Products Live Advanced';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`keyword

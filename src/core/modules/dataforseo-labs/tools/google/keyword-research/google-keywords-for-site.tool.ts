@@ -15,6 +15,10 @@ export class GoogleKeywordsForSiteTool extends BaseTool {
     return `The Keywords For Site endpoint will provide you with a list of keywords relevant to the target domain. Each keyword is supplied with relevant, search volume data for the last month, cost-per-click, competition`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Keywords For Site';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`target domain`),

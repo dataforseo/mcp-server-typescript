@@ -16,6 +16,10 @@ export class AiOptimizationLlmModelsTool extends BaseTool {
       return "Utility tool for ai_optimization_llm_response to get list of availible locations and languages";
   }
 
+  getTitle(): string {
+      return 'AI Optimization LLM Models';
+  }
+
   getParams(): z.ZodRawShape {
     return {
           llm_type: z.string().describe(`type of llm. Must be one of: 'claude', 'gemini', 'chat_gpt', 'perplexity'`),

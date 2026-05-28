@@ -20,6 +20,10 @@ export class AiOptimizationKeywordDataLocationsAndLanguagesListTool extends Base
       return "Utility tool for 'AI Optimization Keyword Data Locations and Languages' (ai_opt_kw_data_loc_and_lang) to get list of availible locations and languages";
   }
 
+  getTitle(): string {
+    return 'AI Optimization Keywords Data Locations and Languages';
+  }
+
   getParams(): ZodRawShape {
      return {};
   }

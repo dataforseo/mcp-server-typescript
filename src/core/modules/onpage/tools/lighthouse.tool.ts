@@ -15,6 +15,10 @@ export class LighthouseTool extends BaseTool {
     return 'The OnPage Lighthouse API is based on Google’s open-source Lighthouse project for measuring the quality of web pages and web apps.';
   }
 
+  getTitle(): string {
+    return 'On Page Lighthouse';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       url: z.string().describe("URL of the page to parse"),

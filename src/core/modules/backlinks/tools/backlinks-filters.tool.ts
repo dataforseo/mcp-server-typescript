@@ -40,6 +40,10 @@ export class BacklinksFiltersTool extends BaseTool {
     return 'backlinks_available_filters';
   }
 
+  getTitle(): string {
+    return 'Backlinks Available Filters';
+  }
+
   getDescription(): string {
     return `Here you will find all the necessary information about filters that can be used with DataForSEO Backlinks API endpoints.
 
