@@ -44,6 +44,10 @@ Please, keep in mind that filters are associated with a certain object in the re
     return true;
   }
 
+  getTitle(): string {
+    return 'Domain Analytics Technologies Available Filters';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       tool: z.string().optional().describe('The name of the tool to get filters for')

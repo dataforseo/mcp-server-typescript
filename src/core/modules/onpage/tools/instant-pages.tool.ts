@@ -15,6 +15,10 @@ export class InstantPagesTool extends BaseTool {
     return "Using this function you will get page-specific data with detailed information on how well a particular page is optimized for organic search";
   }
 
+  getTitle(): string {
+    return 'On Page Instant Pages';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       url: z.string().describe("URL to analyze"),

@@ -15,6 +15,10 @@ export class BacklinksBulkSpamScoreTool extends BaseTool {
     return `This endpoint will provide you with spam scores of the domains, subdomains, and pages you specified in the targets array. Spam Score is DataForSEO’s proprietary metric that indicates how “spammy” your target is on a scale from 0 to 100`;
   }
 
+  getTitle(): string {
+    return 'Backlinks Bulk Spam Score';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       targets: z.array(z.string()).describe(`domains, subdomains or webpages to get rank for

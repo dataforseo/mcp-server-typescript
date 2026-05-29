@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import { DataForSEOClient } from '../client/dataforseo.client.js';
 import { defaultGlobalToolConfig } from '../config/global.tool.js';
+import { DEFAULT_DATAFORSEO_TOOL_ANNOTATIONS } from '../config/tool-annotations.js';
 import { filterFields, parseFieldPaths } from '../utils/field-filter.js';
 import { FieldConfigurationManager } from '../config/field-configuration.js';
 
@@ -138,9 +140,14 @@ export abstract class BaseTool {
   }
 
   abstract getName(): string;
+  abstract getTitle(): string;
   abstract getDescription(): string;
   abstract getParams(): z.ZodRawShape;
   abstract handle(params: any): Promise<any>;
+
+  getAnnotations(): ToolAnnotations {
+    return DEFAULT_DATAFORSEO_TOOL_ANNOTATIONS;
+  }
 
   protected filterResponseFields(response: any, fields: string[]): any {
     if (!fields || fields.length === 0) {

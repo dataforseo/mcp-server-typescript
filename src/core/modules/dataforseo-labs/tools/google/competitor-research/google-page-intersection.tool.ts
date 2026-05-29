@@ -22,6 +22,10 @@ Find keywords your competitors rank for but you do not:
 If you would like to receive all keywords several pages rank for, but particular pages do not, you need to use the exclude_pages array as well. This way you will receive the keywords for which the URLs from the pages object rank for, but the URLs from the exclude_pages array do not`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Page Intersection';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       pages: z.array(z.string()).describe(`pages array

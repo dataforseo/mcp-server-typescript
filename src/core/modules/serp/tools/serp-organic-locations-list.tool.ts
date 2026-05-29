@@ -16,6 +16,10 @@ export class SerpOrganicLocationsListTool extends BaseTool {
     return 'Utility tool for serp_organic_live_advanced to get list of availible locations.';
   }
   
+  getTitle(): string {
+    return 'SERP Locations';
+  }
+  
   getParams(): z.ZodRawShape {
     return {
       search_engine: z.string().default('google').describe("search engine name, one of: google, yahoo, bing."),

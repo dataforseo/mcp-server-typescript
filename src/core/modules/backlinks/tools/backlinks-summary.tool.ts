@@ -15,6 +15,10 @@ export class BacklinksSummaryTool extends BaseTool {
     return "This endpoint will provide you with an overview of backlinks data available for a given domain, subdomain, or webpage";
   }
 
+  getTitle(): string {
+    return 'Backlinks Summary';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain, subdomain or webpage to get backlinks for

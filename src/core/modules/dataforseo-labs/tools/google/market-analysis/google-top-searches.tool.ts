@@ -15,6 +15,10 @@ export class GoogleTopSearchesTool extends BaseTool {
     return `The Top Searches endpoint of DataForSEO Labs API can provide you with over 7 billion keywords from the DataForSEO Keyword Database. Each keyword in the API response is provided with a set of relevant keyword data with Google Ads metrics`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Top Searches';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       location_name: z.string().default("United States").describe(`full name of the location

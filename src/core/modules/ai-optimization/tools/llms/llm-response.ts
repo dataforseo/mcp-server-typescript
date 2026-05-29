@@ -16,6 +16,10 @@ export class AiOptimizationLlmResponseTool extends BaseTool {
       return "This endpoint allows you to retrieve structured responses from a specific AI model, based on the input parameters";
   }
 
+  getTitle(): string {
+      return 'AI Optimization LLM Response';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       llm_type: z.string().describe(`type of llm. Must be one of: 'claude', 'gemini', 'chat_gpt', 'perplexity'`),

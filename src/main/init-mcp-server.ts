@@ -34,8 +34,10 @@ export function initMcpServer(authHeader: string): McpServer {
       server.registerTool(
         name,
         {
+          title: typedTool.title,
           description: typedTool.description,
           inputSchema: schema.shape,
+          annotations: typedTool.annotations,
         },
         (args) => typedTool.handler(args)
       );

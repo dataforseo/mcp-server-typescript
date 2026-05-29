@@ -1,4 +1,4 @@
-import { BaseModule, ToolDefinition } from '../base.module.js';
+import { BaseModule, buildToolsRecord, ToolDefinition } from '../base.module.js';
 import { PromptDefinition } from '../prompt-definition.js';
 import { DataForSeoTrendsDemographyTool } from './tools/dataforseo-trends/dataforseo-trends-demography.tool.js';
 import { DataForSeoTrendsExploreTool } from './tools/dataforseo-trends/dataforseo-trends-explore.tool.js';
@@ -23,14 +23,7 @@ export class KeywordsDataApiModule extends BaseModule {
       // Add more tools here
     ];
 
-    return tools.reduce((acc, tool) => ({
-      ...acc,
-      [tool.getName()]: {
-        description: tool.getDescription(),
-        params: tool.getParams(),
-        handler: (params: any) => tool.handle(params),
-      },
-    }), {});
+    return buildToolsRecord(tools);
   }
 
   getPrompts(): Record<string, PromptDefinition> {

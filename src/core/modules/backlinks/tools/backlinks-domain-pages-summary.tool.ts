@@ -15,6 +15,10 @@ export class BacklinksDomainPagesSummaryTool extends BaseTool {
     return "This endpoint will provide you with detailed summary data on all backlinks and related metrics for each page of the target domain or subdomain you specify. If you indicate a single page as a target, you will get comprehensive summary data on all backlinks for that page";
   }
 
+  getTitle(): string {
+    return 'Backlinks Domain Pages Summary';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain, subdomain or webpage to get backlinks for

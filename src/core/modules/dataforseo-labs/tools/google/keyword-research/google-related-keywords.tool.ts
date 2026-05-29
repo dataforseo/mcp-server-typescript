@@ -21,6 +21,10 @@ Search algorithm: depth-first search for queries appearing in the "search relate
 `;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Related Keywords';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`target keyword`),

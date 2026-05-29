@@ -8,6 +8,10 @@ export class AiOptimizationChatGptLocationsTool extends BaseTool {
         super(dataForSEOClient);
     }
 
+    getTitle(): string {
+        return 'AI Optimization Chat GPT Scraper Locations';
+    }
+
     protected supportOnlyFullResponse(): boolean {
         return true;
     }

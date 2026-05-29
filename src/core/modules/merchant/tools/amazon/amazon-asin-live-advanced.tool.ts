@@ -17,6 +17,10 @@ Returns product title, price, description, images, reviews summary, seller info,
 shipping options, and other product attributes for the specified ASIN.`;
   }
 
+  getTitle(): string {
+    return 'Merchant Amazon ASIN Live Advanced';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       asin: z.string().describe(`product ID

@@ -15,6 +15,10 @@ export class SerpOrganicLiveAdvancedTool extends BaseTool {
     return 'Get organic search results for a keyword in specified search engine';
   }
 
+  getTitle(): string {
+    return 'SERP Organic Live Advanced';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       search_engine: z.string().default('google').describe("search engine name, one of: google, yahoo, bing."),

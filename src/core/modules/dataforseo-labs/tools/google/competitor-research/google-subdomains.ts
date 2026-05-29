@@ -15,6 +15,10 @@ export class GoogleSubdomainsTool extends BaseTool {
     return `This endpoint will provide you with a list of subdomains of the specified domain, along with the ranking distribution across organic and paid search. In addition to that, you will also get the estimated traffic volume of subdomains based on search volume.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Subdomains';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`target domain`),

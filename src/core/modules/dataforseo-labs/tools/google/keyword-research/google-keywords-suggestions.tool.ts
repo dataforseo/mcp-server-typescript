@@ -23,6 +23,10 @@ Along with each suggested keyword, you will get its search volume rate for the l
 `;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Keyword Suggestions';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`target keyword`),

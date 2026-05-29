@@ -15,6 +15,10 @@ export class GoogleAdsSearchVolumeTool extends BaseTool {
     return 'Get search volume data for keywords from Google Ads';
   }
 
+  getTitle(): string {
+    return 'Keywords Data Google Ads Search Volume';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       location_name: z.string().default('United States').describe(`full name of the location

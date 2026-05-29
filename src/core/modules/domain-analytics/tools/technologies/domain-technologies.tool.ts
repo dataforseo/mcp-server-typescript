@@ -15,6 +15,10 @@ export class DomainTechnologiesTool extends BaseTool {
     return `Using this endpoint you will get a list of technologies used in a particular domain`;
   }
 
+  getTitle(): string {
+    return 'Domain Analytics Technologies Domain Technologies';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`target domain

@@ -16,6 +16,10 @@ export class BacklinksBulkNewLostReferringDomainsTool extends BaseTool {
 Note that if you indicate a domain as a target, you will get result for the root domain (domain with all of its subdomains), e.g. dataforseo.com and app.dataforseo.com`;
   }
 
+  getTitle(): string {
+    return 'Backlinks Bulk New Lost Referring Domains';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       targets: z.array(z.string()).describe(`domains, subdomains or webpages to get rank for

@@ -15,6 +15,10 @@ export class GoogleHistoricalDomainRankOverviewTool extends BaseTool {
     return `This endpoint will provide you with historical data on rankings and traffic of the specified domain, such as domain ranking distribution in SERPs and estimated monthly traffic volume for both organic and paid results`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Historical Rank Overview';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`target domain`),

@@ -8,6 +8,10 @@ export class AiOptimizationLlmMentionsLocationsAndLanguagesListTool extends Base
         super(dataForSEOClient);
     }
 
+    getTitle(): string {
+        return 'AI Optimization LLM Mentions Locations and Languages';
+    }
+
     protected supportOnlyFullResponse(): boolean {
         return true;
     }

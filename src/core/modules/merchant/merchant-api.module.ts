@@ -1,4 +1,4 @@
-import { BaseModule, ToolDefinition } from '../base.module.js';
+import { BaseModule, buildToolsRecord, ToolDefinition } from '../base.module.js';
 import { PromptDefinition } from '../prompt-definition.js';
 import { MerchantAmazonAsinLiveAdvancedTool } from './tools/amazon/amazon-asin-live-advanced.tool.js';
 import { MerchantAmazonSellersLiveAdvancedTool } from './tools/amazon/amazon-sellers-live-advanced.tool.js';
@@ -15,14 +15,7 @@ export class MerchantApiModule extends BaseModule {
       // Add more tools here
     ];
 
-    return tools.reduce((acc, tool) => ({
-      ...acc,
-      [tool.getName()]: {
-        description: tool.getDescription(),
-        params: tool.getParams(),
-        handler: (params: any) => tool.handle(params),
-      },
-    }), {});
+    return buildToolsRecord(tools);
   }
 
   getPrompts(): Record<string, PromptDefinition> {

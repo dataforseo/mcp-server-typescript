@@ -16,6 +16,10 @@ export class GoogleSearchIntentTool extends BaseTool {
 Based on keyword data and search results data, our system has been trained to detect four types of search intent: informational, navigational, commercial, transactional.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Search Intent';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keywords: z.array(z.string()).describe(`target keywords

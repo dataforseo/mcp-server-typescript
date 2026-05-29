@@ -15,6 +15,10 @@ export class GoogleRankedKeywordsTool extends BaseTool {
     return "This endpoint will provide you with the list of keywords that any domain or webpage is ranking for. You will also get SERP elements related to the keyword position, as well as impressions, monthly searches and other data relevant to the returned keywords.";
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Ranked Keywords';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain name or page url

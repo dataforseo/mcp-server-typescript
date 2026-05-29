@@ -16,6 +16,10 @@ export class AiOptimizationLlmMentionsTopPagesTool extends BaseTool {
         return "This endpoint provides aggregated LLM mentions metrics grouped by the most frequently mentioned pages for the specified target";
     }
 
+    getTitle(): string {
+        return 'AI Optimization LLM Mentions Top Pages';
+    }
+
     getParams(): z.ZodRawShape {
         return {
             target: z.array(

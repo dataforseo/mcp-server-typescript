@@ -15,6 +15,10 @@ export class BusinessDataBusinessListingsSearchTool extends BaseTool {
     return `Business Listings Search API provides results containing information about business entities listed on Google Maps in the specified categories. You will receive the address, contacts, rating, working hours, and other relevant data`;
   }
 
+  getTitle(): string {
+    return 'Business Data Business Listings Search';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       description: z.string().optional().describe(`description of the element in SERP

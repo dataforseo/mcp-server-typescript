@@ -15,6 +15,10 @@ export class GoogleAdsLocationsListTool extends BaseTool {
     return 'Utility tool for kw_data_google_ads_search_volume to get list of availible locations.';
   }
   
+  getTitle(): string {
+    return 'Keywords Data Google Ads Locations';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       country_iso_code: z.string().describe("ISO 3166-1 alpha-2 country code, for example: US, GB, MT"),

@@ -15,6 +15,10 @@ export class WhoisOverviewTool extends BaseTool {
     return `This endpoint will provide you with Whois data enriched with backlink stats, and ranking and traffic info from organic and paid search results. Using this endpoint you will be able to get all these data for the domains matching the parameters you specify in the request`;
   }
 
+  getTitle(): string {
+    return 'Domain Analytics WHOIS Overview';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       limit: z.number().min(1).max(1000).default(10).optional().describe("the maximum number of returned domains"),

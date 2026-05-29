@@ -16,6 +16,10 @@ export class GoogleHistoricalSERP extends BaseTool {
     return `This endpoint will provide you with Google SERPs collected within the specified time frame. You will also receive a complete overview of featured snippets and other extra elements that were present within the specified dates. The data will allow you to analyze the dynamics of keyword rankings over time for the specified keyword and location.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google Historical SERP';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`target keyword`),

@@ -15,6 +15,10 @@ export class GoogleTrendsCategoriesTool extends BaseTool {
     return 'This endpoint will provide you list of Google Trends Categories';
   }
 
+  getTitle(): string {
+    return 'Keywords Data Google Trends Categories';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       

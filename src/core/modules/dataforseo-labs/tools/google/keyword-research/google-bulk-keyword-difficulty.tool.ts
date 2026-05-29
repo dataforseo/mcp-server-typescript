@@ -15,6 +15,10 @@ export class GoogleBulkKeywordDifficultyTool extends BaseTool {
     return `This endpoint will provide you with the Keyword Difficulty metric for a maximum of 1,000 keywords in one API request. Keyword Difficulty stands for the relative difficulty of ranking in the first top-10 organic results for the related keyword. Keyword Difficulty in DataForSEO API responses indicates the chance of getting in top-10 organic results for a keyword on a logarithmic scale from 0 to 100.`;
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Bulk Keyword Difficulty';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keywords: z.array(z.string()).describe(`target keywords

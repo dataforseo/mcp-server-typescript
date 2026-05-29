@@ -17,6 +17,10 @@ export class AiOptimizationChatGptScraperTool extends BaseTool {
       return "This endpoint provides results from ChatGPT searches";
   }
 
+  getTitle(): string {
+    return 'AI Optimization Chat GPT Scraper';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keyword: z.string().describe(`keyword

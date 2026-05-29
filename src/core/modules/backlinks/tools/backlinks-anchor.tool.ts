@@ -15,6 +15,10 @@ export class BacklinksAnchorTool extends BaseTool {
     return "This endpoint will provide you with a detailed overview of anchors used when linking to the specified website with relevant backlink data for each of them";
   }
 
+  getTitle(): string {
+    return 'Backlinks Anchors';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain, subdomain or webpage to get backlinks for

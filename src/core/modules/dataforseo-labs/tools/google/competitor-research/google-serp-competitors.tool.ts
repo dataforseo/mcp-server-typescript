@@ -15,6 +15,10 @@ export class GoogleSERPCompetitorsTool extends BaseTool {
     return "This endpoint will provide you with a list of domains ranking for the keywords you specify. You will also get SERP rankings, rating, estimated traffic volume, and visibility values the provided domains gain from the specified keywords.";
   }
 
+  getTitle(): string {
+    return 'DataForSEO Labs Google SERP Competitors';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       keywords: z.array(z.string()).describe(`keywords array

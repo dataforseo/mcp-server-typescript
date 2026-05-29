@@ -1,4 +1,4 @@
-import { BaseModule, ToolDefinition } from '../base.module.js';
+import { BaseModule, buildToolsRecord, ToolDefinition } from '../base.module.js';
 import { PromptDefinition } from '../prompt-definition.js';
 import { BusinessDataBusinessListingsSearchTool } from './tools/listings/business-listings-search.tool.js';
 
@@ -9,14 +9,7 @@ export class BusinessDataApiModule extends BaseModule {
       // Add more tools here
     ];
 
-    return tools.reduce((acc, tool) => ({
-      ...acc,
-      [tool.getName()]: {
-        description: tool.getDescription(),
-        params: tool.getParams(),
-        handler: (params: any) => tool.handle(params),
-      },
-    }), {});
+    return buildToolsRecord(tools);
   }
 
     getPrompts(): Record<string, PromptDefinition> {

@@ -15,6 +15,10 @@ export class SerpYoutubeVideoCommentsLiveAdvancedTool extends BaseTool {
         return 'provides data on the video comments you specify';
     }
 
+    getTitle(): string {
+        return 'SERP YouTube Video Comments Live Advanced';
+    }
+
     getParams(): z.ZodRawShape {
         return {
             video_id: z.string().describe("ID of the video"),

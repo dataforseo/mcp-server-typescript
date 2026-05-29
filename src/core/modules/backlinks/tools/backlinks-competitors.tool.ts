@@ -15,6 +15,10 @@ export class BacklinksCompetitorsTool extends BaseTool {
     return "This endpoint will provide you with a list of competitors that share some part of the backlink profile with a target website, along with a number of backlink intersections and the rank of every competing website";
   }
 
+  getTitle(): string {
+    return 'Backlinks Competitors';
+  }
+
   getParams(): z.ZodRawShape {
     return {
       target: z.string().describe(`domain, subdomain or webpage to get backlinks for
