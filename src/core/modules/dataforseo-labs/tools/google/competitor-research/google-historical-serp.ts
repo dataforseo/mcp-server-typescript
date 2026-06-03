@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { DataForSEOClient } from '../../../../../client/dataforseo.client.js';
 import { BaseTool, DataForSEOFullResponse, DataForSEOResponse } from '../../../../base.tool.js';
 import { defaultGlobalToolConfig } from '../../../../../config/global.tool.js';
+import { date } from 'zod/v4';
 
 export class GoogleHistoricalSERP extends BaseTool {
   constructor(client: DataForSEOClient) {
@@ -32,7 +33,9 @@ example:
         `language code
         required field
         example:
-        en`)
+        en`),
+      date_from: z.string().optional().describe(`starting date of the time range, date format: YYYY-MM-DD`),
+      date_to: z.string().optional().describe(`ending date of the time range, date format: YYYY-MM-DD`)
     };
   }
 
@@ -41,7 +44,9 @@ example:
       const response = await this.dataForSEOClient.makeRequest('/v3/dataforseo_labs/google/historical_serps/live', 'POST', [{
         keyword: params.keyword,
         location_name: params.location_name,
-        language_code: params.language_code
+        language_code: params.language_code,
+        date_from: params.date_from,
+        date_to: params.date_to
       }]);
 
       console.error(JSON.stringify(response));
