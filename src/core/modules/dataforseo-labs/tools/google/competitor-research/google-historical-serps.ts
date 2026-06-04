@@ -10,7 +10,7 @@ export class GoogleHistoricalSERP extends BaseTool {
   }
 
   getName(): string {
-    return 'dataforseo_labs_google_historical_serp';
+    return 'dataforseo_labs_google_historical_serps';
   }
 
   getDescription(): string {
@@ -18,7 +18,7 @@ export class GoogleHistoricalSERP extends BaseTool {
   }
 
   getTitle(): string {
-    return 'DataForSEO Labs Google Historical SERP';
+    return 'DataForSEO Labs Google Historical SERPs';
   }
 
   getParams(): z.ZodRawShape {

@@ -30,7 +30,7 @@ export class DataForSeoLabsFilterTool extends BaseTool {
     'dataforseo_labs_google_subdomains': 'subdomains.google',
     'dataforseo_labs_google_domain_intersection': 'domain_intersection.google',
     'dataforseo_labs_google_page_intersection': 'page_intersection.google',
-    'dataforseo_labs_google_historical_serp': 'historical_serp.google',
+    'dataforseo_labs_google_historical_serps': 'historical_serp.google',
     'dataforseo_labs_google_historical_rank_overview': 'domain_rank_overview.google',
     'dataforseo_labs_google_relevant_pages': 'relevant_pages.google',
     'dataforseo_labs_google_top_searches': 'top_searches.google',
