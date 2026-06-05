@@ -13,7 +13,7 @@ import { GoogleKeywordOverviewTool } from './tools/google/keyword-research/googl
 import { GoogleKeywordsForSiteTool } from './tools/google/keyword-research/google-keywords-for-site.tool.js';
 import { GoogleSubdomainsTool } from './tools/google/competitor-research/google-subdomains.js';
 import { GoogleSERPCompetitorsTool } from './tools/google/competitor-research/google-serp-competitors.tool.js';
-import { GoogleHistoricalSERP } from './tools/google/competitor-research/google-historical-serp.js';
+import { GoogleHistoricalSERP } from './tools/google/competitor-research/google-historical-serps.js';
 import { GoogleSearchIntentTool } from './tools/google/keyword-research/google-search-intent.tool.js';
 import { GoogleDomainIntersectionsTool } from './tools/google/competitor-research/google-domain-intersection.tool.js';
 import { GoogleHistoricalDomainRankOverviewTool } from './tools/google/competitor-research/google-historical-domain-rank-overview.tool.js';

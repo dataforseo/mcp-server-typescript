@@ -473,7 +473,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_historical_serp": [
+        "dataforseo_labs_google_historical_serps": [
             "datetime",
             "items.domain",
             "items.rank_absolute",
