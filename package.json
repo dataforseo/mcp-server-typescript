@@ -51,9 +51,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
-    "agents": "0.14.1",
-    "express": "4.22.2",
-    "wrangler": "4.97.0",
+    "agents": "0.14.5",
+    "express": "5.2.1",
+    "wrangler": "4.98.0",
     "zod": "4.4.3"
   }
 }
