@@ -15,6 +15,73 @@ Model Context Protocol (MCP) server implementation for DataForSEO, enabling AI a
 - **CONTENT ANALYSIS API**: robust source of data for brand monitoring, sentiment analysis, and citation management;
 - **MERCHANT API**: provides essential data and metrics for comprehensive competitor analysis, price monitoring, and market research across Google Shopping, Amazon etc.
 
+## Custom SERP Tools (this fork)
+
+This fork adds two SERP tools on top of the upstream server, both focused on returning lean, AI-friendly JSON instead of the full (often enormous) DataForSEO payload. Both live in the `SERP` module.
+
+### `serp_organic_task_bulk` — bulk SERPs via the task queue
+
+Fetches Google/Bing/Yahoo organic results for **many keywords at once** using DataForSEO's task-queue pattern. The upstream server only offers the *live* endpoint (one keyword per call, billed at the higher live rate); this tool batches keywords as standard-priority tasks, which is cheaper and scales.
+
+It runs the whole queue loop internally so a single tool call returns everything:
+
+1. **Post** — submits all keywords in one `task_post` batch (up to 100), tagging each with its index so results map back even if keywords repeat.
+2. **Poll** — polls each task id via `task_get/advanced/{id}` on an interval, watching the queue status codes (`40602` in-queue / `40601` in-progress → keep waiting; `20000` → done).
+3. **Strip** — trims each completed result to organic listings plus an AI Overview signal.
+
+**Parameters**
+
+| Param | Type | Default | Notes |
+|---|---|---|---|
+| `keywords` | `string[]` | — | **Required.** 1–100 keywords. |
+| `language_code` | `string` | — | **Required.** e.g. `"en"`. |
+| `search_engine` | `string` | `"google"` | `google`, `bing`, or `yahoo`. |
+| `location_name` | `string` | `"United States"` | Hierarchical, e.g. `"San Francisco,California,United States"`. |
+| `depth` | `number` | `10` | Number of organic results (10–700). |
+| `device` | `string` | `"desktop"` | `desktop` or `mobile`. |
+| `priority` | `number` | `1` | `1` = normal (cheaper, slower), `2` = high. |
+| `include_ai_overview` | `boolean` | `true` | Requests AI Overview loading so cited URLs are returned. |
+| `max_wait_seconds` | `number` | `180` | Max time to poll before returning partial results (10–600). |
+| `poll_interval_seconds` | `number` | `6` | Delay between polling rounds (2–60). |
+
+**Response shape** — a summary plus one compact object per keyword:
+
+```jsonc
+{
+  "keywords_requested": 3,
+  "completed": 3,
+  "pending": 0,
+  "errored": 0,
+  "results": [
+    {
+      "keyword": "best running shoes",
+      "location_name": "United States",
+      "language_code": "en",
+      "status": "ok",                 // ok | pending | error
+      "organic": [
+        { "rank": 1, "title": "...", "url": "...", "domain": "...", "description": "..." }
+      ],
+      "ai_overview": {
+        "exists": true,
+        "cited_urls": ["https://...", "https://..."]   // citations only, no overview text
+      }
+    }
+  ]
+}
+```
+
+Anything still in the queue when `max_wait_seconds` elapses comes back with `status: "pending"` and a message — the call never hangs, and you can re-run to re-poll. For large batches, raise `max_wait_seconds` or set `priority: 2`.
+
+**Example prompt**
+
+> Use `serp_organic_task_bulk` to pull Google organic results for: "best running shoes", "marathon training plan", "trail running tips". Location "United States", language "en". Flag any keyword with an AI Overview and its cited URLs.
+
+### `serp_organic_live_advanced-content` — live SERP, noise stripped
+
+Same as the upstream `serp_organic_live_advanced` (one keyword, live endpoint) but recursively strips item types that are rarely useful for content analysis before formatting — currently `product_considerations_element`, `popular_products`, and `perspectives` — which meaningfully shrinks the returned JSON. It also sets `group_organic_results: true`.
+
+Use this for a single keyword when you want results immediately; use `serp_organic_task_bulk` for multiple keywords where queue latency is acceptable.
+
 ## Prerequisites
 
 - Node.js (v14 or higher)
@@ -98,6 +165,76 @@ npx dataforseo-mcp-server@latest
 # Start HTTP server
 npx dataforseo-mcp-server@latest http
 ```
+
+## Installing into Claude (local dev build)
+
+Use this when you want to run **your local fork** (including the custom SERP tools above) inside Claude rather than the published npm package. It runs over stdio against the compiled `build/main/main/index.js`.
+
+### 1. Build it
+
+```bash
+git clone <your-fork-url> dataforseo_MCP_AI_Friendly
+cd dataforseo_MCP_AI_Friendly
+npm install
+npm run build
+```
+
+This produces `build/main/main/index.js`. Note the **absolute path** to it — you'll need it below:
+
+```bash
+echo "$(pwd)/build/main/main/index.js"
+```
+
+### 2a. Claude Desktop
+
+Edit Claude Desktop's MCP config file:
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add a server entry pointing `node` at your local build (create the file / `mcpServers` object if it doesn't exist):
+
+```json
+{
+  "mcpServers": {
+    "dataforseo": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/dataforseo_MCP_AI_Friendly/build/main/main/index.js"],
+      "env": {
+        "DATAFORSEO_USERNAME": "your_username",
+        "DATAFORSEO_PASSWORD": "your_password",
+        "ENABLED_MODULES": "SERP"
+      }
+    }
+  }
+}
+```
+
+Fully quit and reopen Claude Desktop. The tools appear under the 🔌 / tools menu; you should see `serp_organic_task_bulk` and `serp_organic_live_advanced-content` in the list.
+
+### 2b. Claude Code (CLI)
+
+Register the same local build with one command:
+
+```bash
+claude mcp add dataforseo \
+  --env DATAFORSEO_USERNAME=your_username \
+  --env DATAFORSEO_PASSWORD=your_password \
+  --env ENABLED_MODULES=SERP \
+  -- node "/ABSOLUTE/PATH/TO/dataforseo_MCP_AI_Friendly/build/main/main/index.js"
+```
+
+Then verify it connected:
+
+```bash
+claude mcp list
+```
+
+### Notes
+
+- **Rebuild after changes.** Stdio launches the compiled JS, so re-run `npm run build` (or `npm run dev` to watch) and restart Claude / the session after editing source.
+- **Scope it down.** `ENABLED_MODULES=SERP` loads only the SERP tools; drop it to expose every module.
+- **Leave `DATAFORSEO_FULL_RESPONSE` unset/`false`** so responses stay trimmed — the custom tools do their own stripping regardless, but other tools rely on this for concise output.
 
 ## HTTP Server Configuration
 
