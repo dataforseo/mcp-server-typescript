@@ -2,6 +2,8 @@ import { BaseModule, buildToolsRecord, ToolDefinition } from '../base.module.js'
 import { PromptDefinition } from '../prompt-definition.js';
 import { z } from 'zod';
 import { SerpOrganicLiveAdvancedTool } from './tools/serp-organic-live-advanced.tool.js';
+import { SerpOrganicLiveAdvancedToolContent } from './tools/serp-organic-live-advanced-content.tool.js';
+import { SerpOrganicTaskBulkTool } from './tools/serp-organic-task-bulk.tool.js';
 import { SerpOrganicLocationsListTool } from './tools/serp-organic-locations-list.tool.js';
 import { SerpYoutubeOrganicLiveAdvancedTool } from './tools/serp-youtube-organic-live-advanced.tool.js';
 import { SerpYoutubeVideoInfoLiveAdvancedTool } from './tools/serp-youtube-video-info-live-advanced.tool.js';
@@ -22,6 +24,8 @@ export class SerpApiModule extends BaseModule {
       new SerpYoutubeVideoCommentsLiveAdvancedTool(this.dataForSEOClient),
       new SerpYoutubeVideoSubtitlesLiveAdvancedTool(this.dataForSEOClient),
       // Add more tools here
+      new SerpOrganicLiveAdvancedToolContent(this.dataForSEOClient),
+      new SerpOrganicTaskBulkTool(this.dataForSEOClient)
     ];
 
     return buildToolsRecord(tools);
