@@ -52,11 +52,12 @@ default value: desktop`),
   async handle(params:any): Promise<any> {
     try {
       console.error(JSON.stringify(params, null, 2));
-      const response = await this.dataForSEOClient.makeRequest(`/v3/serp/${params.search_engine}/organic/live/advanced`, 'POST', [{
+      const response = await this.dataForSEOClient.makeRequest(`/v3/serp/${params.search_engine}/organic/live/advanced.ai`, 'POST', [{
         location_name: params.location_name,
         language_code: params.language_code,
         keyword: params.keyword,
         depth: params.depth,
+        calculate_rectangles: false,
         max_crawl_pages: params.max_crawl_pages,
         device: params.device,
         people_also_ask_click_depth: params.people_also_ask_click_depth && params.people_also_ask_click_depth > 0 ? params.people_also_ask_click_depth : undefined,
