@@ -10,6 +10,8 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/main/main/cli.js', '755')\"",
     "start": "node build/main/main/index.js",
     "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepare": "npm run build",
     "http": "node build/main/main/index-http.js",
     "sse": "node build/main/main/index-sse-http.js",
@@ -47,7 +49,8 @@
   "devDependencies": {
     "@types/express": "^5.0.1",
     "@types/node": "^22.10.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
