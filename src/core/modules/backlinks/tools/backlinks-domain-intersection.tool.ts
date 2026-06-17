@@ -27,6 +27,11 @@ required field
 you can set up to 20 domains, subdomains or webpages
 a domain or a subdomain should be specified without https:// and www.
 a page should be specified with absolute URL (including http:// or https://)`),
+      exclude_targets: z.array(z.string()).max(10).optional().describe(`domains, subdomains or webpages you want to exclude
+optional field
+you can specify up to 10 domains, subdomains or webpages
+if you use this array, results will contain the referring domains that link to targets but don't link to exclude_targets
+example: ["bbc.com","https://www.apple.com/iphone/*","https://dataforseo.com/apis/*"]`),
       limit: z.number().min(1).max(1000).default(10).optional().describe("the maximum number of returned results"),
       offset: z.number().min(0).optional().describe(
         `offset in the array of returned results
@@ -64,6 +69,7 @@ example:
     try {
       const response = await this.dataForSEOClient.makeRequest('/v3/backlinks/domain_intersection/live', 'POST', [{
         targets: mapArrayToNumberedKeys(params.targets),
+        exclude_targets: params.exclude_targets,
         limit: params.limit,
         offset: params.offset,
         filters: this.formatFilters(params.filters),
