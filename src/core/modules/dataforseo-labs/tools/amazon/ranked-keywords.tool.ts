@@ -33,18 +33,13 @@ example: 'United States'`),
         required field if language_name is not specified
         example:
         en`),
-      limit: z.number().min(1).max(1000).default(100).optional().describe("Maximum number of keywords to return"),
+      limit: z.number().min(1).max(1000).default(10).optional().describe("Maximum number of keywords to return"),
       offset: z.number().min(0).optional().describe(
         `offset in the results array of returned keywords
         optional field
         default value: 0
         if you specify the 10 value, the first ten keywords in the results array will be omitted and the data will be provided for the successive keywords`
       ),
-      ignore_synonyms: z.boolean().default(false).optional().describe(
-        `ignore highly similar keywords
-optional field
-if set to true only core keywords will be returned, all highly similar keywords will be excluded
-default value: false`),
       filters: this.getFilterExpression().optional().describe(
         `Array-based filter expression. A single condition is a 3-element array: [field, operator, value]. Combine conditions with ["and"|"or"] between them: [condition, "and", condition]. Max 8 filters.
 Operators: regex, not_regex, <, <=, >, >=, =, <>, in, not_in, like, not_like, match, not_match

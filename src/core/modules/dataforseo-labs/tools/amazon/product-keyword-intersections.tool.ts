@@ -29,13 +29,13 @@ example: ["B09172433Z", "B07GBZ4Q68"]`),
       location_name: z.string().default("United States").describe(`full name of the location
 required field if location_code is not specified
 Note: this endpoint currently supports the US, Egypt, Saudi Arabia, and the United Arab Emirates locations only
-example: 'United States', 'United Kingdom'`),
+example: 'United States'`),
       language_code: z.string().default("en").describe(
         `language code
         required field if language_name is not specified
         example:
         en`),
-      limit: z.number().min(1).max(1000).default(100).optional().describe("Maximum number of keywords to return"),
+      limit: z.number().min(1).max(1000).default(10).optional().describe("Maximum number of keywords to return"),
       offset: z.number().min(0).optional().describe(
         `offset in the results array of returned keywords
         optional field

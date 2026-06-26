@@ -33,7 +33,7 @@ example: 'United States'`),
         required field if language_name is not specified
         example:
         en`),
-      limit: z.number().min(1).max(1000).default(100).optional().describe("Maximum number of product competitors to return"),
+      limit: z.number().min(1).max(1000).default(10).optional().describe("Maximum number of product competitors to return"),
       offset: z.number().min(0).optional().describe(
         `offset in the results array of returned product competitors
         optional field

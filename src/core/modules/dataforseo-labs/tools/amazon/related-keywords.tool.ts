@@ -49,12 +49,7 @@ example: 'United States'`),
 optional field
 if set to true, data for the seed keyword specified in the keyword field will be provided in the seed_keyword_data array of the response
 default value: false`),
-      ignore_synonyms: z.boolean().default(false).optional().describe(
-        `ignore highly similar keywords
-optional field
-if set to true only core keywords will be returned, all highly similar keywords will be excluded
-default value: false`),
-      limit: z.number().min(1).max(1000).default(100).optional().describe("Maximum number of keywords to return"),
+      limit: z.number().min(1).max(1000).default(10).optional().describe("Maximum number of keywords to return"),
       offset: z.number().min(0).optional().describe(
         `offset in the results array of returned keywords
         optional field

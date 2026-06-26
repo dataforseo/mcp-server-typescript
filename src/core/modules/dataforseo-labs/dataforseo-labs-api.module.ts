@@ -22,7 +22,7 @@ import { DataForSeoLabsFilterTool } from './tools/labs-filters.tool.js';
 import { GoogleBulkTrafficEstimationTool } from './tools/google/competitor-research/google-bulk-traffic-estimation.tool.js';
 import { GoogleHistoricalKeywordDataTool } from './tools/google/keyword-research/google-historical-keyword-data.tool.js';
 import { GoogleRelevantPagesTool } from './tools/google/competitor-research/google-relevant-pages.js';
-import { AmazonProductKeywordIntersectionsTool } from './tools/amazon/product-keyword-intersections.js';
+import { AmazonProductKeywordIntersectionsTool } from './tools/amazon/product-keyword-intersections.tool.js';
 import { AmazonProductCompetitorsTool } from './tools/amazon/product-competitors.tool.js';
 import { AmazonRankedKeywordsTool } from './tools/amazon/ranked-keywords.tool.js';
 import { AmazonBulkSearchVolumeTool } from './tools/amazon/bulk-search-volume.tool.js';
