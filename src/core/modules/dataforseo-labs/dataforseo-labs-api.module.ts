@@ -22,6 +22,12 @@ import { DataForSeoLabsFilterTool } from './tools/labs-filters.tool.js';
 import { GoogleBulkTrafficEstimationTool } from './tools/google/competitor-research/google-bulk-traffic-estimation.tool.js';
 import { GoogleHistoricalKeywordDataTool } from './tools/google/keyword-research/google-historical-keyword-data.tool.js';
 import { GoogleRelevantPagesTool } from './tools/google/competitor-research/google-relevant-pages.js';
+import { AmazonProductKeywordIntersectionsTool } from './tools/amazon/product-keyword-intersections.tool.js';
+import { AmazonProductCompetitorsTool } from './tools/amazon/product-competitors.tool.js';
+import { AmazonRankedKeywordsTool } from './tools/amazon/ranked-keywords.tool.js';
+import { AmazonBulkSearchVolumeTool } from './tools/amazon/bulk-search-volume.tool.js';
+import { AmazonRelatedKeywordsTool } from './tools/amazon/related-keywords.tool.js';
+import { AmazonProductRankOverviewTool } from './tools/amazon/product-rank-overview.tool.js';
 import { datalabsPrompts } from './dataforseo-labs.prompts.js';
 
 export class DataForSEOLabsApi extends BaseModule {
@@ -52,6 +58,12 @@ export class DataForSEOLabsApi extends BaseModule {
       new DataForSeoLabsFilterTool(this.dataForSEOClient),
       new GoogleHistoricalKeywordDataTool(this.dataForSEOClient),
       new GoogleRelevantPagesTool(this.dataForSEOClient),
+      new AmazonProductKeywordIntersectionsTool(this.dataForSEOClient),
+      new AmazonProductCompetitorsTool(this.dataForSEOClient),
+      new AmazonRankedKeywordsTool(this.dataForSEOClient),
+      new AmazonBulkSearchVolumeTool(this.dataForSEOClient),
+      new AmazonRelatedKeywordsTool(this.dataForSEOClient),
+      new AmazonProductRankOverviewTool(this.dataForSEOClient),
       // Add more tools here
     ];
 
