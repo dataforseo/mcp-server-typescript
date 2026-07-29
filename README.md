@@ -1,20 +1,28 @@
 # DataForSEO MCP Server
 
+> **This is the new v3 MCP server.** The previous v2+ MCP server is **deprecated** and lives at [dataforseo/mcp-server-typescript-deprecated](https://github.com/dataforseo/mcp-server-typescript-deprecated).
+
 CLI and MCP server for LLM agents to browse DataForSEO API documentation and make authenticated API requests.
 
 ## Quick Start
 
 ```bash
-npm install
-npm run build
 npx dataforseo-mcp-server --help
 ```
 
-### Authentication
+While the package is on the beta channel, use `@beta`:
 
-**Preferred (HTTP MCP):** OAuth 2.0 — MCP clients discover the authorization server via Protected Resource metadata and send `Authorization: Bearer` tokens. Authorization server: `https://data.dataforseo.com` (override with `AUTH_SERVER_URL`).
+```bash
+npx dataforseo-mcp-server@beta --help
+```
 
-**Fallback:** API login/password in environment variables (HTTP Basic). Used for CLI, stdio MCP, and as a request-time fallback on HTTP when no `Authorization` header is present.
+To run from a local clone, see [Development](#development).
+
+## Authentication
+
+**OAuth 2.0 (default for HTTP MCP):** works out of the box. MCP clients discover the DataForSEO authorization server via Protected Resource metadata and send `Authorization: Bearer` tokens.
+
+**Fallback:** API login/password via environment variables (HTTP Basic). Required for CLI and stdio MCP; on HTTP it is used when no `Authorization` header is present.
 
 ```bash
 # bash / macOS / Linux
@@ -47,7 +55,7 @@ set DATAFORSEO_PASSWORD=your_api_password
 | `npx dataforseo-mcp-server docs search <url> --need-code-example` | Fetch documentation with PHP, Node.js, Python, and C# examples |
 | `npx dataforseo-mcp-server request -X <method> -p <path>` | Make an authenticated API request (`.ai` path by default) |
 
-In this repository you can also use `npx .` instead of `npx dataforseo-mcp-server`.
+From a built local clone you can also use `npx .` instead of `npx dataforseo-mcp-server`.
 
 ## Examples
 
@@ -66,8 +74,9 @@ npx dataforseo-mcp-server docs search backlinks/referring_networks/live --need-c
 npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
   --param keyword=dataforseo --param language_code=en --param location_code=2840 --param limit=100
 
-# Same request via JSON
-npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular -d '[{\"keyword\":\"dataforseo\",\"location_code\":2840,\"language_code\":\"en\",\"limit\":100}]'
+# Same request via JSON body
+npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
+  -d '[{"keyword":"dataforseo","location_code":2840,"language_code":"en","limit":100}]'
 ```
 
 Documentation responses are cached for **24 hours**. Default cache directory:
@@ -76,9 +85,9 @@ Documentation responses are cached for **24 hours**. Default cache directory:
 - **macOS:** `~/Library/Caches/dataforseo-mcp-server/docs-cache`
 - **Linux:** `~/.cache/dataforseo-mcp-server/docs-cache` (or `$XDG_CACHE_HOME`)
 
-Override with `--cache-dir <path>` on CLI commands. For MCP, pass `--docs-cache-dir <path>` in server startup `args`.
+Override with `--cache-dir <path>` on CLI `docs` commands. For MCP, pass `--docs-cache-dir <path>` in server startup `args`.
 
-API responses are returned as the response body only (parsed JSON when possible). When a field configuration is loaded, `api_request` / `request` responses are trimmed to the configured fields for that endpoint path (see **Field configuration** below).
+API responses are returned as the response body only (parsed JSON when possible). When a field configuration is loaded, `api_request` / `request` responses are trimmed to the configured fields for that endpoint path (see [Field configuration](#field-configuration)).
 
 ## Field configuration
 
@@ -100,7 +109,7 @@ Or set env:
 - `FIELD_CONFIG_PATH` — path to a JSON file (Node)
 - `FIELD_CONFIG_JSON` — inline JSON string (Node / Cloudflare Worker)
 
-Example (`field-config.example.json`):
+Minimal example (see `field-config.example.json` for a fuller sample):
 
 ```json
 {
@@ -132,16 +141,8 @@ The same tool implementations power both the CLI and MCP server. One binary serv
 **How the binary chooses a mode:**
 
 - CLI — when the first command is `docs` or `request`, or when `--cli` / `--help` / `--version` is passed
-- MCP HTTP — default when no CLI command is passed (Streamable HTTP on port 3000)
+- MCP HTTP — default when no CLI command is passed (Streamable HTTP on port 3000; override with `PORT`)
 - MCP stdio — pass `--mode stdio`
-
-```bash
-npm run build
-npm run start:mcp:http       # Streamable HTTP (same as: node dist/index.js)
-npm run start:mcp            # stdio (--mode stdio)
-```
-
-Or with npx:
 
 ```bash
 npx dataforseo-mcp-server                    # MCP HTTP
@@ -212,7 +213,7 @@ OAuth 2.0 Protected Resource metadata (RFC 9728) is **always** exposed so MCP cl
 - `GET /.well-known/oauth-protected-resource/mcp`
 - `GET /.well-known/oauth-protected-resource/http`
 
-Set `AUTH_SERVER_URL` to override the authorization server URL (default: `https://data.dataforseo.com`). Behind a reverse proxy, set `TRUST_PROXY=true` so metadata URLs use `https`.
+Behind a reverse proxy, set `TRUST_PROXY=true` so metadata URLs use `https`.
 
 Auth priority on HTTP requests:
 
@@ -225,18 +226,22 @@ Auth priority on HTTP requests:
 ```
 src/
 ├── index.ts            # Unified entry (CLI if docs/request/--cli; else MCP, default HTTP)
-├── config/             # URLs, sections
+├── config/             # URLs, sections, auth server
 ├── core/
 │   ├── api/            # auth, client, path, request-body
 │   ├── cli/            # program, error, output
+│   ├── config/         # field configuration + defaults
 │   ├── docs/           # path, section, cache
 │   ├── http/           # fetch
-│   ├── tools/          # Tool implementations + CLI registration (shared by CLI + MCP)
+│   ├── mcp/            # startup args (--fields-filter, --docs-cache-dir)
+│   ├── tools/          # shared CLI + MCP tool implementations
+│   ├── utils/          # field filter
 │   ├── env.ts
 │   └── version.ts
 ├── mcp/
 │   ├── init-mcp-server.ts
 │   ├── tool-definition.ts
+│   ├── auth-middleware.ts
 │   ├── http-routes.ts
 │   ├── index.ts        # stdio transport
 │   └── index-http.ts   # streamable HTTP
@@ -258,11 +263,19 @@ Read [SKILL.md](./SKILL.md) in this repo for full agent instructions.
 
 ## Development
 
-```bash
-npm run dev -- docs index --section "SERP API"
-npm run dev:mcp
-npm run build
-npx dataforseo-mcp-server docs index --list-sections
-```
-
 Requires Node.js 20+.
+
+```bash
+npm install
+npm run build
+
+# Dev (tsx, no build step)
+npm run dev -- docs index --section "SERP API"
+npm run dev:mcp          # stdio
+npm run dev:mcp:http     # HTTP
+
+# After build
+npm run start:mcp:http   # Streamable HTTP (same as: node dist/index.js)
+npm run start:mcp        # stdio
+npx . docs index --list-sections
+```
