@@ -113,10 +113,11 @@ Example (`field-config.example.json`):
 
 Behavior:
 
+- Built-in defaults always apply for `/v3/on_page/lighthouse/live/json` (shrunk Lighthouse payload). Custom config merges on top and can override any path.
 - Path match ignores `.ai` suffix, trailing slash, and host (full URLs work).
 - If the path is configured with a non-empty field list → only those fields are kept (applied to each `tasks[].result[]` item).
-- If the path is missing from the config, or the list is empty → full response.
-- If no configuration is loaded → full response.
+- If the path has an empty field list `[]` → full response for that path (disables filtering).
+- If the path is missing from both defaults and custom config → full response.
 
 Copy the example and trim to the endpoints you use:
 

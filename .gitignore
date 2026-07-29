@@ -1,13 +1,48 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
 build/
+
+# Wrangler / Cloudflare
 .wrangler/
-*.log
-.env
-.env.local
 .dev.vars
+.wrangler-dry-run/
+
+# Environment & secrets (never commit)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+
+# Logs & debug leftovers
+*.log
+logs/
+npm-debug.log*
+mcp-err.log
+mcp-out.log
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# OS / IDE
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/*
 !.vscode/launch.json
+
+# Generated worker version (created by worker:prebuild)
 src/worker/version.worker.ts
+
+# Temp
+.tmp/
+tmp/

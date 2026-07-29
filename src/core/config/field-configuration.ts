@@ -1,5 +1,6 @@
 import { getEnv } from "../env.js";
 import { filterFields, parseFieldPaths } from "../utils/field-filter.js";
+import { defaultFieldConfiguration } from "./default-field-configuration.js";
 
 export interface FieldConfiguration {
   supported_fields: Record<string, string[]>;
@@ -60,17 +61,37 @@ export class FieldConfigurationManager {
       );
     }
 
-    this.config = parsedConfig as FieldConfiguration;
-    this.normalizedIndex = new Map();
-
-    for (const [key, fields] of Object.entries(this.config.supported_fields)) {
+    const userFields = (parsedConfig as FieldConfiguration).supported_fields;
+    for (const [key, fields] of Object.entries(userFields)) {
       if (!Array.isArray(fields)) {
         throw new Error(
           `Invalid field list for "${key}". Expected an array of field paths.`
         );
       }
+    }
+
+    // Defaults first; user config overrides (including empty [] to disable filtering).
+    this.config = {
+      supported_fields: {
+        ...defaultFieldConfiguration.supported_fields,
+        ...userFields,
+      },
+    };
+    this.rebuildNormalizedIndex();
+  }
+
+  private rebuildNormalizedIndex(): void {
+    this.normalizedIndex = new Map();
+    if (!this.config) {
+      return;
+    }
+    for (const [key, fields] of Object.entries(this.config.supported_fields)) {
       this.normalizedIndex.set(normalizeEndpointPath(key), fields);
     }
+  }
+
+  loadDefaults(): void {
+    this.loadFromObject({ supported_fields: {} });
   }
 
   async loadFromFile(configPath: string): Promise<void> {
@@ -81,6 +102,8 @@ export class FieldConfigurationManager {
       await access(configPath, constants.R_OK);
     } catch {
       console.warn(`Configuration file not found: ${configPath}`);
+      this.loadDefaults();
+      console.error("Field configuration loaded from built-in defaults");
       return;
     }
 
@@ -224,6 +247,8 @@ export async function initializeFieldConfiguration(): Promise<void> {
 
   const configPath = getEnv("FIELD_CONFIG_PATH");
   if (!configPath) {
+    FieldConfigurationManager.getInstance().loadDefaults();
+    console.error("Field configuration loaded from built-in defaults");
     return;
   }
 
