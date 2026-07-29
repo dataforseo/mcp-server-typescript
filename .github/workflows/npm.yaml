@@ -58,8 +58,8 @@ jobs:
 
       - name: Validate build output
         run: |
-          if [ ! -d "build/main" ]; then
-            echo "Build failed: build/main directory not found"
+          if [ ! -d "dist" ]; then
+            echo "Build failed: dist directory not found"
             exit 1
           fi
           echo "Build output validated"
