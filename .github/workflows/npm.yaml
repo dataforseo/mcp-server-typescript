@@ -1,0 +1,68 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update npm to latest version
+        run: npm install -g npm@11.12.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify tag matches package.json
+        run: |
+          TAG_VERSION=${GITHUB_REF_NAME#v}
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "Tag $TAG_VERSION does not match package.json $PKG_VERSION"
+            exit 1
+          fi
+          echo "Tag matches package.json: $PKG_VERSION"
+
+      - name: Detect pre-release
+        id: release
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "npm_tag=beta" >> "$GITHUB_OUTPUT"
+            echo "Pre-release detected: $VERSION (npm tag: beta)"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "npm_tag=latest" >> "$GITHUB_OUTPUT"
+            echo "Stable release detected: $VERSION (npm tag: latest)"
+          fi
+
+      - name: Build package
+        run: npm run build
+
+      - name: Validate build output
+        run: |
+          if [ ! -d "build/main" ]; then
+            echo "Build failed: build/main directory not found"
+            exit 1
+          fi
+          echo "Build output validated"
+
+      - name: Publish to npm using Trusted Publisher
+        run: npm publish --provenance --access public --tag "${{ steps.release.outputs.npm_tag }}"
