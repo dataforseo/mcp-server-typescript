@@ -8,24 +8,10 @@ MCP server and CLI for LLM agents to browse DataForSEO API documentation and mak
 
 Start the MCP server on Streamable HTTP (default mode, port 3000; override with `PORT`):
 
-```bash
-npx dataforseo-mcp-server
-```
-
 While the package is on the beta channel, use `@beta`:
-
 ```bash
-npx dataforseo-mcp-server@beta
+npx dataforseo-mcp-server@beta 
 ```
-
-Other modes:
-
-```bash
-npx dataforseo-mcp-server --mode stdio   # MCP stdio
-npx dataforseo-mcp-server --help         # CLI help
-```
-
-To run from a local clone, see [Development](#development).
 
 ## Authentication
 
