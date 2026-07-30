@@ -1,7 +1,7 @@
 import { setDocsCacheDir } from "../docs/cache-config.js";
 
 const DOCS_CACHE_DIR_FLAG = "--docs-cache-dir";
-const FIELDS_FILTER_FLAG = "--fields-filter";
+const CONFIGURATION_FLAG = "--configuration";
 
 function takeFlagValue(argv: string[], flag: string): string | undefined {
   const index = argv.indexOf(flag);
@@ -13,7 +13,7 @@ function takeFlagValue(argv: string[], flag: string): string | undefined {
 
 /**
  * Parse MCP/CLI startup flags that configure process-wide behavior.
- * Sets FIELD_CONFIG_PATH when --fields-filter is passed.
+ * Sets FIELD_CONFIG_PATH when --configuration is passed.
  */
 export function parseMcpStartupArgs(argv: string[]): void {
   const docsCacheDir = takeFlagValue(argv, DOCS_CACHE_DIR_FLAG);
@@ -21,9 +21,9 @@ export function parseMcpStartupArgs(argv: string[]): void {
     setDocsCacheDir(docsCacheDir);
   }
 
-  const configPath = takeFlagValue(argv, FIELDS_FILTER_FLAG);
+  const configPath = takeFlagValue(argv, CONFIGURATION_FLAG);
   if (configPath) {
     process.env.FIELD_CONFIG_PATH = configPath;
-    console.error(`Using fields filter: ${configPath}`);
+    console.error(`Using field configuration: ${configPath}`);
   }
 }

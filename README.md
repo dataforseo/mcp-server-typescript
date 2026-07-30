@@ -117,7 +117,7 @@ Via `command` (stdio) — the client starts the binary itself; `--mode stdio` is
         "stdio",
         // Optional additional args:
         // "--docs-cache-dir", "D:\\my-docs-cache",
-        // "--fields-filter", "field-config.json"
+        // "--configuration", "field-config.json"
       ],
       "env": {
         "DATAFORSEO_LOGIN": "your_api_login",
@@ -231,13 +231,13 @@ Optionally limit which fields are returned from API responses. Unlike the previo
 
 ```bash
 # MCP HTTP (default when no CLI command is passed)
-npx dataforseo-mcp-server --fields-filter field-config.json
+npx dataforseo-mcp-server --configuration field-config.json
 
 # MCP stdio
-npx dataforseo-mcp-server --mode stdio --fields-filter field-config.json
+npx dataforseo-mcp-server --mode stdio --configuration field-config.json
 
 # CLI
-npx dataforseo-mcp-server --fields-filter field-config.json request -X POST -p /v3/backlinks/summary/live --param target=example.com
+npx dataforseo-mcp-server --configuration field-config.json request -X POST -p /v3/backlinks/summary/live --param target=example.com
 ```
 
 Or set env:
@@ -282,7 +282,7 @@ src/
 │   ├── config/         # field configuration + defaults
 │   ├── docs/           # path, section, cache
 │   ├── http/           # fetch
-│   ├── mcp/            # startup args (--fields-filter, --docs-cache-dir)
+│   ├── mcp/            # startup args (--configuration, --docs-cache-dir)
 │   ├── tools/          # shared CLI + MCP tool implementations
 │   ├── utils/          # field filter
 │   ├── env.ts

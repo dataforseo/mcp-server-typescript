@@ -7,7 +7,7 @@ const CLI_COMMANDS = new Set(["docs", "request"]);
 const STARTUP_FLAGS_WITH_VALUE = new Set([
   "--mode",
   "--docs-cache-dir",
-  "--fields-filter",
+  "--configuration",
 ]);
 
 function parseRuntimeArgs(argv: string[]): {
@@ -45,7 +45,7 @@ function parseRuntimeArgs(argv: string[]): {
 function stripStartupFlags(argv: string[]): void {
   const flagsToStrip = [
     "--cli",
-    "--fields-filter",
+    "--configuration",
     "--docs-cache-dir",
   ];
 

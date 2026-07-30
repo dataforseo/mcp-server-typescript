@@ -207,7 +207,7 @@ If not overridden, the platform default directory is used.
 | `--no-ai-mode`        | Use standard API path without `.ai` (default: `.ai` is on) |
 
 
-Response output is the API response body (parsed JSON when possible). Optional field filtering via `--fields-filter field-config.json` / `FIELD_CONFIG_PATH` (keys = endpoint paths; see `field-config.example.json`).
+Response output is the API response body (parsed JSON when possible). Optional field filtering via `--configuration field-config.json` / `FIELD_CONFIG_PATH` (keys = endpoint paths; see `field-config.example.json`).
 
 ---
 
