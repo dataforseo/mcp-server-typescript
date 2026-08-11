@@ -32,14 +32,12 @@ export class ContentParsingTool extends BaseTool {
     url: string; 
     enable_javascript?: boolean; 
     custom_user_agent?: string; 
-    accept_language?: string; 
   }): Promise<any> {
     try {
       const response = await this.dataForSEOClient.makeRequest('/v3/on_page/content_parsing/live', 'POST', [{
         url: params.url,
         enable_javascript: params.enable_javascript,
         custom_user_agent: params.custom_user_agent,
-        accept_language: params.accept_language,
         markdown_view: true
       }]);
       console.error(JSON.stringify(response));

@@ -31,16 +31,14 @@ export class InstantPagesTool extends BaseTool {
     url: string; 
     enable_javascript?: boolean; 
     custom_js?: string; 
-    custom_user_agent?: string; 
-    accept_language?: string; 
+    custom_user_agent?: string;
   }): Promise<any> {
     try {
         const response = await this.dataForSEOClient.makeRequest('/v3/on_page/instant_pages', 'POST', [{
           url: params.url,
           enable_javascript: params.enable_javascript,
           custom_js: params.custom_js,
-          custom_user_agent: params.custom_user_agent,
-          accept_language: params.accept_language,
+          custom_user_agent: params.custom_user_agent
         }]);
         return this.validateAndFormatResponse(response);
       } catch (error) {
