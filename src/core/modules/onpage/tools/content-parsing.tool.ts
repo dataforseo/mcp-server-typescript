@@ -25,9 +25,7 @@ export class ContentParsingTool extends BaseTool {
     return {
       url: z.string().describe("URL of the page to parse"),
       enable_javascript: z.boolean().optional().describe("Enable JavaScript rendering"),
-      custom_user_agent: z.string().optional().describe("Custom User-Agent header"),
-      accept_language: z.string().optional().describe("Accept-Language header value"),
-    };
+      custom_user_agent: z.string().optional().describe("Custom User-Agent header")    };
   }
 
   async handle(params: { 

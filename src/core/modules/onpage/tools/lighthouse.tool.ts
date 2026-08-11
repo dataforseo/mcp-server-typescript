@@ -24,7 +24,6 @@ export class LighthouseTool extends BaseTool {
       url: z.string().describe("URL of the page to parse"),
       enable_javascript: z.boolean().optional().describe("Enable JavaScript rendering"),
       custom_user_agent: z.string().optional().describe("Custom User-Agent header"),
-      accept_language: z.string().optional().describe("Accept-Language header value"),
       full_data: z.boolean().optional().describe("Return the complete API response instead of a reduced version"),
     };
   }
