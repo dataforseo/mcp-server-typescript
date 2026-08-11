@@ -1,519 +1,316 @@
 # DataForSEO MCP Server
 
-Model Context Protocol (MCP) server implementation for DataForSEO, enabling AI assistants to interact with selected DataForSEO APIs and obtain SEO data through a standardized interface. 
+> **This is the new v3 MCP server.** The previous v2+ MCP server is **deprecated** and lives at [dataforseo/mcp-server-typescript-deprecated](https://github.com/dataforseo/mcp-server-typescript-deprecated).
 
-## Features
+MCP server and CLI for LLM agents to browse DataForSEO API documentation and make authenticated API requests. By default the binary starts an MCP Streamable HTTP server; CLI commands are an optional second mode.
 
-- **AI_OPTIMIZATION API**: provides data for keyword discovery, conversational optimization, and real-time LLM benchmarking; 
-- **SERP API**: real-time Search Engine Results Page (SERP) data for Google, Bing, and Yahoo;
-- **KEYWORDS_DATA API**: keyword research and clickstream data, including search volume, cost-per-click, and other metrics;   
-- **ONPAGE API**: allows crawling websites and webpages according to customizable parameters to obtain on-page SEO performance metrics; 
-- **DATAFORSEO LABS API**: data on keywords, SERPs, and domains based on DataForSEO's in-house databases and proprietary algorithms;
-- **BACKLINKS API**: comprehensive backlink analysis including referring domains, anchor text distribution, and link quality metrics;
-- **BUSINESS DATA API**: publicly available data on any business entity;
-- **DOMAIN ANALYTICS API**: data on website traffic, technologies, and Whois details;
-- **CONTENT ANALYSIS API**: robust source of data for brand monitoring, sentiment analysis, and citation management;
-- **MERCHANT API**: provides essential data and metrics for comprehensive competitor analysis, price monitoring, and market research across Google Shopping, Amazon etc.
+## Quick Start
 
-## Prerequisites
+Start the MCP server on Streamable HTTP (default mode, port 3000; override with `PORT`):
 
-- Node.js (v14 or higher)
-- DataForSEO API credentials (API login and password)
-
-## Installation
-
-1. Clone the repository:
+While the package is on the beta channel, use `@beta`:
 ```bash
-git clone https://github.com/dataforseo/mcp-server-typescript
-cd mcp-server-typescript
+npx dataforseo-mcp-server@beta 
 ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+## Authentication
 
-3. Set up environment variables:
-```bash
-# Required
-export DATAFORSEO_USERNAME=your_username
-export DATAFORSEO_PASSWORD=your_password
+**OAuth 2.0 (default for HTTP MCP):** works out of the box. MCP clients discover the DataForSEO authorization server via Protected Resource metadata and send `Authorization: Bearer` tokens.
 
-# Optional: specify which modules to enable (comma-separated)
-# If not set, all modules will be enabled
-export ENABLED_MODULES="SERP,KEYWORDS_DATA,ONPAGE,DATAFORSEO_LABS,BACKLINKS,BUSINESS_DATA,DOMAIN_ANALYTICS"
-
-# Optional: specify which prompts in enabled modules are enable too (prompts names, comma-separated)
-# If not set, all prompts from enabled modules will be enabled
-export ENABLED_PROMPTS="top_3_google_result_domains,top_5_serp_paid_and_organic"
-
-# Optional: enable full API responses
-# If not set or set to false, the server will filter and transform API responses to a more concise format
-# If set to true, the server will return the full, unmodified API responses
-export DATAFORSEO_FULL_RESPONSE="false"
-
-# Optional: enable simple filter schema
-# If set to true, a simplified version of the filters schema will be used.
-# This is required for ChatGPT APIs or other LLMs that cannot handle nested structures.
-export DATAFORSEO_SIMPLE_FILTER="false"
-```
-
-## Installation as an NPM Package
-
-You can install the package globally:
+**Fallback:** API login/password via environment variables (HTTP Basic). Required for CLI and stdio MCP; on HTTP it is used when no `Authorization` header is present.
 
 ```bash
-npm install -g dataforseo-mcp-server@latest
+# bash / macOS / Linux
+export DATAFORSEO_LOGIN="your_api_login"
+export DATAFORSEO_PASSWORD="your_api_password"
 ```
 
-Or run it directly without installation:
+```powershell
+# PowerShell
+$env:DATAFORSEO_LOGIN="your_api_login"
+$env:DATAFORSEO_PASSWORD="your_api_password"
+```
 
+```cmd
+REM CMD
+set DATAFORSEO_LOGIN=your_api_login
+set DATAFORSEO_PASSWORD=your_api_password
+```
+
+`DATAFORSEO_USERNAME` is accepted as an alias for `DATAFORSEO_LOGIN`. Get API keys at [https://app.dataforseo.com/api-access](https://app.dataforseo.com/api-access).
+
+## MCP Server
+
+The same tool implementations power both the MCP server and the CLI. One binary serves both modes; MCP is the default.
+
+**How the binary chooses a mode:**
+
+- MCP HTTP — default when no CLI command is passed (Streamable HTTP on port 3000; override with `PORT`)
+- MCP stdio — pass `--mode stdio`
+- CLI — when the first command is `docs` or `request`, or when `--cli` / `--help` / `--version` is passed
+
+MCP HTTP (default):
 ```bash
-npx dataforseo-mcp-server@latest
+npx dataforseo-mcp-server                    
 ```
-
-Remember to set environment variables before running the command:
-
+MCP stdio:
 ```bash
-# Required environment variables
-export DATAFORSEO_USERNAME=your_username
-export DATAFORSEO_PASSWORD=your_password
-
-# Run with npx
-npx dataforseo-mcp-server@latest
+npx dataforseo-mcp-server --mode stdio             
 ```
-
-## Building and Running
-
-Build the project:
+CLI:
 ```bash
-npm run build
+npx dataforseo-mcp-server docs index             
 ```
 
-Run the server:
-```bash
-# Start local server (direct MCP communication)
-npx dataforseo-mcp-server@latest
+**MCP client config** (Cursor, Claude Desktop, and similar clients that use `mcpServers`):
 
-# Start HTTP server
-npx dataforseo-mcp-server@latest http
-```
+Via URL — use the hosted remote MCP server, or start a local server (`npx dataforseo-mcp-server`) and point the client at it. OAuth works out of the box; env credentials are optional fallback only.
 
-## HTTP Server Configuration
-
-The server runs on port 3000 by default and supports both Basic Authentication and environment variable-based authentication.
-
-To start the HTTP server, run:
-```bash
-npm run http
-```
-
-### Authentication Methods
-
-1. **Basic Authentication**
-   - Send requests with Basic Auth header:
-   ```
-   Authorization: Basic <base64-encoded-credentials>
-   ```
-   - Credentials format: `username:password`
-
-2. **Environment Variables**
-   - If no Basic Auth is provided, the server will use credentials from environment variables:
-   ```bash
-   export DATAFORSEO_USERNAME=your_username
-   export DATAFORSEO_PASSWORD=your_password
-   # Optional
-   export DATAFORSEO_SIMPLE_FILTER="false"
-   export DATAFORSEO_FULL_RESPONSE="true"
-   ```
-
-## Cloudflare Worker Deployment
-
-The DataForSEO MCP Server can be deployed as a Cloudflare Worker for serverless, edge-distributed access to DataForSEO APIs.
-
-### Worker Features
-
-- **Edge Distribution**: Deploy globally across Cloudflare's edge network
-- **Serverless**: No server management required
-- **Auto-scaling**: Handles traffic spikes automatically
-- **MCP Protocol Support**: Compatible with both Streamable HTTP and SSE transports
-- **Environment Variables**: Secure credential management through Cloudflare dashboard
-
-### Quick Start
-
-1. **Install Wrangler CLI**:
-   ```bash
-   npm install -g wrangler
-   ```
-
-2. **Configure Worker**:
-   ```bash
-   # Login to Cloudflare
-   wrangler login
-   
-   # Set environment variables
-   wrangler secret put DATAFORSEO_USERNAME
-   wrangler secret put DATAFORSEO_PASSWORD
-   ```
-
-3. **Deploy Worker**:
-   ```bash
-   # Build and deploy
-   npm run build
-   wrangler deploy --main build/index-worker.js
-   ```
-
-### Configuration
-
-The worker uses the same environment variables as the standard server:
-
-- `DATAFORSEO_USERNAME`: Your DataForSEO username
-- `DATAFORSEO_PASSWORD`: Your DataForSEO password  
-- `ENABLED_MODULES`: Comma-separated list of modules to enable
-- `ENABLED_PROMPTS`: Comma-separated list of prompt names to enable 
-- `DATAFORSEO_FULL_RESPONSE`: Set to "true" for full API responses
-
-### Worker Endpoints
-
-Once deployed, your worker will be available at `https://your-worker.your-subdomain.workers.dev/` with the following endpoints:
-
-- **POST /mcp**: Streamable HTTP transport (recommended)
-- **GET /sse**: SSE connection establishment (deprecated)
-- **POST /messages**: SSE message handling (deprecated)
-- **GET /health**: Health check endpoint
-- **GET /**: API documentation page
-
-### Advanced Configuration
-
-Edit `wrangler.jsonc` to customize your deployment:
-
-```jsonc
-{
-  "name": "dataforseo-mcp-worker",
-  "main": "build/index-worker.js",
-  "compatibility_date": "2025-07-10",
-  "compatibility_flags": ["nodejs_compat"],
-  "vars": {
-    "ENABLED_MODULES": "SERP,KEYWORDS_DATA,ONPAGE,DATAFORSEO_LABS",
-    "ENABLED_PROMPTS":"top_3_google_result_domains,top_5_serp_paid_and_organic"
-  }
-}
-```
-
-### Usage with Claude
-
-After deployment, configure Claude to use your worker:
+Remote MCP server: [https://data.dataforseo.com/v3](https://data.dataforseo.com/v3)
 
 ```json
 {
-  "name": "DataForSEO",
-  "description": "Access DataForSEO APIs via Cloudflare Worker",
-  "transport": {
-    "type": "http",
-    "baseUrl": "https://your-worker.your-subdomain.workers.dev/mcp"
-  }
-}
-```
-   
-## Available Modules
-
-The following modules are available to be enabled/disabled:
-
-- `AI_OPTIMIZATION`: provides data for keyword discovery, conversational optimization, and real-time LLM benchmarking;
-- `SERP`: real-time SERP data for Google, Bing, and Yahoo;
-- `KEYWORDS_DATA`: keyword research and clickstream data;
-- `ONPAGE`: crawl websites and webpages to obtain on-page SEO performance metrics;
-- `DATAFORSEO_LABS`: data on keywords, SERPs, and domains based on DataForSEO's databases and algorithms;
-- `BACKLINKS`: data on inbound links, referring domains and referring pages for any domain, subdomain, or webpage;
-- `BUSINESS_DATA`: based on business reviews and business information publicly shared on the following platforms: Google, Trustpilot, Tripadvisor;
-- `DOMAIN_ANALYTICS`: helps identify all possible technologies used for building websites and offers Whois data;
-- `CONTENT_ANALYSIS`: help you discover citations of the target keyword or brand and analyze the sentiments around it;
-- `MERCHANT`: helps retrieve product data, prices, and seller information from Google Shopping and Amazon etc.;
-
-## Adding New Tools/Modules
-
-### Module Structure
-
-Each module corresponds to a specific DataForSEO API:
-- `AI_OPTIMIZATION`: [AI Optimization API](https://docs.dataforseo.com/v3/ai_optimization/overview)
-- `SERP` module → [SERP API](https://docs.dataforseo.com/v3/serp/overview)
-- `KEYWORDS_DATA` module → [Keywords Data API](https://docs.dataforseo.com/v3/keywords_data/overview)
-- `ONPAGE` module → [OnPage API](https://docs.dataforseo.com/v3/on_page/overview)
-- `DATAFORSEO_LABS` module → [DataForSEO Labs API](https://docs.dataforseo.com/v3/dataforseo_labs/overview)
-- `BACKLINKS`: module → [Backlinks API](https://docs.dataforseo.com/v3/backlinks/overview)
-- `BUSINESS_DATA`: module → [Business Data API](https://docs.dataforseo.com/v3/business_data/overview)
-- `DOMAIN_ANALYTICS`: module → [Domain Analytics API](https://docs.dataforseo.com/v3/domain_analytics/overview)
-- `CONTENT_ANALYSIS`: module → [Content Analysis API](https://docs.dataforseo.com/v3/content_analysis/overview)
-- `MERCHANT`: module -> [Metchant API](https://docs.dataforseo.com/v3/merchant/overview)
-
-### Implementation Options
-
-You can either:
-1. Add a new tool to an existing module
-2. Create a completely new module
-
-### Adding a New Tool
-
-Here's how to add a new tool to any new or pre-existing module:
-
-```typescript
-// src/code/modules/your-module/tools/your-tool.tool.ts
-import { BaseTool } from '../../base.tool';
-import { DataForSEOClient } from '../../../client/dataforseo.client';
-import { z } from 'zod';
-
-export class YourTool extends BaseTool {
-  constructor(private client: DataForSEOClient) {
-    super(client);
-    // DataForSEO API returns extensive data with many fields, which can be overwhelming
-    // for AI agents to process. We select only the most relevant fields to ensure
-    // efficient and focused responses.
-    this.fields = [
-      'title',           // Example: Include the title field
-      'description',     // Example: Include the description field
-      'url',            // Example: Include the URL field
-      // Add more fields as needed
-    ];
-  }
-
-  getName() {
-    return 'your-tool-name';
-  }
-
-  getDescription() {
-    return 'Description of what your tool does';
-  }
-
-  getParams(): z.ZodRawShape {
-    return {
-      // Required parameters
-      keyword: z.string().describe('The keyword to search for'),
-      location: z.string().describe('Location in format "City,Region,Country" or just "Country"'),
-      
-      // Optional parameters
-      fields: z.array(z.string()).optional().describe('Specific fields to return in the response. If not specified, all fields will be returned'),
-      language: z.string().optional().describe('Language code (e.g., "en")'),
-    };
-  }
-
-  async handle(params: any) {
-    try {
-      // Make the API call
-      const response = await this.client.makeRequest({
-        endpoint: '/v3/dataforseo_endpoint_path',
-        method: 'POST',
-        body: [{
-          // Your request parameters
-          keyword: params.keyword,
-          location: params.location,
-          language: params.language,
-        }],
-      });
-
-      // Validate the response for errors
-      this.validateResponse(response);
-
-      //if the main data array is specified in tasks[0].result[:] field
-      const result = this.handleDirectResult(response);
-      //if main data array specified in tasks[0].result[0].items field
-      const result = this.handleItemsResult(response);
-      // Format and return the response
-      return this.formatResponse(result);
-    } catch (error) {
-      // Handle and format any errors
-      return this.formatErrorResponse(error);
+  "mcpServers": {
+    "dataforseo": {
+      "url": "https://data.dataforseo.com/v3/mcp"
     }
   }
 }
 ```
 
-### Creating a New Module
+Local server (default port 3000):
 
-1. Create a new directory under `src/core/modules/` for your module:
+```json
+{
+  "mcpServers": {
+    "dataforseo": {
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+Via `command` (stdio) — the client starts the binary itself; `--mode stdio` is required. OAuth is not used on this transport — set env credentials (or pass them in the MCP client `env` block):
+
+```jsonc
+{
+  "mcpServers": {
+    "dataforseo": {
+      "command": "npx",
+      "args": [
+        "dataforseo-mcp-server",
+        "--mode",
+        "stdio",
+        // Optional additional args:
+        // "--docs-cache-dir", "D:\\my-docs-cache",
+        // "--configuration", "field-config.json"
+      ],
+      "env": {
+        "DATAFORSEO_LOGIN": "your_api_login",
+        "DATAFORSEO_PASSWORD": "your_api_password",
+        // Optional additional env:
+        // "FIELD_CONFIG_PATH": "field-config.json"
+      }
+    }
+  }
+}
+```
+
+From the repo root during development:
+
+```json
+{
+  "mcpServers": {
+    "dataforseo": {
+      "command": "npx",
+      "args": ["tsx", "src/index.ts", "--mode", "stdio"],
+      "cwd": "/path/to/mcp-server-typescript"
+    }
+  }
+}
+```
+
+### MCP Tools
+
+| Tool | Title | Description |
+|------|-------|-------------|
+| `docs_index` | Docs Index | Fetch documentation index, optionally filtered by section (24h cache) |
+| `docs_list_sections` | Docs List Sections | Return available documentation section names |
+| `docs_search` | Docs Search | Fetch documentation from a documentation URL (`needCodeExample`, 24h cache) |
+| `api_request` | API Request | Make an authenticated API request |
+
+`api_request` uses `.ai` paths by default (no `aiMode` parameter). Request body is passed as `data` (JSON object or array). CLI-only options (`--param`, `--no-ai-mode`) are not exposed via MCP.
+
+### HTTP transport
+
+Streamable HTTP endpoints:
+
+- `POST /mcp`
+- `POST /http`
+
+OAuth 2.0 Protected Resource metadata (RFC 9728) is **always** exposed so MCP clients can discover the authorization server and authenticate with Bearer tokens:
+
+- `GET /.well-known/oauth-protected-resource`
+- `GET /.well-known/oauth-protected-resource/mcp`
+- `GET /.well-known/oauth-protected-resource/http`
+
+Behind a reverse proxy, set `TRUST_PROXY=true` so metadata URLs use `https`.
+
+Auth priority on HTTP requests:
+
+1. `Authorization: Basic` header
+2. `Authorization: Bearer` header (OAuth access token)
+3. Env credentials (`DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD`) — fallback when no `Authorization` header is sent
+
+## CLI (optional)
+
+In addition to MCP, the same binary exposes `docs` and `request` as CLI commands.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `npx dataforseo-mcp-server docs index` | Fetch full API documentation index |
+| `npx dataforseo-mcp-server docs index --section "SERP API"` | Filter index by API section |
+| `npx dataforseo-mcp-server docs index --list-sections` | List available sections |
+| `npx dataforseo-mcp-server docs search <url>` | Fetch documentation from a documentation URL or path (cURL example only by default) |
+| `npx dataforseo-mcp-server docs search <url> --need-code-example` | Fetch documentation with PHP, Node.js, Python, and C# examples |
+| `npx dataforseo-mcp-server request -X <method> -p <path>` | Make an authenticated API request (`.ai` path by default) |
+
+From a built local clone you can also use `npx .` instead of `npx dataforseo-mcp-server`.
+
+### Examples
+
 ```bash
-mkdir -p src/core/modules/your-module-name
+# Browse SERP API endpoints
+npx dataforseo-mcp-server docs index --section "SERP API"
+
+# Read endpoint documentation (path or full docs URL)
+npx dataforseo-mcp-server docs search serp/google/organic/live/regular
+npx dataforseo-mcp-server docs search https://docs.dataforseo.com/v3/serp/google/organic/live/regular
+
+# Include multi-language code examples (PHP, Node.js, Python, C#)
+npx dataforseo-mcp-server docs search backlinks/referring_networks/live --need-code-example
+
+# Live SERP request (recommended: use --param)
+npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
+  --param keyword=dataforseo --param language_code=en --param location_code=2840
+
+# Same request via JSON body
+npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
+  -d '[{"keyword":"dataforseo","location_code":2840,"language_code":"en"}]'
 ```
 
-2. Create module files:
-```typescript
-// src/core/modules/your-module-name/your-module-name.module.ts
-import { BaseModule } from '../base.module';
-import { DataForSEOClient } from '../../client/dataforseo.client';
-import { YourTool } from './tools/your-tool.tool';
+Documentation responses are cached for **24 hours**. Default cache directory:
 
-export class YourModuleNameModule extends BaseModule {
-  constructor(private client: DataForSEOClient) {
-    super();
-  }
+- **Windows:** `%LOCALAPPDATA%\dataforseo-mcp-server\docs-cache`
+- **macOS:** `~/Library/Caches/dataforseo-mcp-server/docs-cache`
+- **Linux:** `~/.cache/dataforseo-mcp-server/docs-cache` (or `$XDG_CACHE_HOME`)
 
-  getTools() {
-    return {
-      'your-tool-name': new YourTool(this.client),
-    };
-  }
-}
+Override with `--cache-dir <path>` on CLI `docs` commands. For MCP, pass `--docs-cache-dir <path>` in server startup `args`.
+
+API responses are returned as the response body only (parsed JSON when possible). When a field configuration is loaded, `api_request` / `request` responses are trimmed to the configured fields for that endpoint path (see [Field configuration](#field-configuration)).
+
+## Field configuration
+
+Optionally limit which fields are returned from API responses. Unlike the previous multi-tool MCP server (keys = tool names), this package keys the config by **API endpoint path**.
+
+```bash
+# MCP HTTP (default when no CLI command is passed)
+npx dataforseo-mcp-server --configuration field-config.json
+
+# MCP stdio
+npx dataforseo-mcp-server --mode stdio --configuration field-config.json
+
+# CLI
+npx dataforseo-mcp-server --configuration field-config.json request -X POST -p /v3/backlinks/summary/live --param target=example.com
 ```
 
-3. Register your module in `src/core/config/modules.config.ts`:
-```typescript
-export const AVAILABLE_MODULES = [
-  'SERP',
-  'KEYWORDS_DATA',
-  'ONPAGE',
-  'DATAFORSEO_LABS',
-  'BACKLINKS',
-  'BUSINESS_DATA',
-  'DOMAIN_ANALYTICS',
-  'CONTENT_ANALYSIS',
-  'YOUR_MODULE_NAME'  // Add your module name here
-] as const;
-```
+Or set env:
 
-4. Initialize your module in `src/main/index.ts`:
-```typescript
-if (isModuleEnabled('YOUR_MODULE_NAME', enabledModules)) {
-  modules.push(new YourModuleNameModule(dataForSEOClient));
-}
-```
+- `FIELD_CONFIG_PATH` — path to a JSON file (Node)
+- `FIELD_CONFIG_JSON` — inline JSON string (Node / Cloudflare Worker)
 
-## Field Configuration
-
-The MCP server supports field filtering to customize which data fields are returned in API responses. This helps reduce response size and focus on the most relevant data for your use case.
-
-### Configuration File Format
-
-Create a JSON configuration file with the following structure:
+Minimal example (see `field-config.example.json` for a fuller sample):
 
 ```json
 {
   "supported_fields": {
-    "tool_name": ["field1", "field2", "field3"],
-    "another_tool": ["field1", "field2"]
+    "/v3/serp/google/organic/live/advanced": ["id", "items.title", "items.url", "status_code"],
+    "/v3/backlinks/summary/live": ["id", "items.backlinks", "items.referring_domains", "status_code"]
   }
 }
 ```
 
-### Using Field Configuration
+Behavior:
 
-Pass the configuration file using the `--configuration` parameter:
+- Built-in defaults always apply for `/v3/on_page/lighthouse/live/json` (shrunk Lighthouse payload). Custom config merges on top and can override any path.
+- Path match ignores `.ai` suffix, trailing slash, and host (full URLs work).
+- If the path is configured with a non-empty field list → only those fields are kept (applied to each `tasks[].result[]` item).
+- If the path has an empty field list `[]` → full response for that path (disables filtering).
+- If the path is missing from both defaults and custom config → full response.
 
-```bash
-# With npm
-npm run cli -- http --configuration field-config.json
+Copy the example and trim to the endpoints you use:
 
-# With npx
-npx dataforseo-mcp-server@latest http --configuration field-config.json
-
-# Local mode
-npx dataforseo-mcp-server@latest local --configuration field-config.json
-```
-
-### Configuration Behavior
-
-- **If a tool is configured**: Only the specified fields will be returned in the response
-- **If a tool is not configured**: All available fields will be returned (default behavior)
-- **If no configuration file is provided**: All tools return all available fields
-
-### Example Configuration File
-
-The repository includes an example configuration file `field-config.example.json` with optimized field selections for common tools:
-
-```json
-{
-  "supported_fields": {
-    "backlinks_backlinks": [
-      "id",
-      "items.anchor",
-      "items.backlink_spam_score",
-      "items.dofollow",
-      "items.domain_from",
-      "items.domain_from_country",
-      "items.domain_from_ip",
-      "items.domain_from_platform_type",
-      "items.domain_from_rank",
-      "items.domain_to",
-      "items.first_seen",
-      "items.is_broken",
-      "items.is_new",
-      "items.item_type",
-      "items.last_seen",
-      "items.links_count",
-      "items.original",
-      "items.page_from_encoding",
-      "items.page_from_external_links",
-      "items.page_from_internal_links",
-      "items.page_from_language",
-      "items.page_from_rank",
-      "items.page_from_size",
-      "items.page_from_status_code",
-      "items.page_from_title",
-      "items.prev_seen",
-      "items.rank",
-      "items.ranked_keywords_info.page_from_keywords_count_top_10",
-      "items.ranked_keywords_info.page_from_keywords_count_top_100",
-      "items.ranked_keywords_info.page_from_keywords_count_top_3",
-      "items.semantic_location",
-      "items.text_post",
-      "items.text_pre",
-      "items.tld_from",
-      "items.type",
-      "items.url_from",
-      "items.url_from_https",
-      "items.url_to",
-      "items.url_to_https",
-      "items.url_to_spam_score",
-      "items.url_to_status_code",
-      "status_code",
-      "status_message"
-    ],
-    ...
-  }
-}
-```
-
-### Nested Field Support
-
-The configuration supports nested field paths using dot notation:
-
-- `"rating.value"` - Access the `value` field within the `rating` object
-- `"items.demography.age.keyword"` - Access deeply nested fields
-- `"meta.description"` - Access nested object properties
-
-### Field Discovery
-
-To discover available fields for any tool:
-
-1. Run the tool without field configuration to see the full response
-2. Identify the fields you need from the API response
-3. Add those field paths to your configuration file
-
-### Creating Your Own Configuration
-
-1. Copy the example file:
 ```bash
 cp field-config.example.json my-config.json
 ```
 
-2. Modify the field selections based on your needs
+## Architecture
 
-3. Use your custom configuration:
-```bash
-npx dataforseo-mcp-server@latest http --configuration my-config.json
+```
+src/
+├── index.ts            # Unified entry (MCP by default HTTP; CLI if docs/request/--cli)
+├── config/             # URLs, sections, auth server
+├── core/
+│   ├── api/            # auth, client, path, request-body
+│   ├── cli/            # program, error, output
+│   ├── config/         # field configuration + defaults
+│   ├── docs/           # path, section, cache
+│   ├── http/           # fetch
+│   ├── mcp/            # startup args (--configuration, --docs-cache-dir)
+│   ├── tools/          # shared CLI + MCP tool implementations
+│   ├── utils/          # field filter
+│   ├── env.ts
+│   └── version.ts
+├── mcp/
+│   ├── init-mcp-server.ts
+│   ├── tool-definition.ts
+│   ├── auth-middleware.ts
+│   ├── http-routes.ts
+│   ├── index.ts        # stdio transport
+│   └── index-http.ts   # streamable HTTP
+└── worker/             # Cloudflare Worker entry (built separately)
 ```
 
-## What endpoints/APIs do you want us to support next?
+### Build outputs
 
-We're always looking to expand the capabilities of this MCP server. If you have specific DataForSEO endpoints or APIs you'd like to see supported, please:
+| Target | Command | Output | Used by |
+|--------|---------|--------|---------|
+| Node (MCP + CLI) | `npm run build` (`tsc`) | `dist/index.js` | `bin`, Docker, `start*` scripts |
+| Cloudflare Worker | `npm run worker:build` | `build/worker/worker/index-worker.js` | `wrangler.jsonc` → `main` |
 
-1. Check the [DataForSEO API Documentation](https://docs.dataforseo.com/v3/) to see what's available
-2. Open an issue in our GitHub repository with:
-   - The API/endpoint you'd like to see supported;
-   - A brief description of your use case;
-   - Describe any specific features you'd like to see implemented.
+Worker path is `build/worker/worker/...` because `tsconfig.worker.json` sets `rootDir` to `src` and the entry lives at `src/worker/index-worker.ts`.
 
-Your feedback helps us prioritize which APIs to support next!
+## For LLM Agents
 
-## Resources
+Read [SKILL.md](./SKILL.md) in this repo for full agent instructions.
 
-- [Model Context Protocol Documentation](https://modelcontextprotocol.io/quickstart)
-- [DataForSEO API Documentation](https://docs.dataforseo.com/)
+## Development
+
+Requires Node.js 20+.
+
+```bash
+npm install
+npm run build
+
+# Dev (tsx, no build step)
+npm run dev:mcp:http     # MCP HTTP (default)
+npm run dev:mcp          # MCP stdio
+npm run dev -- docs index --section "SERP API"   # CLI
+
+# After build
+npm run start:mcp:http   # Streamable HTTP (same as: node dist/index.js)
+npm run start:mcp        # stdio
+npx . docs index --list-sections
+```

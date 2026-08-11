@@ -23,6 +23,5 @@ EXPOSE 3000
 # Set production environment
 ENV NODE_ENV=production
 
-# Set entrypoint and default command
-ENTRYPOINT ["node", "build/main/main/cli.js"]
-CMD ["http"]
+# Set entrypoint (MCP Streamable HTTP by default)
+ENTRYPOINT ["node", "dist/index.js"]

@@ -1,90 +1,115 @@
 type FieldPath = string | string[];
 
-export function filterFields(data: any, fields: FieldPath[]): any {
+export function filterFields(data: unknown, fields: FieldPath[]): unknown {
   if (!data || !fields || fields.length === 0) {
     return data;
   }
 
-  const result: any = {};
+  const result: Record<string, unknown> = {};
 
-  fields.forEach(field => {
-    const path = Array.isArray(field) ? field : field.split('.');
+  for (const field of fields) {
+    const path = Array.isArray(field) ? field : field.split(".");
     extractAndSetValue(data, result, path);
-  });
+  }
 
   pruneEmpty(result);
   return result;
 }
 
-function extractAndSetValue(source: any, target: any, path: string[]): void {
+function extractAndSetValue(
+  source: unknown,
+  target: Record<string, unknown> | unknown[],
+  path: string[]
+): void {
   if (path.length === 0) return;
 
   const [currentKey, ...remainingPath] = path;
-  
+
   if (remainingPath.length === 0) {
-    // This is the final key, extract the value
-    if (currentKey === '*') {
-      // Wildcard at the end - copy all properties/items
+    if (currentKey === "*") {
       if (Array.isArray(source)) {
         Object.assign(target, source);
-      } else if (source && typeof source === 'object') {
+      } else if (source && typeof source === "object") {
         Object.assign(target, source);
       }
-    } else if (source && typeof source === 'object' && currentKey in source) {
-      target[currentKey] = source[currentKey];
+    } else if (
+      source &&
+      typeof source === "object" &&
+      currentKey in (source as object)
+    ) {
+      (target as Record<string, unknown>)[currentKey] = (
+        source as Record<string, unknown>
+      )[currentKey];
     }
     return;
   }
 
-  // Not the final key, need to go deeper
-  if (currentKey === '*') {
-    // Wildcard in the middle of the path
+  if (currentKey === "*") {
     if (Array.isArray(source)) {
-      // Handle array with wildcard
+      const targetArray = target as unknown[];
       if (!Array.isArray(target)) {
-        // Convert target to array to match source structure
-        Object.keys(target).forEach(key => delete target[key]);
+        Object.keys(target).forEach((key) => delete (target as Record<string, unknown>)[key]);
         Object.setPrototypeOf(target, Array.prototype);
-        target.length = 0;
+        (target as unknown as { length: number }).length = 0;
       }
-      
+
       source.forEach((item, index) => {
-        if (!target[index]) {
-          target[index] = {};
+        if (!targetArray[index]) {
+          targetArray[index] = {};
         }
-        extractAndSetValue(item, target[index], remainingPath);
+        extractAndSetValue(
+          item,
+          targetArray[index] as Record<string, unknown>,
+          remainingPath
+        );
       });
-    } else if (source && typeof source === 'object') {
-      // Handle object with wildcard
-      Object.keys(source).forEach(key => {
-        if (!target[key]) {
-          target[key] = {};
+    } else if (source && typeof source === "object") {
+      const sourceObj = source as Record<string, unknown>;
+      const targetObj = target as Record<string, unknown>;
+      Object.keys(sourceObj).forEach((key) => {
+        if (!targetObj[key]) {
+          targetObj[key] = {};
         }
-        extractAndSetValue(source[key], target[key], remainingPath);
+        extractAndSetValue(
+          sourceObj[key],
+          targetObj[key] as Record<string, unknown>,
+          remainingPath
+        );
       });
     }
-  } else if (source && typeof source === 'object' && currentKey in source) {
-    // Regular key handling
-    const sourceValue = source[currentKey];
-    
+  } else if (
+    source &&
+    typeof source === "object" &&
+    currentKey in (source as object)
+  ) {
+    const sourceValue = (source as Record<string, unknown>)[currentKey];
+    const targetObj = target as Record<string, unknown>;
+
     if (Array.isArray(sourceValue)) {
-      // Handle array - preserve array structure
-      if (!target[currentKey]) {
-        target[currentKey] = [];
+      if (!targetObj[currentKey]) {
+        targetObj[currentKey] = [];
       }
-      
+      const targetArray = targetObj[currentKey] as unknown[];
+
       sourceValue.forEach((item, index) => {
-        if (!target[currentKey][index]) {
-          target[currentKey][index] = {};
+        if (!targetArray[index]) {
+          targetArray[index] = {};
         }
-        extractAndSetValue(item, target[currentKey][index], remainingPath);
+        extractAndSetValue(
+          item,
+          targetArray[index] as Record<string, unknown>,
+          remainingPath
+        );
       });
-    } else if (sourceValue && typeof sourceValue === 'object') {
-      // Handle object
-      if (!target[currentKey]) {
-        target[currentKey] = {};
+    } else if (sourceValue && typeof sourceValue === "object") {
+      if (!targetObj[currentKey]) {
+        targetObj[currentKey] = {};
       }
-      extractAndSetValue(sourceValue, target[currentKey], remainingPath);
+      extractAndSetValue(
+        sourceValue,
+        targetObj[currentKey] as Record<string, unknown>,
+        remainingPath
+      );
     }
   }
 }
@@ -116,11 +141,10 @@ function pruneEmpty(obj: any): boolean {
 }
 
 export function parseFieldPaths(fields: string[]): FieldPath[] {
-  return fields.map(field => {
-    // Handle array notation
-    if (field.includes('[')) {
-      const [base, index] = field.split('[');
-      return [base, index.replace(']', '')];
+  return fields.map((field) => {
+    if (field.includes("[")) {
+      const [base, index] = field.split("[");
+      return [base, index.replace("]", "")];
     }
     return field;
   });

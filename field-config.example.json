@@ -1,6 +1,6 @@
 {
     "supported_fields": {
-        "serp_organic_live_advanced": [
+        "/v3/serp/google/organic/live/advanced": [
             "id",
             "items.asynchronous_ai_overview",
             "items.breadcrumb",
@@ -67,7 +67,7 @@
             "status_code",
             "status_message"
         ],
-        "keywords_data_google_ads_search_volume": [
+        "/v3/keywords_data/google_ads/search_volume/live": [
             "id",
             "items.competition",
             "items.competition_index",
@@ -80,7 +80,7 @@
             "status_code",
             "status_message"
         ],
-        "keywords_data_dataforseo_trends_demography": [
+        "/v3/keywords_data/dataforseo_trends/demography/live": [
             "id",
             "items.demography.age.keyword",
             "items.demography.age.values.type",
@@ -93,7 +93,7 @@
             "status_code",
             "status_message"
         ],
-        "keywords_data_dataforseo_trends_subregion_interests": [
+        "/v3/keywords_data/dataforseo_trends/subregion_interests/live": [
             "id",
             "items.interests.keyword",
             "items.interests.values.geo_id",
@@ -104,7 +104,7 @@
             "status_code",
             "status_message"
         ],
-        "keywords_data_dataforseo_trends_explore": [
+        "/v3/keywords_data/dataforseo_trends/explore/live": [
             "id",
             "items.averages",
             "items.data.date_from",
@@ -116,7 +116,7 @@
             "status_code",
             "status_message"
         ],
-        "keywords_data_google_trends_explore": [
+        "/v3/keywords_data/google_trends/explore/live": [
             "id",
             "items.data.date_from",
             "items.data.date_to",
@@ -128,7 +128,7 @@
             "status_code",
             "status_message"
         ],
-        "on_page_instant_pages": [
+        "/v3/on_page/instant_pages": [
             "id",
             "items.cache_control",
             "items.checks",
@@ -173,7 +173,32 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_ranked_keywords": [
+        "/v3/on_page/lighthouse/live/json": [
+            "id",
+            "status_code",
+            "status_message",
+            "items.lighthouseVersion",
+            "items.requestedUrl",
+            "items.mainDocumentUrl",
+            "items.finalDisplayedUrl",
+            "items.finalUrl",
+            "items.gatherMode",
+            "items.userAgent",
+            "items.audits.*.numericValue",
+            "items.configSettings",
+            "items.categories.*.title",
+            "items.categories.*.description",
+            "items.categories.*.id",
+            "items.categories.*.score",
+            "items.category_groups",
+            "items.stackPacks.id",
+            "items.stackPacks.title",
+            "items.stackPacks.descriptions",
+            "items.entities.name",
+            "items.entities.category",
+            "items.timing.total"
+        ],
+        "/v3/dataforseo_labs/google/ranked_keywords/live": [
             "id",
             "items.keyword_data.avg_backlinks_info.backlinks",
             "items.keyword_data.avg_backlinks_info.dofollow",
@@ -254,7 +279,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_competitors_domain": [
+        "/v3/dataforseo_labs/google/competitors_domain/live": [
             "id",
             "items.avg_position",
             "items.competitor_metrics.organic.count",
@@ -319,7 +344,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_domain_rank_overview": [
+        "/v3/dataforseo_labs/google/domain_rank_overview/live": [
             "id",
             "items.language_code",
             "items.location_code",
@@ -345,7 +370,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_keyword_ideas": [
+        "/v3/dataforseo_labs/google/keyword_ideas/live": [
             "id",
             "items.avg_backlinks_info.backlinks",
             "items.avg_backlinks_info.dofollow",
@@ -385,7 +410,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_related_keywords": [
+        "/v3/dataforseo_labs/google/related_keywords/live": [
             "id",
             "items.depth",
             "items.keyword_data.avg_backlinks_info.backlinks",
@@ -434,7 +459,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_keyword_suggestions": [
+        "/v3/dataforseo_labs/google/keyword_suggestions/live": [
             "id",
             "items.avg_backlinks_info.backlinks",
             "items.avg_backlinks_info.dofollow",
@@ -473,14 +498,14 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_historical_serps": [
+        "/v3/dataforseo_labs/google/historical_serps/live": [
             "datetime",
             "items.domain",
             "items.rank_absolute",
             "items.title",
             "items.type"
         ],
-        "dataforseo_labs_google_serp_competitors": [
+        "/v3/dataforseo_labs/google/serp_competitors/live": [
             "id",
             "items.avg_position",
             "items.domain",
@@ -495,7 +520,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_bulk_keyword_difficulty": [
+        "/v3/dataforseo_labs/google/bulk_keyword_difficulty/live": [
             "id",
             "items.keyword",
             "items.keyword_difficulty",
@@ -503,7 +528,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_subdomains": [
+        "/v3/dataforseo_labs/google/subdomains/live": [
             "id",
             "items.metrics.*.count",
             "items.metrics.*.estimated_paid_traffic_cost",
@@ -528,7 +553,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_keyword_overview": [
+        "/v3/dataforseo_labs/google/keyword_overview/live": [
             "id",
             "items.avg_backlinks_info.backlinks",
             "items.avg_backlinks_info.dofollow",
@@ -564,7 +589,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_top_searches": [
+        "/v3/dataforseo_labs/google/top_searches/live": [
             "id",
             "items.avg_backlinks_info.backlinks",
             "items.avg_backlinks_info.dofollow",
@@ -604,7 +629,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_search_intent": [
+        "/v3/dataforseo_labs/google/search_intent/live": [
             "id",
             "items.keyword",
             "items.keyword_intent.label",
@@ -614,7 +639,7 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_keywords_for_site": [
+        "/v3/dataforseo_labs/google/keywords_for_site/live": [
             "id",
             "items.avg_backlinks_info.backlinks",
             "items.avg_backlinks_info.dofollow",
@@ -653,13 +678,13 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_domain_intersection": [
+        "/v3/dataforseo_labs/google/domain_intersection/live": [
             "id",
             "items",
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_google_historical_rank_overview": [
+        "/v3/dataforseo_labs/google/historical_rank_overview/live": [
             "id",
             "items.metrics.*.count",
             "items.metrics.*.estimated_paid_traffic_cost",
@@ -686,15 +711,15 @@
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_bulk_traffic_estimation": [
+        "/v3/dataforseo_labs/google/bulk_traffic_estimation/live": [
             "id",
             "items.se_type",
             "items.target",
             "status_code",
             "status_message"
         ],
-        "dataforseo_labs_available_filters": [],
-        "dataforseo_labs_google_historical_keyword_data": [
+        "/v3/dataforseo_labs/available_filters": [],
+        "/v3/dataforseo_labs/google/historical_keyword_data/live": [
             "id",
             "items.history.keyword_info.categories",
             "items.history.keyword_info.competition",
@@ -718,7 +743,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_backlinks": [
+        "/v3/backlinks/backlinks/live": [
             "id",
             "items.anchor",
             "items.backlink_spam_score",
@@ -763,7 +788,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_anchors": [
+        "/v3/backlinks/anchors/live": [
             "id",
             "items.anchor",
             "items.backlinks",
@@ -790,7 +815,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_competitors": [
+        "/v3/backlinks/competitors/live": [
             "id",
             "items.intersections",
             "items.rank",
@@ -799,7 +824,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_domain_intersection": [
+        "/v3/backlinks/domain_intersection/live": [
             "id",
             "items.domain_intersection.*.backlinks",
             "items.domain_intersection.*.broken_backlinks",
@@ -822,7 +847,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_domain_pages_summary": [
+        "/v3/backlinks/domain_pages_summary/live": [
             "id",
             "items.backlinks",
             "items.backlinks_spam_score",
@@ -853,7 +878,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_domain_pages": [
+        "/v3/backlinks/domain_pages/live": [
             "id",
             "items.content_encoding",
             "items.domain",
@@ -904,7 +929,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_page_intersection": [
+        "/v3/backlinks/page_intersection/live": [
             "id",
             "items.page_intersection.*.alt",
             "items.page_intersection.*.anchor",
@@ -949,7 +974,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_referring_domains": [
+        "/v3/backlinks/referring_domains/live": [
             "id",
             "items.backlinks",
             "items.backlinks_spam_score",
@@ -976,7 +1001,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_referring_networks": [
+        "/v3/backlinks/referring_networks/live": [
             "id",
             "items.backlinks",
             "items.broken_backlinks",
@@ -1002,7 +1027,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_summary": [
+        "/v3/backlinks/summary/live": [
             "id",
             "items.backlinks",
             "items.backlinks_spam_score",
@@ -1039,7 +1064,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_timeseries_new_lost_summary": [
+        "/v3/backlinks/timeseries_new_lost_summary/live": [
             "id",
             "items.date",
             "items.lost_backlinks",
@@ -1052,7 +1077,7 @@
             "status_code",
             "status_message"
         ],
-        "backlinks_timeseries_summary": [
+        "/v3/backlinks/timeseries_summary/live": [
             "id",
             "items.backlinks",
             "items.backlinks_nofollow",
@@ -1070,7 +1095,7 @@
             "status_code",
             "status_message"
         ],
-        "business_data_business_listings_search": [
+        "/v3/business_data/business_listings/search/live": [
             "id",
             "items.additional_categories",
             "items.address",
@@ -1122,7 +1147,7 @@
             "status_code",
             "status_message"
         ],
-        "domain_analytics_whois_overview": [
+        "/v3/domain_analytics/whois/overview/live": [
             "id",
             "items.backlinks_info.backlinks",
             "items.backlinks_info.dofollow",
@@ -1158,8 +1183,8 @@
             "status_code",
             "status_message"
         ],
-        "domain_analytics_whois_available_filters": [],
-        "domain_analytics_technologies_domain_technologies": [
+        "/v3/domain_analytics/whois/available_filters": [],
+        "/v3/domain_analytics/technologies/domain_technologies/live": [
             "id",
             "items.content_language_code",
             "items.country_iso_code",
@@ -1172,8 +1197,8 @@
             "status_code",
             "status_message"
         ],
-        "domain_analytics_technologies_available_filters": [],
-        "content_analysis_search": [
+        "/v3/domain_analytics/technologies/available_filters": [],
+        "/v3/content_analysis/search/live": [
             "id",
             "items.content_info.author",
             "items.content_info.connotation_types",
@@ -1206,7 +1231,7 @@
             "status_code",
             "status_message"
         ],
-        "content_analysis_summary": [
+        "/v3/content_analysis/summary/live": [
             "id",
             "items.connotation_types",
             "items.countries",
@@ -1225,7 +1250,7 @@
             "status_code",
             "status_message"
         ],
-        "content_analysis_phrase_trends": [
+        "/v3/content_analysis/phrase_trends/live": [
             "id",
             "items.connotation_types",
             "items.countries",

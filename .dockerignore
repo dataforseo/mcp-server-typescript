@@ -4,6 +4,9 @@ npm-debug.log*
 
 # Build output (will be generated during build)
 build
+dist
+.wrangler
+.wrangler-dry-run
 
 # Git
 .git
@@ -23,10 +26,14 @@ README.md
 .DS_Store
 Thumbs.db
 
-# Environment files
+# Environment & secrets
 .env
-.env.local
-.env.*.local
+.env.*
+.dev.vars
+*.pem
+*.key
+credentials.json
+secrets.json
 
 # Logs
 logs
