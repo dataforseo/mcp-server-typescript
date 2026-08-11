@@ -117,7 +117,7 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
           url?: string;
           param?: Record<string, unknown>;
           data?: string;
-          noAiMode?: boolean;
+          aiMode?: boolean;
         }) => {
           try {
             const result = await this.invokeCli({
@@ -126,7 +126,7 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
               url: options.url,
               params: options.param,
               data: options.data,
-              aiMode: !options.noAiMode,
+              aiMode: options.aiMode ?? true,
             });
             printToolResult(result);
           } catch (error) {
