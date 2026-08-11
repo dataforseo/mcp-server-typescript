@@ -194,11 +194,11 @@ npx dataforseo-mcp-server docs search backlinks/referring_networks/live --need-c
 
 # Live SERP request (recommended: use --param)
 npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
-  --param keyword=dataforseo --param language_code=en --param location_code=2840 --param limit=100
+  --param keyword=dataforseo --param language_code=en --param location_code=2840
 
 # Same request via JSON body
 npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
-  -d '[{"keyword":"dataforseo","location_code":2840,"language_code":"en","limit":100}]'
+  -d '[{"keyword":"dataforseo","location_code":2840,"language_code":"en"}]'
 ```
 
 Documentation responses are cached for **24 hours**. Default cache directory:
