@@ -88,7 +88,7 @@ Parse the printed output to decide the next step.
 
 POST endpoints accept a **JSON array of task objects**: `[{ ... }]`.
 
-**Preferred:** pass fields with repeatable `--param key=value` (merged into the first task object). Use exact API field names from endpoint docs (e.g. `keyword`, `language_code`, `location_code`, `limit`).
+**Preferred:** pass fields with repeatable `--param key=value` (merged into the first task object). Use exact API field names from endpoint docs (e.g. `keyword`, `language_code`, `location_code`).
 
 `--param` values override the same fields in `-d` JSON when both are used.
 
@@ -114,13 +114,13 @@ Valid JSON in `--param` still works when your shell preserves quotes (bash: `'ke
 
 ```bash
 npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular \
-  --param keyword=dataforseo --param language_code=en --param location_code=2840 --param limit=100
+  --param keyword=dataforseo --param language_code=en --param location_code=2840
 ```
 
 JSON form:
 
 ```bash
-npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular -d '[{\"keyword\":\"dataforseo\",\"location_code\":2840,\"language_code\":\"en\",\"limit\":100}]'
+npx dataforseo-mcp-server request -X POST -p /v3/serp/google/organic/live/regular -d '[{\"keyword\":\"dataforseo\",\"location_code\":2840,\"language_code\":\"en\"}]'
 ```
 
 ---
