@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "MCP HTTP",
+      "name": "MCP stdio",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
@@ -10,20 +10,20 @@
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
-      "env": {
-        "PORT": "3000"
-      },
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "MCP stdio",
+      "name": "MCP HTTP",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
-      "args": ["${workspaceFolder}/src/index.ts", "--mode", "stdio"],
+      "args": ["${workspaceFolder}/src/index.ts", "--mode", "http"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "env": {
+        "PORT": "3000"
+      },
       "envFile": "${workspaceFolder}/.env"
     },
     {

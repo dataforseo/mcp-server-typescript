@@ -3,12 +3,13 @@ import { z } from "zod";
 import { applyFieldConfigurationToResponse } from "../config/field-configuration.js";
 import { applyAiModePath } from "../api/path.js";
 import { makeApiRequest } from "../api/client.js";
+import { apiRequestMiddlewarePipeline } from "../middleware/api-request/api-request-middleware-pipeline.js";
 import { buildRequestBody, collectParam } from "../api/request-body.js";
 import { printError } from "../cli/error.js";
 import { printToolResult } from "../cli/output.js";
 import { DEFAULT_API_TOOL_ANNOTATIONS } from "./tool-annotations.js";
 import { BaseTool } from "./base-tool.js";
-import { bodyResult, errorResult } from "./types.js";
+import { bodyResult, errorResult, type ToolResult } from "./types.js";
 
 export const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE"] as const;
 export type HttpMethod = (typeof HTTP_METHODS)[number];
@@ -139,7 +140,7 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
   private async performRequest(
     input: ApiRequestMcpInput,
     options: { aiMode: boolean; params: Record<string, unknown> }
-  ) {
+  ): Promise<ToolResult> {
     const target = input.url ?? input.path;
     if (!target) {
       throw new Error("Either path or url is required.");
@@ -147,11 +148,16 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
 
     const requestPath = applyAiModePath(target, options.aiMode);
     const body = buildRequestBody(input.data, options.params);
+    const middlewareResult = apiRequestMiddlewarePipeline.apply({
+      method: input.method,
+      path: requestPath,
+      body,
+    });
 
     const response = await makeApiRequest({
       method: input.method,
       path: requestPath,
-      body,
+      body: middlewareResult.body,
       ...(this.authHeader ? { authHeader: this.authHeader } : {}),
     });
 
@@ -166,6 +172,20 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
       parsedBody = applyFieldConfigurationToResponse(parsedBody, requestPath);
     }
 
-    return bodyResult(parsedBody, response.status >= 400);
+    const result = bodyResult(parsedBody, response.status >= 400);
+    if (middlewareResult.warnings.length === 0) {
+      return result;
+    }
+
+    return {
+      ...result,
+      content: [
+        ...middlewareResult.warnings.map((text) => ({
+          type: "text" as const,
+          text,
+        })),
+        ...result.content,
+      ],
+    };
   }
 }

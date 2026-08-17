@@ -4,6 +4,7 @@ import { printError } from "../cli/error.js";
 import { printToolResult } from "../cli/output.js";
 import { fetchDocText } from "../docs/cache.js";
 import { docsCacheDirSchema } from "../docs/cache-options.js";
+import { docsMiddlewarePipeline } from "../middleware/docs/docs-middleware-pipeline.js";
 import { buildDocUrl } from "../docs/path.js";
 import { stripCodeExamples } from "../docs/strip-code-examples.js";
 import { BaseTool } from "./base-tool.js";
@@ -46,7 +47,9 @@ export class DocsSearchTool extends BaseTool<DocsSearchMcpInput> {
       content = stripCodeExamples(content);
     }
 
-    return textResult(content);
+    return textResult(
+      docsMiddlewarePipeline.apply({ docUrl, content }).content
+    );
   }
 
   async invokeCli(args: unknown) {
@@ -59,7 +62,10 @@ export class DocsSearchTool extends BaseTool<DocsSearchMcpInput> {
         content = stripCodeExamples(content);
       }
 
-      return textResult(content);
+      var middlewareResult = docsMiddlewarePipeline.apply({ docUrl, content });
+      return textResult(
+        middlewareResult.content
+      );
     } catch (error) {
       if (error instanceof z.ZodError) {
         const details = error.issues

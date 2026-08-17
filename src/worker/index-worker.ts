@@ -16,6 +16,7 @@ import {
   docsSearchTool,
 } from "../core/tools/index.js";
 import { ApiRequestTool } from "../core/tools/api-request-tool.js";
+import { McpServerInstructions } from "../mcp/instructions.js";
 import { buildToolDefinition, toMcpResponse } from "../mcp/tool-definition.js";
 import { name, version } from "./version.worker.js";
 
@@ -40,10 +41,16 @@ export class DataForSEOUniversalMcpAgent extends McpAgent<
   unknown,
   AuthProps
 > {
-  server = new McpServer({
-    name: SERVER_NAME,
-    version: SERVER_VERSION,
-  });
+  server = new McpServer(
+    {
+      name: SERVER_NAME,
+      version: SERVER_VERSION,
+    },
+    {
+      capabilities: { logging: {} },
+      instructions: McpServerInstructions.TEXT,
+    }
+  );
 
   constructor(ctx: DurableObjectState, protected env: Env) {
     super(ctx, env);
