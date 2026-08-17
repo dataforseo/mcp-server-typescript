@@ -18,11 +18,11 @@ export class LiveEndpointDocsMiddleware implements DocsMiddleware {
 
     return {
       content: [
+        ctx.content,
         "",
         "## Mandatory rules",
         "- Use only 1 task per request. For multiple tasks make separate requests.",
         "",
-        ctx.content.trimEnd(),
       ].join("\n"),
     };
   }

@@ -28,8 +28,8 @@ Run shell commands and read stdout/stderr. Always invoke the tool through the te
 
 | Mode | Preferred auth | Fallback |
 | ---- | -------------- | -------- |
-| HTTP MCP (default when no CLI command; or `npx dataforseo-mcp-server` with no args) | OAuth 2.0 Bearer via authorization server `https://data.dataforseo.com` (discovery at `/.well-known/oauth-protected-resource`) | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` in env |
-| MCP stdio (`--mode stdio`) | Env credentials (HTTP Basic) | — |
+| MCP stdio (default when no CLI command; or `npx dataforseo-mcp-server` with no args) | Env credentials (HTTP Basic) | — |
+| HTTP MCP (`--mode http`) | OAuth 2.0 Bearer via authorization server `https://data.dataforseo.com` (discovery at `/.well-known/oauth-protected-resource`) | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` in env |
 | CLI (`docs` / `request` / `--cli`) | Env credentials (HTTP Basic) | — |
 
 

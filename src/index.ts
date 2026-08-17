@@ -14,7 +14,7 @@ function parseRuntimeArgs(argv: string[]): {
   isCli: boolean;
   mode: "stdio" | "http";
 } {
-  let mode: "stdio" | "http" = "http";
+  let mode: "stdio" | "http" = "stdio";
 
   const modeIndex = argv.indexOf("--mode");
   if (modeIndex !== -1) {

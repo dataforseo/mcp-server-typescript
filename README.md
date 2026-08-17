@@ -2,14 +2,20 @@
 
 > **This is the new v3 MCP server.** The previous v2+ MCP server is **deprecated** and lives at [dataforseo/mcp-server-typescript-deprecated](https://github.com/dataforseo/mcp-server-typescript-deprecated).
 
-MCP server and CLI for LLM agents to browse DataForSEO API documentation and make authenticated API requests. By default the binary starts an MCP Streamable HTTP server; CLI commands are an optional second mode.
+MCP server and CLI for LLM agents to browse DataForSEO API documentation and make authenticated API requests. By default the binary starts an MCP server on stdio; CLI commands are an optional second mode.
 
 ## Quick Start
 
-Start the MCP server on Streamable HTTP (default mode, port 3000; override with `PORT`):
+Start the MCP server on stdio (default mode; set `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD`):
 
 ```bash
 npx dataforseo-mcp-server@latest
+```
+
+HTTP transport (port 3000; override with `PORT`):
+
+```bash
+npx dataforseo-mcp-server@latest --mode http
 ```
 
 ## Authentication
@@ -44,26 +50,26 @@ The same tool implementations power both the MCP server and the CLI. One binary 
 
 **How the binary chooses a mode:**
 
-- MCP HTTP — default when no CLI command is passed (Streamable HTTP on port 3000; override with `PORT`)
-- MCP stdio — pass `--mode stdio`
+- MCP stdio — default when no CLI command is passed
+- MCP HTTP — pass `--mode http` (Streamable HTTP on port 3000; override with `PORT`)
 - CLI — when the first command is `docs` or `request`, or when `--cli` / `--help` / `--version` is passed
 
-MCP HTTP (default):
+MCP stdio (default):
 ```bash
-npx dataforseo-mcp-server                    
+npx dataforseo-mcp-server
 ```
-MCP stdio:
+MCP HTTP:
 ```bash
-npx dataforseo-mcp-server --mode stdio             
+npx dataforseo-mcp-server --mode http
 ```
 CLI:
 ```bash
-npx dataforseo-mcp-server docs index             
+npx dataforseo-mcp-server docs index
 ```
 
 **MCP client config** (Cursor, Claude Desktop, and similar clients that use `mcpServers`):
 
-Via URL — use the hosted remote MCP server, or start a local server (`npx dataforseo-mcp-server`) and point the client at it. OAuth works out of the box; env credentials are optional fallback only.
+Via URL — use the hosted remote MCP server, or start a local HTTP server (`npx dataforseo-mcp-server --mode http`) and point the client at it. OAuth works out of the box; env credentials are optional fallback only.
 
 Remote MCP server: [https://data.dataforseo.com/v3](https://data.dataforseo.com/v3)
 
@@ -89,7 +95,7 @@ Local server (default port 3000):
 }
 ```
 
-Via `command` (stdio) — the client starts the binary itself; `--mode stdio` is required. OAuth is not used on this transport — set env credentials (or pass them in the MCP client `env` block):
+Via `command` (stdio) — the client starts the binary itself (stdio is the default mode). OAuth is not used on this transport — set env credentials (or pass them in the MCP client `env` block):
 
 ```jsonc
 {
@@ -98,8 +104,6 @@ Via `command` (stdio) — the client starts the binary itself; `--mode stdio` is
       "command": "npx",
       "args": [
         "dataforseo-mcp-server",
-        "--mode",
-        "stdio",
         // Optional additional args:
         // "--docs-cache-dir", "D:\\my-docs-cache",
         // "--configuration", "field-config.json"
@@ -122,7 +126,7 @@ From the repo root during development:
   "mcpServers": {
     "dataforseo": {
       "command": "npx",
-      "args": ["tsx", "src/index.ts", "--mode", "stdio"],
+      "args": ["tsx", "src/index.ts"],
       "cwd": "/path/to/mcp-server-typescript"
     }
   }
@@ -215,11 +219,11 @@ API responses are returned as the response body only (parsed JSON when possible)
 Optionally limit which fields are returned from API responses. Unlike the previous multi-tool MCP server (keys = tool names), this package keys the config by **API endpoint path**.
 
 ```bash
-# MCP HTTP (default when no CLI command is passed)
+# MCP stdio (default when no CLI command is passed)
 npx dataforseo-mcp-server --configuration field-config.json
 
-# MCP stdio
-npx dataforseo-mcp-server --mode stdio --configuration field-config.json
+# MCP HTTP
+npx dataforseo-mcp-server --mode http --configuration field-config.json
 
 # CLI
 npx dataforseo-mcp-server --configuration field-config.json request -X POST -p /v3/backlinks/summary/live --param target=example.com
@@ -259,7 +263,7 @@ cp field-config.example.json my-config.json
 
 ```
 src/
-├── index.ts            # Unified entry (MCP by default HTTP; CLI if docs/request/--cli)
+├── index.ts            # Unified entry (MCP by default stdio; CLI if docs/request/--cli)
 ├── config/             # URLs, sections, auth server
 ├── core/
 │   ├── api/            # auth, client, path, request-body
@@ -304,12 +308,12 @@ npm install
 npm run build
 
 # Dev (tsx, no build step)
-npm run dev:mcp:http     # MCP HTTP (default)
-npm run dev:mcp          # MCP stdio
+npm run dev              # MCP stdio (default)
+npm run dev:mcp:http     # MCP HTTP
 npm run dev -- docs index --section "SERP API"   # CLI
 
 # After build
-npm run start:mcp:http   # Streamable HTTP (same as: node dist/index.js)
-npm run start:mcp        # stdio
+npm run start            # MCP stdio (default)
+npm run start:mcp:http   # Streamable HTTP
 npx . docs index --list-sections
 ```
