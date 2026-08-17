@@ -1,6 +1,6 @@
 {
   "name": "dataforseo-mcp-server",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "CLI and MCP server for DataForSEO API — browse documentation and make authenticated API requests",
   "type": "module",
   "bin": {
