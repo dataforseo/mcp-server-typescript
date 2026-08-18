@@ -71,13 +71,13 @@ npx dataforseo-mcp-server docs index
 
 Via URL — use the hosted remote MCP server, or start a local HTTP server (`npx dataforseo-mcp-server --mode http`) and point the client at it. OAuth works out of the box; env credentials are optional fallback only.
 
-Remote MCP server: [https://data.dataforseo.com/v3](https://data.dataforseo.com/v3)
+Public remote MCP server URL: [https://mcp.dataforseo.com/v3/mcp](https://mcp.dataforseo.com/v3/mcp)
 
 ```json
 {
   "mcpServers": {
     "dataforseo": {
-      "url": "https://data.dataforseo.com/v3/mcp"
+      "url": "https://mcp.dataforseo.com/v3/mcp"
     }
   }
 }
