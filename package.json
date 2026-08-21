@@ -1,6 +1,6 @@
 {
   "name": "dataforseo-mcp-server",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "CLI and MCP server for DataForSEO API — browse documentation and make authenticated API requests",
   "type": "module",
   "bin": {
@@ -42,21 +42,21 @@
   ],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.4.0",
-    "agents": "^0.0.101",
-    "commander": "^12.1.0",
-    "express": "^4.18.2",
-    "wrangler": "^4.24.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "agents": "^0.21.0",
+    "commander": "^15.0.0",
+    "express": "^5.2.1",
+    "wrangler": "^4.125.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20251118.0",
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.20.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "@cloudflare/workers-types": "^5.20260821.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
   }
 }

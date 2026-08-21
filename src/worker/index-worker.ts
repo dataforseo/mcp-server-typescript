@@ -185,7 +185,7 @@ export default {
         authHeader: resolved.authHeader,
       };
 
-      // agents/mcp only calls DO._init(props) on the initialize request.
+      // agents/mcp only passes props when resolving the session agent.
       // Refresh auth on later requests so api_request uses the current Bearer.
       const sessionId = request.headers.get("mcp-session-id");
       if (sessionId) {
@@ -195,7 +195,7 @@ export default {
         const stub = env.MCP_OBJECT.get(
           doId
         ) as DurableObjectStub<DataForSEOUniversalMcpAgent>;
-        await stub._init({ authHeader: resolved.authHeader });
+        await stub.updateProps({ authHeader: resolved.authHeader });
       }
     }
 

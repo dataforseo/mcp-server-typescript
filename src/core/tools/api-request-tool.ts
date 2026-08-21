@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { z } from "zod";
+import { API_BASE_URL } from "../../config/index.js";
 import { applyFieldConfigurationToResponse } from "../config/field-configuration.js";
 import { applyAiModePath } from "../api/path.js";
 import { makeApiRequest } from "../api/client.js";
@@ -25,6 +26,13 @@ export const apiRequestMcpInputSchema = z.object({
     .any()
     .optional()
     .describe("Request body as JSON object or array of task objects"),
+  noAiMode: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      "Disable the .ai path suffix and return the full response schema instead of the AI-optimized subset. Can increase context size significantly. Default: false."
+    ),
 });
 
 export const apiRequestCliInputSchema = apiRequestMcpInputSchema.extend({
@@ -32,11 +40,6 @@ export const apiRequestCliInputSchema = apiRequestMcpInputSchema.extend({
     .record(z.string(), z.unknown())
     .optional()
     .describe("Request body fields merged into the first task object"),
-  aiMode: z
-    .boolean()
-    .optional()
-    .default(true)
-    .describe("Use .ai path suffix (default: true)"),
 });
 
 export type ApiRequestMcpInput = z.infer<typeof apiRequestMcpInputSchema>;
@@ -65,7 +68,7 @@ export class ApiRequestTool extends BaseTool<ApiRequestMcpInput> {
     try {
       const input = apiRequestCliInputSchema.parse(args);
       return await this.performRequest(input, {
-        aiMode: input.aiMode ?? true,
+        aiMode: !(input.noAiMode ?? true),
         params: input.params ?? {},
       });
     } catch (error) {
@@ -110,7 +113,10 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
         "-d, --data <json>",
         "Request body as JSON string (merged with --param; --param values override JSON)"
       )
-      .option("--no-ai-mode", "Use standard API path without .ai suffix")
+      .option(
+        "--no-ai-mode",
+        "Disable the .ai path suffix and return the full response schema instead of the AI-optimized subset. Can increase context size significantly."
+      )
       .action(
         async (options: {
           method: HttpMethod;
@@ -127,7 +133,7 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
               url: options.url,
               params: options.param,
               data: options.data,
-              aiMode: options.aiMode ?? true,
+              noAiMode: !(options.aiMode ?? true),
             });
             printToolResult(result);
           } catch (error) {
@@ -144,6 +150,12 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
     const target = input.url ?? input.path;
     if (!target) {
       throw new Error("Either path or url is required.");
+    }
+
+    if (target.startsWith("http") && !target.startsWith(`${API_BASE_URL}/`)) {
+      throw new Error(
+        `Domain does not match: only ${API_BASE_URL} requests are allowed, received ${target}`
+      );
     }
 
     const requestPath = applyAiModePath(target, options.aiMode);
