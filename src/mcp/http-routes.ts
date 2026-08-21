@@ -58,6 +58,12 @@ export function registerHttpRoutes(app: import("express").Express): void {
     });
   };
 
+  app.get("/health", (_req, res) => {
+    res.status(200).json({
+      status: "ok"
+    });
+  });
+
   app.post("/http", authMiddleware, handleStreamableRequest);
   app.post("/mcp", authMiddleware, handleStreamableRequest);
   app.get("/http", handleNotAllowed("GET HTTP"));
@@ -83,6 +89,7 @@ SUPPORTED TRANSPORT OPTIONS:
 
 Streamable HTTP (Protocol version: 2025-03-26)
 Endpoints: /http (POST), /mcp (POST)
+Health: /health (GET)
 ==============================================
 `);
 }
