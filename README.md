@@ -112,6 +112,7 @@ Via `command` (stdio) — the client starts the binary itself (stdio is the defa
         "DATAFORSEO_LOGIN": "your_api_login",
         "DATAFORSEO_PASSWORD": "your_api_password",
         // Optional additional env:
+        // "DATAFORSEO_FULL_RESPONSE": "true",
         // "FIELD_CONFIG_PATH": "field-config.json"
       }
     }
