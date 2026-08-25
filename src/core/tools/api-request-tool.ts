@@ -61,14 +61,13 @@ export class ApiRequestTool extends BaseTool<ApiRequestMcpInput> {
   }
 
   protected async execute(input: ApiRequestMcpInput) {
-    return this.performRequest(input, { aiMode: true, params: {} });
+    return this.performRequest(input, { params: {} });
   }
 
   async invokeCli(args: unknown) {
     try {
       const input = apiRequestCliInputSchema.parse(args);
       return await this.performRequest(input, {
-        aiMode: !(input.noAiMode ?? true),
         params: input.params ?? {},
       });
     } catch (error) {
@@ -145,7 +144,7 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
 
   private async performRequest(
     input: ApiRequestMcpInput,
-    options: { aiMode: boolean; params: Record<string, unknown> }
+    options: { params: Record<string, unknown> }
   ): Promise<ToolResult> {
     const target = input.url ?? input.path;
     if (!target) {
@@ -158,7 +157,7 @@ See SKILL.md in the project root for full LLM agent guide. Run commands with: np
       );
     }
 
-    const requestPath = applyAiModePath(target, options.aiMode);
+    const requestPath = applyAiModePath(target, !(input.noAiMode ?? false));
     const body = buildRequestBody(input.data, options.params);
     const middlewareResult = apiRequestMiddlewarePipeline.apply({
       method: input.method,

@@ -143,7 +143,7 @@ From the repo root during development:
 | `docs_search` | Docs Search | Fetch documentation from a documentation URL (`needCodeExample`, 24h cache) |
 | `api_request` | API Request | Make an authenticated API request |
 
-`api_request` uses `.ai` paths by default (no `aiMode` parameter). Request body is passed as `data` (JSON object or array). CLI-only options (`--param`, `--no-ai-mode`) are not exposed via MCP.
+`api_request` uses `.ai` paths by default. Set `noAiMode` to `true` in MCP requests, or pass `--no-ai-mode` in the CLI, to use the standard path. Request body is passed as `data` (JSON object or array). The `--param` option is CLI-only.
 
 ### HTTP transport
 
