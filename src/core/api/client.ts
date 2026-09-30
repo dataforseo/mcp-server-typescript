@@ -5,6 +5,7 @@ import {
   getCredentials,
   type Credentials,
 } from "./auth.js";
+import { resolveOutboundUserAgent } from "./user-agent.js";
 
 export interface ApiRequestOptions {
   method: string;
@@ -33,7 +34,7 @@ export async function makeApiRequest(
 
   const headers: Record<string, string> = {
     Authorization: authorization,
-    "User-Agent": getUserAgent(),
+    "User-Agent": resolveOutboundUserAgent(getUserAgent()),
   };
 
   const method = options.method.toUpperCase();

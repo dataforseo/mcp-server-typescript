@@ -16,6 +16,10 @@ import {
   docsSearchTool,
 } from "../core/tools/index.js";
 import { ApiRequestTool } from "../core/tools/api-request-tool.js";
+import {
+  clientUserAgentFromExtra,
+  runWithClientUserAgent,
+} from "../core/api/user-agent.js";
 import { McpServerInstructions } from "../mcp/instructions.js";
 import { buildToolDefinition, toMcpResponse } from "../mcp/tool-definition.js";
 import { name, version } from "./version.worker.js";
@@ -73,11 +77,13 @@ export class DataForSEOUniversalMcpAgent extends McpAgent<
 
     const apiDefinition = buildToolDefinition(apiRequestTool);
     const apiSchema = z.object(apiDefinition.params);
-    this.server.tool(apiRequestTool.name, apiSchema.shape, async (args) => {
-      const authHeader = this.props?.authHeader;
-      const tool = new ApiRequestTool(authHeader);
-      return toMcpResponse(await tool.invoke(args));
-    });
+    this.server.tool(apiRequestTool.name, apiSchema.shape, (args, extra) =>
+      runWithClientUserAgent(clientUserAgentFromExtra(extra), async () => {
+        const authHeader = this.props?.authHeader;
+        const tool = new ApiRequestTool(authHeader);
+        return toMcpResponse(await tool.invoke(args));
+      })
+    );
   }
 }
 

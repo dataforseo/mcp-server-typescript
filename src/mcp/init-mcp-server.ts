@@ -29,7 +29,7 @@ export function initMcpServer(tools: BaseTool<unknown>[]): McpServer {
         inputSchema: schema.shape,
         annotations: tool.annotations,
       },
-      (args) => tool.handler(args)
+      (args, extra) => tool.handler(args, extra)
     );
   }
 
