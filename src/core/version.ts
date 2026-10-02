@@ -51,7 +51,7 @@ export function getPackageName(): string {
 }
 
 export function getUserAgent(): string {
-  return `DataForSEO-MCP-Server-${getPackageVersion()}`;
+  return `DataForSEO-MCP-Server/${getPackageVersion()}`;
 }
 
 /** @deprecated Prefer getPackageVersion() for Worker-safe lazy resolution. */
