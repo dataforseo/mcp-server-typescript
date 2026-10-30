@@ -14,6 +14,13 @@ export function initMcpServer(tools: BaseTool<unknown>[]): McpServer {
     {
       capabilities: { logging: {} },
       instructions: McpServerInstructions.TEXT,
+      // Counts array elements and object members across the whole tools/call
+      // arguments object before any tool schema is walked. The heaviest request
+      // this server forwards is a bulk POST of 100 tasks (the DataForSEO API
+      // limit), a few thousand elements at most; 10,000 leaves several times
+      // that headroom while staying far below the element count a 100 KB JSON
+      // body can pack (2-byte elements alone reach ~51,000 in 100 KB).
+      maxToolInputElements: 10_000,
     }
   );
 
